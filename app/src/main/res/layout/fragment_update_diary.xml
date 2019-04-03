@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/fragment_update_diary">
+    <TextView
+        android:id="@+id/update_diary_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/update_diary"
+        android:textAppearance="?android:textAppearanceLarge"/>
+    <Button
+        android:id="@+id/removeDiary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/update_diary_title"
+        android:text="-"/>
+
+    <EditText
+        android:id="@+id/update_diary_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/removeDiary"
+        android:inputType="text"
+        android:hint="@string/name">
+    </EditText>
+
+    <EditText
+        android:id="@+id/update_diary_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="date"
+        android:layout_below="@id/update_diary_name"
+        android:hint="@string/start"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancelUpdateDiary"
+        android:text="@string/cancel"
+        android:layout_below="@id/update_diary_start"
+        android:layout_toLeftOf="@id/okUpdateDiary"
+        android:layout_toStartOf="@id/okUpdateDiary" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/okUpdateDiary"
+        android:text="@string/save"
+        android:layout_below="@id/update_diary_start"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

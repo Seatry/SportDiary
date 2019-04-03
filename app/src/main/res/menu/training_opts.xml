@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/trainingExercises"
+        android:title="@string/Exercises" />
+    <item
+        android:id="@+id/trainingUpdate"
+        android:title="@string/update" />
+
+    <item
+        android:id="@+id/trainingDelete"
+        android:title="@string/delete" />
+
+</menu>

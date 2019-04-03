@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/fragment_add_edit">
+    <TextView
+        android:id="@+id/add_edit_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceLarge"/>
+
+    <EditText
+        android:id="@+id/add_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/add_edit_title"
+        android:inputType="text"
+        android:hint="@string/name">
+    </EditText>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancelAddButton"
+        android:text="@string/cancel"
+        android:layout_below="@id/add_edit_text"
+        android:layout_toLeftOf="@id/okAddButton"
+        android:layout_toStartOf="@id/okAddButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/okAddButton"
+        android:text="@string/add"
+        android:layout_below="@id/add_edit_text"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

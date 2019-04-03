@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_ex"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/Exercises"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_zone"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/Zones"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_aim"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/aims"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_equipment"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/equipment"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_time"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/times"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_training_place"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/training_places"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_borg"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/borg_ratings"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_style"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/styles"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_tempo"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/tempos"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+    </group>
+
+        <item
+            android:id="@+id/diaries"
+            android:title="@string/diaries"
+            android:orderInCategory="0">
+            <menu
+                android:id="@+id/diaryMenu">
+                <item
+                    android:id="@+id/nav_add"
+                    android:icon="@drawable/ic_menu_send"
+                    android:title="@string/add"
+                    android:orderInCategory="2" />
+            </menu>
+        </item>
+
+</menu>

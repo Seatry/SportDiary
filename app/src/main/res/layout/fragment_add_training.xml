@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_add_training">
+
+    <TextView
+        android:id="@+id/trainingTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <LinearLayout
+        android:id="@+id/timeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/trainingTitle">
+        <TextView
+            android:text="@string/time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <Spinner
+            android:id="@+id/timeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/trainingPlaceLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/timeLayout">
+        <TextView
+            android:text="@string/training_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/trainingPlaceSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/aimLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trainingPlaceLayout"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/aims"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <com.example.alexander.sportdiary.Utils.MultiSelectionSpinner
+            android:id="@+id/aimSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/equipmentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/aimLayout"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/equipment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <com.example.alexander.sportdiary.Utils.MultiSelectionSpinner
+            android:id="@+id/equipmentSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/BorgLayout"
+        android:layout_below="@+id/equipmentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/borg_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/borgRatingSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancelAddTraining"
+        android:text="@string/cancel"
+        android:layout_below="@id/BorgLayout"
+        android:layout_toLeftOf="@id/okAddTraining"
+        android:layout_toStartOf="@id/okAddTraining" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/okAddTraining"
+        android:text="@string/add"
+        android:layout_below="@id/BorgLayout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>
