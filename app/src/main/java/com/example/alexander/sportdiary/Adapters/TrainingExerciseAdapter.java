@@ -91,10 +91,10 @@ public class TrainingExerciseAdapter extends RecyclerView.Adapter<TrainingExerci
     }
 
     private void setViewHolderData(TrainingExercise trainingExercise, TrainingExerciseViewHolder viewHolder) {
-        String exercise = sportDataBase.exerciseDao().getNameById(trainingExercise.getExerciseId());
-        String style = sportDataBase.styleDao().getNameById(trainingExercise.getStyleId());
-        String tempo = sportDataBase.tempoDao().getNameById(trainingExercise.getTempoId());
-        String zone = sportDataBase.zoneDao().getNameById(trainingExercise.getZoneId());
+        String exercise = trainingExercise.getExerciseId() == null ? "" : sportDataBase.exerciseDao().getNameById(trainingExercise.getExerciseId());
+        String style = trainingExercise.getStyleId() == null ? "" : sportDataBase.styleDao().getNameById(trainingExercise.getStyleId());
+        String tempo = trainingExercise.getTempoId() == null ? "" : sportDataBase.tempoDao().getNameById(trainingExercise.getTempoId());
+        String zone = trainingExercise.getZoneId() == null ? "" : sportDataBase.zoneDao().getNameById(trainingExercise.getZoneId());
         int work = trainingExercise.getWork();
         int rest = trainingExercise.getRest();
         String workToRest = String.valueOf(work) + ":" + String.valueOf(rest);
@@ -103,7 +103,7 @@ public class TrainingExerciseAdapter extends RecyclerView.Adapter<TrainingExerci
         int length = trainingExercise.getLength();
         String capacity = String.valueOf(series) + "x" + String.valueOf(repeats) + "x" + String.valueOf(length);
         String time = String.valueOf(trainingExercise.getMinutes());
-        String borg = sportDataBase.borgDao().getNameById(trainingExercise.getBorgId());
+        String borg = trainingExercise.getBorgId() == null ? "" : sportDataBase.borgDao().getNameById(trainingExercise.getBorgId());
         String note = trainingExercise.getNote();
         viewHolder.setData(exercise, style, tempo, zone, workToRest, capacity, time, borg, note);
     }

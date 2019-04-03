@@ -22,6 +22,8 @@ import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.EditOption;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.Training;
+import com.example.alexander.sportdiary.Entities.TrainingsToAims;
+import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.SportDataBase;
@@ -162,6 +164,20 @@ public class DayFragment extends Fragment {
                 @Override
                 public void onChanged(@Nullable List<Training> elems) {
                     adapter.setTrainings(elems);
+                    adapter.notifyDataSetChanged();
+                }
+            });
+            LiveData<List<TrainingsToAims>> trainingsToAims = sportDataBase.trainingsToAimsDao().getAll();
+            trainingsToAims.observe(MainActivity.getInstance(), new Observer<List<TrainingsToAims>>() {
+                @Override
+                public void onChanged(@Nullable List<TrainingsToAims> trainingsToAims) {
+                    adapter.notifyDataSetChanged();
+                }
+            });
+            LiveData<List<TrainingsToEquipments>> trainingsToEquipments = sportDataBase.trainingsToEquipmentsDao().getAll();
+            trainingsToEquipments.observe(MainActivity.getInstance(), new Observer<List<TrainingsToEquipments>>() {
+                @Override
+                public void onChanged(@Nullable List<TrainingsToEquipments> trainingsToEquipments) {
                     adapter.notifyDataSetChanged();
                 }
             });

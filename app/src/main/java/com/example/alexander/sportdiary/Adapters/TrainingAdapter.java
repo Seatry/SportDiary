@@ -96,19 +96,25 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingViewHolder> {
     }
 
     private void setViewHolderData(Training training, TrainingViewHolder viewHolder) {
-        String time = sportDataBase.timeDao().getNameById(training.getTimeId());
-        String place = sportDataBase.trainingPlaceDao().getNameById(training.getPlaceId());
+        String time = training.getTimeId() == null ? "" : sportDataBase.timeDao().getNameById(training.getTimeId());
+        String place = training.getPlaceId() == null ? "" : sportDataBase.trainingPlaceDao().getNameById(training.getPlaceId());
         StringBuilder aims = new StringBuilder();
         for(long aimId : sportDataBase.trainingsToAimsDao().getAimIdsByTrainingId(training.getId())) {
             aims.append(sportDataBase.aimDao().getNameById(aimId)).append(", ");
         }
-        aims.deleteCharAt(aims.length()-1);
+        if(aims.length() > 1) {
+            aims.deleteCharAt(aims.length() - 1);
+            aims.deleteCharAt(aims.length() - 1);
+        }
         StringBuilder equipments = new StringBuilder();
         for(long eqId : sportDataBase.trainingsToEquipmentsDao().getEquipmentIdsByTrainingId(training.getId())) {
             equipments.append(sportDataBase.equipmentDao().getNameById(eqId)).append(", ");
         }
-        equipments.deleteCharAt(equipments.length()-1);
-        String borgs = sportDataBase.borgDao().getNameById(training.getBorgId());
+        if(equipments.length() > 1) {
+            equipments.deleteCharAt(equipments.length()-1);
+            equipments.deleteCharAt(equipments.length()-1);
+        }
+        String borgs = training.getBorgId() == null ? "" : sportDataBase.borgDao().getNameById(training.getBorgId());
         viewHolder.setData(time, place, aims.toString(), equipments.toString(), borgs, String.valueOf(training.getCapacity()));
     }
 

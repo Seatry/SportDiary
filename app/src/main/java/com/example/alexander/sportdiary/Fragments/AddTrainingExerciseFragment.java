@@ -24,7 +24,7 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
     private long trainingId;
     private String title;
     private EditOption option;
-    private TrainingExercise updateTrainingExercise;
+    private TrainingExercise updateTrainingExercise = new TrainingExercise();
     private Spinner exerciseSpinner;
     private Spinner styleSpinner;
     private Spinner tempoSpinner;
@@ -61,25 +61,27 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
         borgSpinner = v.findViewById(R.id.borgExerciseSpinner);
         noteEdit = v.findViewById(R.id.noteEdit);
 
-        toolSpinner(sportDataBase.exerciseDao(), exerciseSpinner);
-        toolSpinner(sportDataBase.styleDao(), styleSpinner);
-        toolSpinner(sportDataBase.tempoDao(), tempoSpinner);
-        toolSpinner(sportDataBase.zoneDao(), zoneSpinner);
-        toolSpinner(sportDataBase.borgDao(), borgSpinner);
+        toolSpinner(sportDataBase.exerciseDao(), exerciseSpinner, sportDataBase.exerciseDao().getNameById(updateTrainingExercise.getExerciseId()));
+        toolSpinner(sportDataBase.styleDao(), styleSpinner, sportDataBase.styleDao().getNameById(updateTrainingExercise.getStyleId()));
+        toolSpinner(sportDataBase.tempoDao(), tempoSpinner, sportDataBase.tempoDao().getNameById(updateTrainingExercise.getTempoId()));
+        toolSpinner(sportDataBase.zoneDao(), zoneSpinner, sportDataBase.zoneDao().getNameById(updateTrainingExercise.getZoneId()));
+        toolSpinner(sportDataBase.borgDao(), borgSpinner, sportDataBase.borgDao().getNameById(updateTrainingExercise.getBorgId()));
+
+        if (option == EditOption.UPDATE) {
+            fillEdits();
+        }
 
         return v;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Dialog dialog = getDialog();
-        if (dialog != null)
-        {
-            int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = ViewGroup.LayoutParams.MATCH_PARENT;
-            dialog.getWindow().setLayout(width, height);
-        }
+    private void fillEdits() {
+        workEdit.setText(String.valueOf(updateTrainingExercise.getWork()));
+        restEdit.setText(String.valueOf(updateTrainingExercise.getRest()));
+        seriesEdit.setText(String.valueOf(updateTrainingExercise.getSeries()));
+        repeatsEdit.setText(String.valueOf(updateTrainingExercise.getRepeats()));
+        lengthEdit.setText(String.valueOf(updateTrainingExercise.getLength()));
+        timeEdit.setText(String.valueOf(updateTrainingExercise.getMinutes()));
+        noteEdit.setText(updateTrainingExercise.getNote());
     }
 
     @Override
@@ -113,29 +115,39 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
     }
 
     public void add() {
-        long exerciseId = sportDataBase.exerciseDao().getIdByName(exerciseSpinner.getSelectedItem().toString());
-        long styleId = sportDataBase.styleDao().getIdByName(styleSpinner.getSelectedItem().toString());
-        long tempoId = sportDataBase.tempoDao().getIdByName(tempoSpinner.getSelectedItem().toString());
-        long zoneId = sportDataBase.zoneDao().getIdByName(zoneSpinner.getSelectedItem().toString());
-        long borgId = sportDataBase.borgDao().getIdByName(borgSpinner.getSelectedItem().toString());
-        int work = Integer.parseInt(workEdit.getText().toString());
-        int rest = Integer.parseInt(restEdit.getText().toString());
-        int length = Integer.parseInt(lengthEdit.getText().toString());
-        int repeats = Integer.parseInt(repeatsEdit.getText().toString());
-        int series = Integer.parseInt(seriesEdit.getText().toString());
+        Long exerciseId = exerciseSpinner.getSelectedItem() == null ? null
+                : sportDataBase.exerciseDao().getIdByName(exerciseSpinner.getSelectedItem().toString());
+        Long styleId = styleSpinner.getSelectedItem() == null ? null
+                : sportDataBase.styleDao().getIdByName(styleSpinner.getSelectedItem().toString());
+        Long tempoId = tempoSpinner.getSelectedItem() == null ? null
+                : sportDataBase.tempoDao().getIdByName(tempoSpinner.getSelectedItem().toString());
+        Long zoneId = zoneSpinner.getSelectedItem() == null ? null
+                : sportDataBase.zoneDao().getIdByName(zoneSpinner.getSelectedItem().toString());
+        Long borgId = borgSpinner.getSelectedItem() == null ? null
+                : sportDataBase.borgDao().getIdByName(borgSpinner.getSelectedItem().toString());
+        int work = workEdit.getText().length() == 0 ? 1 : Integer.parseInt(workEdit.getText().toString());
+        int rest = restEdit.getText().length() == 0 ? 1 : Integer.parseInt(restEdit.getText().toString());
+        int length = lengthEdit.getText().length() == 0 ? 0 : Integer.parseInt(lengthEdit.getText().toString());
+        int repeats = repeatsEdit.getText().length() == 0 ? 0 : Integer.parseInt(repeatsEdit.getText().toString());
+        int series = seriesEdit.getText().length() == 0 ? 0 : Integer.parseInt(seriesEdit.getText().toString());
         String note = noteEdit.getText().toString();
-        int minutes = Integer.parseInt(timeEdit.getText().toString());
+        int minutes = timeEdit.getText().length() == 0 ? 0 : Integer.parseInt(timeEdit.getText().toString());
         TrainingExercise trainingExercise = new TrainingExercise(trainingId, exerciseId, styleId, tempoId, zoneId,
                 borgId, work, rest, length, repeats, series, note, minutes);
         sportDataBase.trainingExerciseDao().insert(trainingExercise);
     }
 
     public void update() {
-        long exerciseId = sportDataBase.exerciseDao().getIdByName(exerciseSpinner.getSelectedItem().toString());
-        long styleId = sportDataBase.styleDao().getIdByName(styleSpinner.getSelectedItem().toString());
-        long tempoId = sportDataBase.tempoDao().getIdByName(tempoSpinner.getSelectedItem().toString());
-        long zoneId = sportDataBase.zoneDao().getIdByName(zoneSpinner.getSelectedItem().toString());
-        long borgId = sportDataBase.borgDao().getIdByName(borgSpinner.getSelectedItem().toString());
+        Long exerciseId = exerciseSpinner.getSelectedItem() == null ? null
+                : sportDataBase.exerciseDao().getIdByName(exerciseSpinner.getSelectedItem().toString());
+        Long styleId = styleSpinner.getSelectedItem() == null ? null
+                : sportDataBase.styleDao().getIdByName(styleSpinner.getSelectedItem().toString());
+        Long tempoId = tempoSpinner.getSelectedItem() == null ? null
+                : sportDataBase.tempoDao().getIdByName(tempoSpinner.getSelectedItem().toString());
+        Long zoneId = zoneSpinner.getSelectedItem() == null ? null
+                : sportDataBase.zoneDao().getIdByName(zoneSpinner.getSelectedItem().toString());
+        Long borgId = borgSpinner.getSelectedItem() == null ? null
+                : sportDataBase.borgDao().getIdByName(borgSpinner.getSelectedItem().toString());
         int work = Integer.parseInt(workEdit.getText().toString());
         int rest = Integer.parseInt(restEdit.getText().toString());
         int length = Integer.parseInt(lengthEdit.getText().toString());

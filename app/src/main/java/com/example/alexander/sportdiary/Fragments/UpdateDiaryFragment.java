@@ -22,12 +22,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
+
 public class UpdateDiaryFragment extends DialogFragment implements View.OnClickListener {
     private EditText editNameText;
     private EditText editStartText;
     private int id;
     private Menu menu;
     private SeasonPlanDao dao;
+    private SeasonPlan seasonPlan;
 
     public void setItemId(int id) {
         this.id = id;
@@ -46,6 +49,11 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         MenuItem diaryItem = navigationView.getMenu().findItem(R.id.diaries);
         menu = diaryItem.getSubMenu();
         dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
+
+        seasonPlan = dao.getSeasonPlanById(id);
+        editNameText.setText(seasonPlan.getName());
+        editStartText.setText(sdf.format(seasonPlan.getStart()));
+
         return v;
     }
 
@@ -65,7 +73,6 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
 
     public void update() {
 
-        SeasonPlan seasonPlan = dao.getSeasonPlanById(id);
         try {
             seasonPlan.setName(editNameText.getText().toString());
             String dateText = editStartText.getText().toString();

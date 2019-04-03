@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.Nullable;
 
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
@@ -29,14 +30,17 @@ public class Training {
     @ColumnInfo(name = "day_id")
     private long dayId;
 
+    @Nullable
     @ColumnInfo(name = "time_id")
-    private long timeId;
+    private Long timeId;
 
+    @Nullable
     @ColumnInfo(name = "place_id")
-    private long placeId;
+    private Long placeId;
 
+    @Nullable
     @ColumnInfo(name = "borg_id")
-    private long borgId;
+    private Long borgId;
 
     private int capacity = 0;
 
@@ -44,7 +48,7 @@ public class Training {
 
     }
 
-    public Training(long dayId, long timeId, long placeId, long borgId) {
+    public Training(long dayId, @Nullable Long timeId, @Nullable Long placeId, @Nullable Long borgId) {
         this.dayId = dayId;
         this.timeId = timeId;
         this.placeId = placeId;
@@ -67,27 +71,30 @@ public class Training {
         this.dayId = dayId;
     }
 
-    public long getTimeId() {
+    @Nullable
+    public Long getTimeId() {
         return timeId;
     }
 
-    public void setTimeId(long timeId) {
+    public void setTimeId(@Nullable Long timeId) {
         this.timeId = timeId;
     }
 
-    public long getPlaceId() {
+    @Nullable
+    public Long getPlaceId() {
         return placeId;
     }
 
-    public void setPlaceId(long placeId) {
+    public void setPlaceId(@Nullable Long placeId) {
         this.placeId = placeId;
     }
 
-    public long getBorgId() {
+    @Nullable
+    public Long getBorgId() {
         return borgId;
     }
 
-    public void setBorgId(long borgId) {
+    public void setBorgId(@Nullable Long borgId) {
         this.borgId = borgId;
     }
 

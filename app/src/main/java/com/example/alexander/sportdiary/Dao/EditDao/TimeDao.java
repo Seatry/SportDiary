@@ -20,5 +20,5 @@ public interface TimeDao extends EditDao<Time>{
     long getIdByName(String name);
 
     @Query("SELECT name FROM Time where id = :id")
-    String getNameById(long id);
+    String getNameById(Long id);
 }

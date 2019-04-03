@@ -23,5 +23,5 @@ public interface TrainingPlaceDao extends EditDao<TrainingPlace> {
     long getIdByName(String name);
 
     @Query("SELECT name FROM TrainingPlace where id = :id")
-    String getNameById(long id);
+    String getNameById(Long id);
 }

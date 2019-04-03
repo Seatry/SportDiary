@@ -14,7 +14,7 @@ public interface ExerciseDao extends EditDao<Exercise> {
     LiveData<List<Exercise>> getAll();
 
     @Query("SELECT name FROM Exercise where id = :id")
-    String getNameById(long id);
+    String getNameById(Long id);
 
     @Query("SELECT name FROM Exercise")
     List<String> getAllNames();

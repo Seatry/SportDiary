@@ -63,6 +63,7 @@ public class MultiSelectionSpinner extends android.support.v7.widget.AppCompatSp
 
     @Override
     public boolean performClick() {
+        if (_items == null) return true;
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.select);
         builder.setMultiChoiceItems(_items, mSelection, this);
@@ -184,6 +185,9 @@ public class MultiSelectionSpinner extends android.support.v7.widget.AppCompatSp
 
     public List<String> getSelectedStrings() {
         List<String> selection = new LinkedList<>();
+        if (_items == null) {
+            return selection;
+        }
         for (int i = 0; i < _items.length; ++i) {
             if (mSelection[i]) {
                 selection.add(_items[i]);

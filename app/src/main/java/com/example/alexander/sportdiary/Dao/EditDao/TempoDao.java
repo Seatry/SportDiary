@@ -14,7 +14,7 @@ public interface TempoDao extends EditDao<Tempo> {
     LiveData<List<Tempo>> getAll();
 
     @Query("SELECT name FROM Tempo where id = :id")
-    String getNameById(long id);
+    String getNameById(Long id);
 
     @Query("SELECT name FROM Tempo")
     List<String> getAllNames();

@@ -15,7 +15,7 @@ public interface ZoneDao extends EditDao<Zone> {
     LiveData<List<Zone>> getAll();
 
     @Query("SELECT name FROM Zone where id = :id")
-    String getNameById(long id);
+    String getNameById(Long id);
 
     @Query("SELECT name FROM Zone")
     List<String> getAllNames();

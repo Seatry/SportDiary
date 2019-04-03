@@ -14,7 +14,7 @@ public interface StyleDao extends EditDao<Style> {
     LiveData<List<Style>> getAll();
 
     @Query("SELECT name FROM Style where id = :id")
-    String getNameById(long id);
+    String getNameById(Long id);
 
     @Query("SELECT name FROM Style")
     List<String> getAllNames();

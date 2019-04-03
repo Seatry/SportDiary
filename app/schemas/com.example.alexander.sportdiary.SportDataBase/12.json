@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 12,
-    "identityHash": "570529d5a61ff6c713239b074a80ad5d",
+    "identityHash": "3f865ebee95f05eb527fdeb7349f2490",
     "entities": [
       {
         "tableName": "Exercise",
@@ -532,7 +532,7 @@
       },
       {
         "tableName": "Training",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `day_id` INTEGER NOT NULL, `time_id` INTEGER NOT NULL, `place_id` INTEGER NOT NULL, `borg_id` INTEGER NOT NULL, `capacity` INTEGER NOT NULL, FOREIGN KEY(`day_id`) REFERENCES `Day`(`id`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`time_id`) REFERENCES `Time`(`id`) ON UPDATE CASCADE ON DELETE SET NULL , FOREIGN KEY(`place_id`) REFERENCES `TrainingPlace`(`id`) ON UPDATE CASCADE ON DELETE SET NULL , FOREIGN KEY(`borg_id`) REFERENCES `Borg`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `day_id` INTEGER NOT NULL, `time_id` INTEGER, `place_id` INTEGER NOT NULL, `borg_id` INTEGER NOT NULL, `capacity` INTEGER NOT NULL, FOREIGN KEY(`day_id`) REFERENCES `Day`(`id`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`time_id`) REFERENCES `Time`(`id`) ON UPDATE CASCADE ON DELETE SET NULL , FOREIGN KEY(`place_id`) REFERENCES `TrainingPlace`(`id`) ON UPDATE CASCADE ON DELETE SET NULL , FOREIGN KEY(`borg_id`) REFERENCES `Borg`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "id",
@@ -550,7 +550,7 @@
             "fieldPath": "timeId",
             "columnName": "time_id",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "placeId",
@@ -788,7 +788,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"570529d5a61ff6c713239b074a80ad5d\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"3f865ebee95f05eb527fdeb7349f2490\")"
     ]
   }
 }

@@ -1,19 +1,15 @@
 package com.example.alexander.sportdiary.Fragments;
 
-import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
 import com.example.alexander.sportdiary.EditOption;
-import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
@@ -22,6 +18,7 @@ import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.SportDataBase;
 import com.example.alexander.sportdiary.Utils.MultiSelectionSpinner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.alexander.sportdiary.Utils.ToolerOfSpinners.toolMultiSpinner;
@@ -38,7 +35,7 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
     private long dayId;
     private String title;
     private EditOption option;
-    private Training training;
+    private Training updateTraining = new Training();
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -54,25 +51,43 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
         aimSpinner = v.findViewById(R.id.aimSpinner);
         equipmentSpinner = v.findViewById(R.id.equipmentSpinner);
 
-        toolSpinner(sportDataBase.timeDao(), timeSpinner);
-        toolSpinner(sportDataBase.trainingPlaceDao(), trainingPlaceSpinner);
-        toolSpinner(sportDataBase.borgDao(), borgRatingSpinner);
-        toolMultiSpinner(sportDataBase.aimDao(), aimSpinner, this);
-        toolMultiSpinner(sportDataBase.equipmentDao(), equipmentSpinner, this);
+        toolSpinner(sportDataBase.timeDao(), timeSpinner, sportDataBase.timeDao().getNameById(updateTraining.getTimeId()));
+        toolSpinner(sportDataBase.trainingPlaceDao(), trainingPlaceSpinner, sportDataBase.trainingPlaceDao().getNameById(updateTraining.getPlaceId()));
+        toolSpinner(sportDataBase.borgDao(), borgRatingSpinner, sportDataBase.borgDao().getNameById(updateTraining.getBorgId()));
+        toolMultiSpinner(sportDataBase.aimDao(), aimSpinner, this, getSelectedAims());
+        toolMultiSpinner(sportDataBase.equipmentDao(), equipmentSpinner, this, getSelectedEquipments());
 
         return v;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Dialog dialog = getDialog();
-        if (dialog != null)
-        {
-            int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = ViewGroup.LayoutParams.MATCH_PARENT;
-            dialog.getWindow().setLayout(width, height);
+    private List<String> getSelectedAims() {
+        if (option == EditOption.UPDATE) {
+            List<Long> aimIds = sportDataBase.trainingsToAimsDao().getAimIdsByTrainingId(updateTraining.getId());
+            if (aimIds.size() == 0) {
+                return null;
+            }
+            List<String> aims = new ArrayList<>();
+            for (long id : aimIds) {
+                aims.add(sportDataBase.aimDao().getNameById(id));
+            }
+            return aims;
         }
+        return null;
+    }
+
+    private List<String> getSelectedEquipments() {
+        if (option == EditOption.UPDATE) {
+            List<Long> equipmentIds = sportDataBase.trainingsToEquipmentsDao().getEquipmentIdsByTrainingId(updateTraining.getId());
+            if (equipmentIds.size() == 0) {
+                return null;
+            }
+            List<String> equipments = new ArrayList<>();
+            for (long id : equipmentIds) {
+                equipments.add(sportDataBase.equipmentDao().getNameById(id));
+            }
+            return equipments;
+        }
+        return null;
     }
 
     @Override
@@ -106,32 +121,38 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
     }
 
     public void update() {
-        long timeId = sportDataBase.timeDao().getIdByName(timeSpinner.getSelectedItem().toString());
-        long trainingPlaceId = sportDataBase.trainingPlaceDao().getIdByName(trainingPlaceSpinner.getSelectedItem().toString());
-        long borgRatingId = sportDataBase.borgDao().getIdByName(borgRatingSpinner.getSelectedItem().toString());
-        training.setTimeId(timeId);
-        training.setPlaceId(trainingPlaceId);
-        training.setBorgId(borgRatingId);
-        sportDataBase.trainingDao().update(training);
+        Long timeId = timeSpinner.getSelectedItem() == null ? null :
+                sportDataBase.timeDao().getIdByName(timeSpinner.getSelectedItem().toString());
+        Long trainingPlaceId = trainingPlaceSpinner.getSelectedItem() == null ? null
+                : sportDataBase.trainingPlaceDao().getIdByName(trainingPlaceSpinner.getSelectedItem().toString());
+        Long borgRatingId = borgRatingSpinner.getSelectedItem() == null ? null
+                : sportDataBase.borgDao().getIdByName(borgRatingSpinner.getSelectedItem().toString());
+        updateTraining.setTimeId(timeId);
+        updateTraining.setPlaceId(trainingPlaceId);
+        updateTraining.setBorgId(borgRatingId);
+        sportDataBase.trainingDao().update(updateTraining);
 
         List<String> aimNames = aimSpinner.getSelectedStrings();
         List<String> equipmentNames = equipmentSpinner.getSelectedStrings();
-        sportDataBase.trainingsToAimsDao().deleteByTrainingId(training.getId());
-        sportDataBase.trainingsToEquipmentsDao().deleteByTrainingId(training.getId());
+        sportDataBase.trainingsToAimsDao().deleteByTrainingId(updateTraining.getId());
+        sportDataBase.trainingsToEquipmentsDao().deleteByTrainingId(updateTraining.getId());
         for(String aimName : aimNames) {
             long aimId = sportDataBase.aimDao().getIdByName(aimName);
-            sportDataBase.trainingsToAimsDao().insert(new TrainingsToAims(training.getId(), aimId));
+            sportDataBase.trainingsToAimsDao().insert(new TrainingsToAims(updateTraining.getId(), aimId));
         }
         for(String equipmentName : equipmentNames) {
             long equipmentId = sportDataBase.equipmentDao().getIdByName(equipmentName);
-            sportDataBase.trainingsToEquipmentsDao().insert(new TrainingsToEquipments(training.getId(), equipmentId));
+            sportDataBase.trainingsToEquipmentsDao().insert(new TrainingsToEquipments(updateTraining.getId(), equipmentId));
         }
     }
 
     public void add() {
-        long timeId = sportDataBase.timeDao().getIdByName(timeSpinner.getSelectedItem().toString());
-        long trainingPlaceId = sportDataBase.trainingPlaceDao().getIdByName(trainingPlaceSpinner.getSelectedItem().toString());
-        long borgRatingId = sportDataBase.borgDao().getIdByName(borgRatingSpinner.getSelectedItem().toString());
+        Long timeId = timeSpinner.getSelectedItem() == null ? null :
+                sportDataBase.timeDao().getIdByName(timeSpinner.getSelectedItem().toString());
+        Long trainingPlaceId = trainingPlaceSpinner.getSelectedItem() == null ? null
+                : sportDataBase.trainingPlaceDao().getIdByName(trainingPlaceSpinner.getSelectedItem().toString());
+        Long borgRatingId = borgRatingSpinner.getSelectedItem() == null ? null
+                : sportDataBase.borgDao().getIdByName(borgRatingSpinner.getSelectedItem().toString());
         Training training = new Training(dayId, timeId, trainingPlaceId, borgRatingId);
         long trainingId = sportDataBase.trainingDao().insert(training);
 
@@ -173,7 +194,7 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
     }
 
     public AddTrainingFragment setUpdateItem(Training training) {
-        this.training = training;
+        this.updateTraining = training;
         return this;
     }
 }

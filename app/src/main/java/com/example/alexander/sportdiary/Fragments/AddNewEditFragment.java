@@ -39,6 +39,9 @@ public class AddNewEditFragment<T extends Edit> extends DialogFragment implement
         v.findViewById(R.id.okAddButton).setOnClickListener(this);
         ((TextView) v.findViewById(R.id.add_edit_title)).setText(title);
         editText = v.findViewById(R.id.add_edit_text);
+        if (option == EditOption.UPDATE) {
+            editText.setText(updateItem.getName());
+        }
         return v;
     }
 

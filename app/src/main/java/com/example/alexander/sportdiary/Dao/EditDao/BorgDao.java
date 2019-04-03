@@ -22,5 +22,5 @@ public interface BorgDao extends EditDao<Borg>{
     long getIdByName(String name);
 
     @Query("SELECT name FROM Borg where id = :id")
-    String getNameById(long id);
+    String getNameById(Long id);
 }

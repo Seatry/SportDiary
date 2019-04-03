@@ -36,7 +36,7 @@ import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
 
 @Database(entities = {Exercise.class, Zone.class, SeasonPlan.class, Day.class,
         Equipment.class, Aim.class, Time.class, Borg.class, TrainingsToEquipments.class, TrainingExercise.class,
-        Training.class, TrainingPlace.class, TrainingsToAims.class, Style.class, Tempo.class}, version = 12)
+        Training.class, TrainingPlace.class, TrainingsToAims.class, Style.class, Tempo.class}, version = 14)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
     public abstract ZoneDao zoneDao();

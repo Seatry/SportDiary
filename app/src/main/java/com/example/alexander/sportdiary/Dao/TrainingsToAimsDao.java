@@ -1,5 +1,6 @@
 package com.example.alexander.sportdiary.Dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -24,6 +25,9 @@ public interface TrainingsToAimsDao {
 
     @Query("SELECT aim_id FROM TrainingsToAims where training_id = :id")
     List<Long> getAimIdsByTrainingId(long id);
+
+    @Query("SELECT * FROM TrainingsToAims")
+    LiveData<List<TrainingsToAims>> getAll();
 
     @Query("DELETE FROM TrainingsToAims where training_id = :id")
     void deleteByTrainingId(long id);

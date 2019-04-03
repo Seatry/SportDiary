@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.Nullable;
 
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
 import com.example.alexander.sportdiary.Entities.EditEntities.Exercise;
@@ -35,31 +36,40 @@ public class TrainingExercise {
     @ColumnInfo(name = "training_id")
     private long trainingId;
 
+    @Nullable
     @ColumnInfo(name = "exercise_id")
-    private long exerciseId;
+    private Long exerciseId;
 
+    @Nullable
     @ColumnInfo(name = "style_id")
-    private long styleId;
+    private Long styleId;
 
+    @Nullable
     @ColumnInfo(name = "tempo_id")
-    private long tempoId;
+    private Long tempoId;
 
+    @Nullable
     @ColumnInfo(name = "zone_id")
-    private long zoneId;
+    private Long zoneId;
 
+    @Nullable
     @ColumnInfo(name = "borg_id")
-    private long borgId;
+    private Long borgId;
 
-    private int work;
-    private int rest;
-    private int length;
-    private int repeats;
-    private int series;
-    private String note;
-    private int minutes;
+    private int work = 1;
+    private int rest = 1;
+    private int length = 0;
+    private int repeats = 0;
+    private int series = 0;
+    private String note = "";
+    private int minutes = 0;
 
-    public TrainingExercise(long trainingId, long exerciseId, long styleId, long tempoId,
-                            long zoneId, long borgId, int work, int rest, int length, int repeats, int series, String note, int minutes) {
+    public TrainingExercise() {
+
+    }
+
+    public TrainingExercise(long trainingId, @Nullable Long exerciseId, @Nullable Long styleId, @Nullable Long tempoId,
+                            @Nullable Long zoneId, @Nullable Long borgId, int work, int rest, int length, int repeats, int series, String note, int minutes) {
         this.trainingId = trainingId;
         this.exerciseId = exerciseId;
         this.styleId = styleId;
@@ -91,43 +101,48 @@ public class TrainingExercise {
         this.trainingId = trainingId;
     }
 
-    public long getExerciseId() {
+    @Nullable
+    public Long getExerciseId() {
         return exerciseId;
     }
 
-    public void setExerciseId(long exerciseId) {
+    public void setExerciseId(@Nullable Long exerciseId) {
         this.exerciseId = exerciseId;
     }
 
-    public long getStyleId() {
+    @Nullable
+    public Long getStyleId() {
         return styleId;
     }
 
-    public void setStyleId(long styleId) {
+    public void setStyleId(@Nullable Long styleId) {
         this.styleId = styleId;
     }
 
-    public long getTempoId() {
+    @Nullable
+    public Long getTempoId() {
         return tempoId;
     }
 
-    public void setTempoId(long tempoId) {
+    public void setTempoId(@Nullable Long tempoId) {
         this.tempoId = tempoId;
     }
 
-    public long getZoneId() {
+    @Nullable
+    public Long getZoneId() {
         return zoneId;
     }
 
-    public void setZoneId(long zoneId) {
+    public void setZoneId(@Nullable Long zoneId) {
         this.zoneId = zoneId;
     }
 
-    public long getBorgId() {
+    @Nullable
+    public Long getBorgId() {
         return borgId;
     }
 
-    public void setBorgId(long borgId) {
+    public void setBorgId(@Nullable Long borgId) {
         this.borgId = borgId;
     }
 
