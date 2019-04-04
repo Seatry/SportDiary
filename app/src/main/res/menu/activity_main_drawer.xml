@@ -59,6 +59,63 @@
             android:title="@string/tempos"
             app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
             />
+        <item
+            android:id="@+id/nav_competition"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/competitions"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_importance"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/importance"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_block"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/blocks"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_stage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/stages"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_type"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/types"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_camps"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/camps"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_plan"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/overall_plan"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_competition_schedule"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/competition_schedule"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
+        <item
+            android:id="@+id/nav_statistics"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/statistics"
+            app:actionViewClass="com.example.alexander.sportdiary.NavigationItemLongPressInterceptor"
+            />
     </group>
 
         <item

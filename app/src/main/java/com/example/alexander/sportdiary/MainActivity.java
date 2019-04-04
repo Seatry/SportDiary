@@ -12,15 +12,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
+import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
+import com.example.alexander.sportdiary.Entities.EditEntities.Camp;
+import com.example.alexander.sportdiary.Entities.EditEntities.Competition;
 import com.example.alexander.sportdiary.Entities.EditEntities.Equipment;
 import com.example.alexander.sportdiary.Entities.EditEntities.Exercise;
+import com.example.alexander.sportdiary.Entities.EditEntities.Importance;
+import com.example.alexander.sportdiary.Entities.EditEntities.Stage;
 import com.example.alexander.sportdiary.Entities.EditEntities.Style;
 import com.example.alexander.sportdiary.Entities.EditEntities.Tempo;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
 import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
+import com.example.alexander.sportdiary.Entities.EditEntities.Type;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
@@ -43,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private DayFragment dayFragment;
     private final static int CALENDAR = 50;
+    private Long seasonPlanId;
 
     public static MainActivity getInstance() {
         return instance;
@@ -172,6 +180,54 @@ public class MainActivity extends AppCompatActivity
             tempoEditFragment.setClass(Tempo.class, getString(R.string.tempos),
                     database.tempoDao(), getString(R.string.addTempo), getString(R.string.updateTempo));
             tempoEditFragment.show(getSupportFragmentManager(), "tempoDialog");
+        } else if (id == R.id.nav_competition) {
+            EditFragment<Competition> competitionEditFragment = new EditFragment<>();
+            competitionEditFragment.setClass(Competition.class, getString(R.string.competitions),
+                    database.competitionDao(), getString(R.string.addCompetition), getString(R.string.updateCompetition));
+            competitionEditFragment.show(getSupportFragmentManager(), "competitionDialog");
+        } else if (id == R.id.nav_importance) {
+            EditFragment<Importance> importanceEditFragment = new EditFragment<>();
+            importanceEditFragment.setClass(Importance.class, getString(R.string.importance),
+                    database.importanceDao(), getString(R.string.addImportance), getString(R.string.updateImportance));
+            importanceEditFragment.show(getSupportFragmentManager(), "importanceDialog");
+        } else if (id == R.id.nav_block) {
+            EditFragment<Block> blockEditFragment = new EditFragment<>();
+            blockEditFragment.setClass(Block.class, getString(R.string.blocks),
+                    database.blockDao(), getString(R.string.addBlock), getString(R.string.updateBlock));
+            blockEditFragment.show(getSupportFragmentManager(), "blockDialog");
+        } else if (id == R.id.nav_stage) {
+            EditFragment<Stage> stageEditFragment = new EditFragment<>();
+            stageEditFragment.setClass(Stage.class, getString(R.string.stages),
+                    database.stageDao(), getString(R.string.addStage), getString(R.string.updateStage));
+            stageEditFragment.show(getSupportFragmentManager(), "stageDialog");
+        } else if (id == R.id.nav_type) {
+            EditFragment<Type> typeEditFragment = new EditFragment<>();
+            typeEditFragment.setClass(Type.class, getString(R.string.types),
+                    database.typeDao(), getString(R.string.addType), getString(R.string.updateType));
+            typeEditFragment.show(getSupportFragmentManager(), "typeDialog");
+        } else if (id == R.id.nav_camps) {
+            EditFragment<Camp> campEditFragment = new EditFragment<>();
+            campEditFragment.setClass(Camp.class, getString(R.string.camps),
+                    database.campDao(), getString(R.string.addCamp), getString(R.string.updateCamp));
+            campEditFragment.show(getSupportFragmentManager(), "campDialog");
+        } else if (id == R.id.nav_plan) {
+            if (seasonPlanId == null) {
+                Toast.makeText(this, R.string.no_diary_selected, Toast.LENGTH_SHORT).show();
+            } else {
+
+            }
+        } else if (id == R.id.nav_competition_schedule) {
+            if (seasonPlanId == null) {
+                Toast.makeText(this, R.string.no_diary_selected, Toast.LENGTH_SHORT).show();
+            } else {
+
+            }
+        } else if (id == R.id.nav_statistics) {
+            if (seasonPlanId == null) {
+                Toast.makeText(this, R.string.no_diary_selected, Toast.LENGTH_SHORT).show();
+            } else {
+
+            }
         } else if (id == R.id.nav_add) {
             AddNewDiaryFragment diaryFragment = new AddNewDiaryFragment();
             diaryFragment.show(getSupportFragmentManager(), "diaryDialog");
@@ -179,6 +235,7 @@ public class MainActivity extends AppCompatActivity
             // Handle diary select
             dayFragment = new DayFragment();
             dayFragment.setSeasonPlanId(id);
+            seasonPlanId = (long) id;
             toolbar.getMenu().removeItem(CALENDAR);
             toolbar.getMenu().add(0, CALENDAR, 50, "").setIcon(R.drawable.ic_menu_gallery).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             this.setTitle("(" + item.getTitle().charAt(0) + ")");
@@ -203,7 +260,10 @@ public class MainActivity extends AppCompatActivity
         int id = itemHandle.getItemId(navigationView);
         if(id != R.id.nav_ex && id != R.id.nav_zone && id != R.id.nav_time && id != R.id.nav_aim
                 && id != R.id.nav_equipment && id != R.id.nav_borg && id != R.id.nav_tempo
-                && id != R.id.nav_training_place && id != R.id.nav_style) {
+                && id != R.id.nav_training_place && id != R.id.nav_style && id != R.id.nav_competition
+                && id != R.id.nav_importance && id != R.id.nav_block && id != R.id.nav_stage
+                && id != R.id.nav_type && id != R.id.nav_camps && id != R.id.nav_statistics
+                && id != R.id.nav_competition_schedule && id != R.id.nav_plan) {
             UpdateDiaryFragment updateDiaryFragment = new UpdateDiaryFragment();
             updateDiaryFragment.setItemId(id);
             updateDiaryFragment.show(getSupportFragmentManager(), "updateDiary");

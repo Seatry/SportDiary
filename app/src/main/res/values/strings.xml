@@ -71,6 +71,32 @@
     <string name="series_repeats_length">Series x Repeats x Length</string>
     <string name="x">x</string>
     <string name="double_dot">:</string>
+    <string name="competitions">Competitions</string>
+    <string name="addCompetition">New competition</string>
+    <string name="updateCompetition">Update competition</string>
+    <string name="competition">Competition</string>
+    <string name="competition_schedule">Competition schedule</string>
+    <string name="addImportance">New importance</string>
+    <string name="updateImportance">Update importance</string>
+    <string name="importance">Importance</string>
+    <string name="blocks">Block</string>
+    <string name="addBlock">New block</string>
+    <string name="updateBlock">Update block</string>
+    <string name="block">Block</string>
+    <string name="stages">Stages</string>
+    <string name="addStage">New stage</string>
+    <string name="updateStage">Update stage</string>
+    <string name="stage">Stage</string>
+    <string name="types">Types</string>
+    <string name="addType">New type</string>
+    <string name="updateType">Update type</string>
+    <string name="type">Type</string>
+    <string name="camps">Camps</string>
+    <string name="addCamp">New camps</string>
+    <string name="updateCamp">Update camps</string>
+    <string name="overall_plan">Overall plan</string>
+    <string name="statistics">Statistics</string>
+    <string name="no_diary_selected">Please choose the diary</string>
 
 
 </resources>

@@ -67,6 +67,32 @@
     <string name="series_repeats_length">Серии x Повторы x Длина</string>
     <string name="x">x</string>
     <string name="double_dot">:</string>
+    <string name="competitions">Соревнования</string>
+    <string name="addCompetition">Новое соревнование</string>
+    <string name="updateCompetition">Изменить соревнование</string>
+    <string name="competition">Соревнование</string>
+    <string name="competition_schedule">Расписание соревнований</string>
+    <string name="importance">Значительность</string>
+    <string name="addImportance">Новая значительность</string>
+    <string name="updateImportance">Изменить значительность</string>
+    <string name="blocks">Блоки</string>
+    <string name="addBlock">Новый блок</string>
+    <string name="updateBlock">Изменить блок</string>
+    <string name="block">Блок</string>
+    <string name="stages">Этапы</string>
+    <string name="addStage">Новый этап</string>
+    <string name="updateStage">Изменить этап</string>
+    <string name="stage">Этап</string>
+    <string name="types">Типы</string>
+    <string name="addType">Новый тип</string>
+    <string name="updateType">Изменить тип</string>
+    <string name="type">Тип</string>
+    <string name="camps">Сборы</string>
+    <string name="addCamp">Новые сборы</string>
+    <string name="updateCamp">Изменить сборы</string>
+    <string name="overall_plan">Общий план</string>
+    <string name="statistics">Статистика</string>
+    <string name="no_diary_selected">Пожалуйста выберите дневник</string>
 
 
 </resources>
