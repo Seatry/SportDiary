@@ -93,6 +93,7 @@
     <string name="overall_plan">Общий план</string>
     <string name="statistics">Статистика</string>
     <string name="no_diary_selected">Пожалуйста выберите дневник</string>
+    <string name="lists_edit">Редактирование списков</string>
 
 
 </resources>

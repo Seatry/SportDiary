@@ -3,12 +3,8 @@ package com.example.alexander.sportdiary.Fragments;
 import android.database.sqlite.SQLiteConstraintException;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -19,15 +15,15 @@ import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
-import com.example.alexander.sportdiary.Utils.DateUtil;
-import com.example.alexander.sportdiary.Utils.NavigationItemLongPressInterceptor;
+import com.example.alexander.sportdiary.MenuModel;
 import com.example.alexander.sportdiary.R;
+import com.example.alexander.sportdiary.Utils.DateUtil;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
+import java.util.List;
 
+import static com.example.alexander.sportdiary.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class AddNewDiaryFragment extends DialogFragment implements View.OnClickListener {
@@ -35,7 +31,6 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
     private EditText editStartText;
     private SeasonPlanDao dao;
     private DayDao dayDao;
-    private Menu menu;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,9 +42,7 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
 
         dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
         dayDao = MainActivity.getInstance().getDatabase().dayDao();
-        NavigationView navigationView = MainActivity.getInstance().findViewById(R.id.nav_view);
-        MenuItem diaryItem = navigationView.getMenu().findItem(R.id.diaries);
-        menu = diaryItem.getSubMenu();
+
         return v;
     }
 
@@ -73,11 +66,13 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             final Date date = sdf.parse(dateText);
             seasonPlan.setStart(date);
             final long id = dao.insert(seasonPlan);
-            MenuItem item = menu.add(R.id.diaryMenu,(int) id, 1,
-                    seasonPlan.getName() + " " + dateText);
-            item.setIcon(R.drawable.ic_menu_share);
-            item.setActionView(new NavigationItemLongPressInterceptor(MainActivity.getInstance()));
-
+            MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
+            List<MenuModel> childs = MainActivity.getChildList().get(menuModel);
+            String diaryName = seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart());
+            MenuModel childModel = new MenuModel(diaryName, false, false, (int) id);
+            childs.add(childModel);
+            MainActivity.putToChildList(menuModel, childs);
+            MainActivity.getExpandableListAdapter().notifyDataSetChanged();
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {

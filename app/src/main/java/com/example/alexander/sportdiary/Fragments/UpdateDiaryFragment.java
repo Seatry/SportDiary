@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
+import com.example.alexander.sportdiary.MenuModel;
 import com.example.alexander.sportdiary.R;
 
 import java.text.ParseException;
@@ -22,13 +23,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.example.alexander.sportdiary.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class UpdateDiaryFragment extends DialogFragment implements View.OnClickListener {
     private EditText editNameText;
     private EditText editStartText;
     private int id;
-    private Menu menu;
     private SeasonPlanDao dao;
     private SeasonPlan seasonPlan;
 
@@ -45,9 +46,6 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         editNameText = v.findViewById(R.id.update_diary_name);
         editStartText = v.findViewById(R.id.update_diary_start);
 
-        NavigationView navigationView = MainActivity.getInstance().findViewById(R.id.nav_view);
-        MenuItem diaryItem = navigationView.getMenu().findItem(R.id.diaries);
-        menu = diaryItem.getSubMenu();
         dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
 
         seasonPlan = dao.getSeasonPlanById(id);
@@ -76,12 +74,13 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         try {
             seasonPlan.setName(editNameText.getText().toString());
             String dateText = editStartText.getText().toString();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
             Date date = sdf.parse(dateText);
             seasonPlan.setStart(date);
             dao.update(seasonPlan);
-            MenuItem item = menu.findItem(id);
-            item.setTitle(seasonPlan.getName() + " " + seasonPlan.getStart());
+            MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
+            MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
+            diary.setMenuName(seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart()));
+            MainActivity.getExpandableListAdapter().notifyDataSetChanged();
             dismiss();
         } catch (SQLiteConstraintException e) {
             e.printStackTrace();
@@ -96,7 +95,10 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     public void remove() {
         SeasonPlan seasonPlan = dao.getSeasonPlanById(id);
         dao.delete(seasonPlan);
-        menu.removeItem(id);
+        MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
+        MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
+        MainActivity.getChildList().get(menuModel).remove(diary);
+        MainActivity.getExpandableListAdapter().notifyDataSetChanged();
         dismiss();
     }
 
