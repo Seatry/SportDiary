@@ -36,6 +36,9 @@ public interface DayDao {
     @Query("SELECT id FROM Day WHERE  date = :date and season_plan_id = :id")
     long getDayIdByDateAndSeasonPlanId(Date date, long id);
 
+    @Query("SELECT * FROM Day WHERE  date = :date and season_plan_id = :id")
+    LiveData<Day> getDayByDateAndSeasonPlanId(Date date, long id);
+
     @Query("SELECT * FROM Day WHERE competition_to_importance_id is not null and season_plan_id = :id")
     LiveData<List<Day>> getAllDaysBySeasonPlanIdWhereCompetitionToImportanceIsNotNull(long id);
 
@@ -47,4 +50,7 @@ public interface DayDao {
 
     @Query("SELECT * FROM Day WHERE date = :date and season_plan_id = :seasonPlanId and competition_to_importance_id is not null")
     Day getDayByDateAndSeasonIdWhereCompetitionToImportanceNotNull(Date date, long seasonPlanId);
+
+    @Query("UPDATE Day set capacity = :capacity WHERE id = :dayId")
+    void updateCapacityById(int capacity, long dayId);
 }

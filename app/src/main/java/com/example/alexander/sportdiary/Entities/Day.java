@@ -42,6 +42,7 @@ public class Day {
     private long id;
 
     private Date date;
+    private int capacity = 0;
 
     public Day() {
 
@@ -142,5 +143,13 @@ public class Day {
 
     public void setCompetitionToImportanceId(@Nullable Long competitionToImportanceId) {
         this.competitionToImportanceId = competitionToImportanceId;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 }

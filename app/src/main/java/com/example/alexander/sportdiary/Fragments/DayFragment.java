@@ -15,13 +15,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 import com.example.alexander.sportdiary.Adapters.EditAdapter;
 import com.example.alexander.sportdiary.Adapters.TrainingAdapter;
 import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.Training;
+import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
 import com.example.alexander.sportdiary.MainActivity;
@@ -46,6 +49,12 @@ public class DayFragment extends Fragment {
     private RecyclerView recyclerView;
     private TrainingAdapter adapter;
     private SportDataBase sportDataBase;
+    private TextView blockText;
+    private TextView stageText;
+    private TextView typeText;
+    private TextView campsText;
+    private TextView competitionText;
+    private TextView capacityText;
 
     public void setSeasonPlanId(long seasonPlanId) {
         this.seasonPlanId = seasonPlanId;
@@ -83,6 +92,7 @@ public class DayFragment extends Fragment {
                 currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
                 MainActivity.getInstance().setTitle(diaryName + " " + currentDate);
                 getTrainings();
+                getInfo();
             }
         });
 
@@ -92,6 +102,14 @@ public class DayFragment extends Fragment {
         adapter = new TrainingAdapter();
         recyclerView.setAdapter(adapter);
         getTrainings();
+
+        blockText = v.findViewById(R.id.blockText);
+        stageText = v.findViewById(R.id.stageText);
+        typeText = v.findViewById(R.id.typeText);
+        campsText = v.findViewById(R.id.campsText);
+        competitionText = v.findViewById(R.id.day_competition_text);
+        capacityText = v.findViewById(R.id.day_capacity_text);
+        getInfo();
 
         TabHost tabHost = v.findViewById(R.id.day_tabHost);
         tabHost.setup();
@@ -163,13 +181,20 @@ public class DayFragment extends Fragment {
 
     public void getTrainings() {
         try {
-            long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+            final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
             LiveData<List<Training>> trainingLiveData = sportDataBase.trainingDao().getAllByDayId(dayId);
             trainingLiveData.observe(MainActivity.getInstance(), new Observer<List<Training>>() {
                 @Override
                 public void onChanged(@Nullable List<Training> elems) {
                     adapter.setTrainings(elems);
                     adapter.notifyDataSetChanged();
+                    if (elems != null) {
+                        int capacity = 0;
+                        for(Training training : elems) {
+                            capacity += training.getCapacity();
+                        }
+                        sportDataBase.dayDao().updateCapacityById(capacity, dayId);
+                    }
                 }
             });
             LiveData<List<TrainingsToAims>> trainingsToAims = sportDataBase.trainingsToAimsDao().getAll();
@@ -184,6 +209,42 @@ public class DayFragment extends Fragment {
                 @Override
                 public void onChanged(@Nullable List<TrainingsToEquipments> trainingsToEquipments) {
                     adapter.notifyDataSetChanged();
+                }
+            });
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getInfo() {
+        try {
+            LiveData<Day> day = dayDao.getDayByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+            day.observe(this, new Observer<Day>() {
+                @Override
+                public void onChanged(@Nullable Day day) {
+                    if (day == null) return;
+                    String block = day.getBlockId() == null ? "" : sportDataBase.blockDao().getNameById(day.getBlockId());
+                    blockText.setText(String.format("%s: %s", getString(R.string.block), block));
+                    String stage = day.getStageId() == null ? "" : sportDataBase.stageDao().getNameById(day.getStageId());
+                    stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
+                    String type = day.getTypeId() == null ? "" : sportDataBase.typeDao().getNameById(day.getTypeId());
+                    typeText.setText(String.format("%s: %s", getString(R.string.type), type));
+                    String camps = day.getCampId() == null ? "" : sportDataBase.campDao().getNameById(day.getCampId());
+                    campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
+                    Long competitionToImportanceId = day.getCompetitionToImportanceId();
+                    String competitionToImportance;
+                    if (competitionToImportanceId == null) {
+                        competitionToImportance = "";
+                    } else {
+                        Long competitionId = sportDataBase.competitionToImportanceDao().getCompetitionIdById(competitionToImportanceId);
+                        String competition = sportDataBase.competitionDao().getNameById(competitionId);
+                        Long importanceId = sportDataBase.competitionToImportanceDao().getImportanceIdById(competitionToImportanceId);
+                        String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameById(importanceId);
+                        competitionToImportance = competition + " (" + importance + ")";
+                    }
+                    competitionText.setText(String.format("%s: %s", getString(R.string.competition), competitionToImportance));
+                    String capacity = String.valueOf(day.getCapacity());
+                    capacityText.setText(String.format("%s: %s", getString(R.string.capacity), capacity));
                 }
             });
         } catch (ParseException e) {
