@@ -25,7 +25,7 @@ import static android.arch.persistence.room.ForeignKey.SET_NULL;
         {@ForeignKey(
                 entity = SeasonPlan.class, parentColumns = "id", childColumns = "season_plan_id", onDelete = CASCADE, onUpdate = CASCADE),
         @ForeignKey(
-                entity = Competition.class, parentColumns = "id", childColumns = "competition_id", onDelete = SET_NULL, onUpdate = CASCADE),
+                entity = CompetitionToImportance.class, parentColumns = "id", childColumns = "competition_to_importance_id", onDelete = SET_NULL, onUpdate = CASCADE),
         @ForeignKey(
                 entity = Block.class, parentColumns = "id", childColumns = "block_id", onDelete = SET_NULL, onUpdate = CASCADE),
         @ForeignKey(
@@ -34,8 +34,6 @@ import static android.arch.persistence.room.ForeignKey.SET_NULL;
                 entity = Type.class, parentColumns = "id", childColumns = "type_id", onDelete = SET_NULL, onUpdate = CASCADE),
         @ForeignKey(
                 entity = Camp.class, parentColumns = "id", childColumns = "camp_id", onDelete = SET_NULL, onUpdate = CASCADE),
-        @ForeignKey(
-                entity = Importance.class, parentColumns = "id", childColumns = "importance_id", onDelete = SET_NULL, onUpdate = CASCADE),
         },
         indices = {@Index(value = {"date", "season_plan_id"}, unique = true)})
 @TypeConverters(DateConverter.class)
@@ -50,8 +48,8 @@ public class Day {
     }
 
     @Nullable
-    @ColumnInfo(name = "competition_id")
-    private Long competitionId;
+    @ColumnInfo(name = "competition_to_importance_id")
+    private Long competitionToImportanceId;
 
     @Nullable
     @ColumnInfo(name = "block_id")
@@ -68,10 +66,6 @@ public class Day {
     @Nullable
     @ColumnInfo(name = "camp_id")
     private Long campId;
-
-    @Nullable
-    @ColumnInfo(name = "importance_id")
-    private Long importanceId;
 
     public Day(Date date, long seasonPlanId) {
         this.date = date;
@@ -102,16 +96,7 @@ public class Day {
     }
 
     public void setSeasonPlanId(long seasonPlanId) {
-        seasonPlanId = seasonPlanId;
-    }
-
-    @Nullable
-    public Long getCompetitionId() {
-        return competitionId;
-    }
-
-    public void setCompetitionId(@Nullable Long competitionId) {
-        this.competitionId = competitionId;
+        this.seasonPlanId = seasonPlanId;
     }
 
     @Nullable
@@ -151,11 +136,11 @@ public class Day {
     }
 
     @Nullable
-    public Long getImportanceId() {
-        return importanceId;
+    public Long getCompetitionToImportanceId() {
+        return competitionToImportanceId;
     }
 
-    public void setImportanceId(@Nullable Long importanceId) {
-        this.importanceId = importanceId;
+    public void setCompetitionToImportanceId(@Nullable Long competitionToImportanceId) {
+        this.competitionToImportanceId = competitionToImportanceId;
     }
 }

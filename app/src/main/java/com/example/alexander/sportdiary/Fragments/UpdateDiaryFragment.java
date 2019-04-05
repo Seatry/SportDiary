@@ -1,28 +1,32 @@
 package com.example.alexander.sportdiary.Fragments;
 
+import android.app.DatePickerDialog;
 import android.database.sqlite.SQLiteConstraintException;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
+import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.MenuModel;
 import com.example.alexander.sportdiary.R;
+import com.example.alexander.sportdiary.Utils.DateUtil;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
+import static com.example.alexander.sportdiary.MenuItemIds.CALENDAR;
 import static com.example.alexander.sportdiary.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
@@ -31,6 +35,7 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     private EditText editStartText;
     private int id;
     private SeasonPlanDao dao;
+    private DayDao dayDao;
     private SeasonPlan seasonPlan;
 
     public void setItemId(int id) {
@@ -45,8 +50,30 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         v.findViewById(R.id.removeDiary).setOnClickListener(this);
         editNameText = v.findViewById(R.id.update_diary_name);
         editStartText = v.findViewById(R.id.update_diary_start);
+        editStartText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(seasonPlan.getStart());
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                month +=1;
+                                String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
+                                editStartText.setText(currentDate);
+                            }
+                        }, year, month, day
+                );
+                datePickerDialog.show();
+            }
+        });
 
         dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
+        dayDao = MainActivity.getInstance().getDatabase().dayDao();
 
         seasonPlan = dao.getSeasonPlanById(id);
         editNameText.setText(seasonPlan.getName());
@@ -74,9 +101,31 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         try {
             seasonPlan.setName(editNameText.getText().toString());
             String dateText = editStartText.getText().toString();
-            Date date = sdf.parse(dateText);
+            final Date date = sdf.parse(dateText);
             seasonPlan.setStart(date);
             dao.update(seasonPlan);
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    dayDao.deleteBySeasonPlanId(id);
+                    for(int i = 0; i < 365; i++) {
+                        dayDao.insert(new Day(DateUtil.addDays(date, i), id));
+                    }
+                }
+            });
+
+            if (MainActivity.getSeasonPlanId() != null && MainActivity.getSeasonPlanId() == id) {
+                DayFragment dayFragment = new DayFragment();
+                dayFragment.setSeasonPlanId(id);
+                MainActivity.getInstance().setTitle("(" + seasonPlan.getName().charAt(0) + ")");
+                MainActivity.getInstance().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_frame, dayFragment)
+                        .commit();
+                MainActivity.getInstance().setDayFragment(dayFragment);
+            }
+
             MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
             MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
             diary.setMenuName(seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart()));

@@ -9,6 +9,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
 
 import com.example.alexander.sportdiary.Converters.DateConverter;
+import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.Day;
 
 import java.util.Date;
@@ -26,9 +27,24 @@ public interface DayDao {
     @Delete
     void delete(Day day);
 
+    @Query("DELETE FROM Day WHERE season_plan_id = :id")
+    void deleteBySeasonPlanId(long id);
+
     @Query("SELECT * FROM Day")
     List<Day> getAll();
 
     @Query("SELECT id FROM Day WHERE  date = :date and season_plan_id = :id")
     long getDayIdByDateAndSeasonPlanId(Date date, long id);
+
+    @Query("SELECT * FROM Day WHERE competition_to_importance_id is not null and season_plan_id = :id")
+    LiveData<List<Day>> getAllDaysBySeasonPlanIdWhereCompetitionToImportanceIsNotNull(long id);
+
+    @Query("UPDATE Day set competition_to_importance_id = :id WHERE date = :date and season_plan_id = :seasonId")
+    void updateCompetitionToImportanceByDateAndSeasonId(Long id, Date date, long seasonId);
+
+    @Query("SELECT competition_to_importance_id FROM Day WHERE  date = :date and season_plan_id = :id")
+    long getCompetitionToImportanceIdByDateAndSeasonId(Date date, long id);
+
+    @Query("SELECT * FROM Day WHERE date = :date and season_plan_id = :seasonPlanId and competition_to_importance_id is not null")
+    Day getDayByDateAndSeasonIdWhereCompetitionToImportanceNotNull(Date date, long seasonPlanId);
 }

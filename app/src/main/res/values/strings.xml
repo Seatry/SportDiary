@@ -98,6 +98,8 @@
     <string name="statistics">Statistics</string>
     <string name="no_diary_selected">Please choose the diary</string>
     <string name="lists_edit">Lists edit</string>
+    <string name="competition_date">Competition date</string>
+    <string name="competition_error">Please choose competition</string>
 
 
 </resources>

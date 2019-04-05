@@ -3,6 +3,7 @@ package com.example.alexander.sportdiary;
 import android.arch.persistence.room.Room;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,6 +35,7 @@ import com.example.alexander.sportdiary.Entities.EditEntities.Type;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
+import com.example.alexander.sportdiary.Fragments.CompetitionScheduleFragment;
 import com.example.alexander.sportdiary.Fragments.DayFragment;
 import com.example.alexander.sportdiary.Fragments.EditFragment;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
@@ -51,7 +53,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SportDataBase database;
     private Toolbar toolbar;
     private DayFragment dayFragment;
-    private Long seasonPlanId;
+
+
+    public void setDayFragment(DayFragment dayFragment) {
+        this.dayFragment = dayFragment;
+    }
+
+    @Nullable
+    public static Long getSeasonPlanId() {
+        return seasonPlanId;
+    }
+
+    private static Long seasonPlanId;
 
     private static ExpandableListAdapter expandableListAdapter;
     private ExpandableListView expandableListView;
@@ -382,7 +395,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (seasonPlanId == null) {
                 Toast.makeText(this, R.string.no_diary_selected, Toast.LENGTH_SHORT).show();
             } else {
-
+                CompetitionScheduleFragment scheduleFragment = new CompetitionScheduleFragment();
+                scheduleFragment.setSeasonPlanId(seasonPlanId);
+                scheduleFragment.show(getSupportFragmentManager(), "scheduleDialog");
             }
         } else if (id == STATISTICS.getValue()) {
             if (seasonPlanId == null) {

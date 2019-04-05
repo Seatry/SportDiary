@@ -3,6 +3,7 @@ package com.example.alexander.sportdiary;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
+import com.example.alexander.sportdiary.Dao.CompetitionToImportanceDao;
 import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.Dao.EditDao.AimDao;
 import com.example.alexander.sportdiary.Dao.EditDao.BlockDao;
@@ -24,6 +25,7 @@ import com.example.alexander.sportdiary.Dao.TrainingDao;
 import com.example.alexander.sportdiary.Dao.TrainingExerciseDao;
 import com.example.alexander.sportdiary.Dao.TrainingsToAimsDao;
 import com.example.alexander.sportdiary.Dao.TrainingsToEquipmentsDao;
+import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
@@ -51,8 +53,8 @@ import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
                 Time.class, Borg.class, TrainingsToEquipments.class, TrainingExercise.class,
                 Training.class, TrainingPlace.class, TrainingsToAims.class, Style.class,
                 Tempo.class, Block.class, Camp.class, Competition.class, Importance.class,
-                Stage.class, Type.class
-        }, version = 15)
+                Stage.class, Type.class, CompetitionToImportance.class
+        }, version = 18)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
     public abstract ZoneDao zoneDao();
@@ -75,4 +77,5 @@ public abstract class SportDataBase extends RoomDatabase {
     public abstract ImportanceDao importanceDao();
     public abstract StageDao stageDao();
     public abstract TypeDao typeDao();
+    public abstract CompetitionToImportanceDao competitionToImportanceDao();
 }

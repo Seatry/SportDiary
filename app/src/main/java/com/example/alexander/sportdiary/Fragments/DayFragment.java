@@ -51,6 +51,11 @@ public class DayFragment extends Fragment {
         this.seasonPlanId = seasonPlanId;
     }
 
+    @Nullable
+    public Long getSeasonPlanId() {
+        return seasonPlanId;
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_day, container, false);

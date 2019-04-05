@@ -1,5 +1,6 @@
 package com.example.alexander.sportdiary.Fragments;
 
+import android.app.DatePickerDialog;
 import android.database.sqlite.SQLiteConstraintException;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -39,6 +41,21 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
         v.findViewById(R.id.okAddDiary).setOnClickListener(this);
         editNameText = v.findViewById(R.id.add_diary_name);
         editStartText = v.findViewById(R.id.add_diary_start);
+        editStartText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance());
+                datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        month +=1;
+                        String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
+                        editStartText.setText(currentDate);
+                    }
+                });
+                datePickerDialog.show();
+            }
+        });
 
         dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
         dayDao = MainActivity.getInstance().getDatabase().dayDao();
