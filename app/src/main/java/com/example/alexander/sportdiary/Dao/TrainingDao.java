@@ -27,7 +27,10 @@ public interface TrainingDao {
     LiveData<List<Training>> getAll();
 
     @Query("SELECT * FROM Training WHERE day_id = :id")
-    LiveData<List<Training>> getAllByDayId(long id);
+    LiveData<List<Training>> getAllLiveByDayId(long id);
+
+    @Query("SELECT * FROM Training WHERE day_id = :id")
+    List<Training> getAllByDayId(long id);
 
     @Query("SELECT * FROM Training WHERE id = :id")
     Training getTrainingById(long id);

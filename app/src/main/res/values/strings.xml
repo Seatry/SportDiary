@@ -100,6 +100,11 @@
     <string name="lists_edit">Lists edit</string>
     <string name="competition_date">Competition date</string>
     <string name="competition_error">Please choose competition</string>
+    <string name="week"> week</string>
+    <string name="week_info">Week info</string>
+    <string name="info_for">Info for </string>
+    <string name="for_week"> week</string>
+    <string name="update_week_info">Update week info</string>
 
 
 </resources>

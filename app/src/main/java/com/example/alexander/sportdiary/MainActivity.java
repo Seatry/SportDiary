@@ -38,6 +38,7 @@ import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
 import com.example.alexander.sportdiary.Fragments.CompetitionScheduleFragment;
 import com.example.alexander.sportdiary.Fragments.DayFragment;
 import com.example.alexander.sportdiary.Fragments.EditFragment;
+import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
 
 import java.util.ArrayList;
@@ -389,7 +390,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (seasonPlanId == null) {
                 Toast.makeText(this, R.string.no_diary_selected, Toast.LENGTH_SHORT).show();
             } else {
-
+                OverallPlanFragment overallPlanFragment = new OverallPlanFragment();
+                overallPlanFragment.setSeasonPlanId(seasonPlanId);
+                overallPlanFragment.show(getSupportFragmentManager(), "planDialog");
             }
         } else if (id == COMPETITION_SCHEDULE.getValue()) {
             if (seasonPlanId == null) {

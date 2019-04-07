@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_update_week_info">
+
+    <TextView
+        android:id="@+id/update_week_info_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/update_week_info"
+        android:textAppearance="?android:textAppearanceLarge"/>
+
+    <LinearLayout
+        android:id="@+id/weekBlockLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/update_week_info_title">
+        <TextView
+            android:text="@string/block"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <Spinner
+            android:id="@+id/weekBlockSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/weekStageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/weekBlockLayout">
+        <TextView
+            android:text="@string/stage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/weekStageSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/weekTypeLayout"
+        android:layout_below="@+id/weekStageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/weekTypeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/weekCampLayout"
+        android:layout_below="@+id/weekTypeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/camps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/weekCampSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancelUpdateWeekInfo"
+        android:text="@string/cancel"
+        android:layout_below="@id/weekCampLayout"
+        android:layout_toLeftOf="@id/okAddTrainingExercise"
+        android:layout_toStartOf="@id/okAddTrainingExercise" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/okUpdateWeekInfo"
+        android:text="@string/add"
+        android:layout_below="@id/weekCampLayout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>

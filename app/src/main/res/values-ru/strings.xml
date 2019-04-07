@@ -96,6 +96,11 @@
     <string name="lists_edit">Редактирование списков</string>
     <string name="competition_date">Дата соревнования</string>
     <string name="competition_error">Пожалуйста выберите соревнование</string>
+    <string name="week">неделя</string>
+    <string name="week_info">Информация по недели</string>
+    <string name="info_for">Информация по</string>
+    <string name="for_week">недели</string>
+    <string name="update_week_info">Изменить информацию по недели</string>
 
 
 </resources>

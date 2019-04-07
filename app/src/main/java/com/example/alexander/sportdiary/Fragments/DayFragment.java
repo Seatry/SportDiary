@@ -182,7 +182,7 @@ public class DayFragment extends Fragment {
     public void getTrainings() {
         try {
             final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
-            LiveData<List<Training>> trainingLiveData = sportDataBase.trainingDao().getAllByDayId(dayId);
+            LiveData<List<Training>> trainingLiveData = sportDataBase.trainingDao().getAllLiveByDayId(dayId);
             trainingLiveData.observe(MainActivity.getInstance(), new Observer<List<Training>>() {
                 @Override
                 public void onChanged(@Nullable List<Training> elems) {
@@ -218,35 +218,29 @@ public class DayFragment extends Fragment {
 
     public void getInfo() {
         try {
-            LiveData<Day> day = dayDao.getDayByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
-            day.observe(this, new Observer<Day>() {
-                @Override
-                public void onChanged(@Nullable Day day) {
-                    if (day == null) return;
-                    String block = day.getBlockId() == null ? "" : sportDataBase.blockDao().getNameById(day.getBlockId());
-                    blockText.setText(String.format("%s: %s", getString(R.string.block), block));
-                    String stage = day.getStageId() == null ? "" : sportDataBase.stageDao().getNameById(day.getStageId());
-                    stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
-                    String type = day.getTypeId() == null ? "" : sportDataBase.typeDao().getNameById(day.getTypeId());
-                    typeText.setText(String.format("%s: %s", getString(R.string.type), type));
-                    String camps = day.getCampId() == null ? "" : sportDataBase.campDao().getNameById(day.getCampId());
-                    campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
-                    Long competitionToImportanceId = day.getCompetitionToImportanceId();
-                    String competitionToImportance;
-                    if (competitionToImportanceId == null) {
-                        competitionToImportance = "";
-                    } else {
-                        Long competitionId = sportDataBase.competitionToImportanceDao().getCompetitionIdById(competitionToImportanceId);
-                        String competition = sportDataBase.competitionDao().getNameById(competitionId);
-                        Long importanceId = sportDataBase.competitionToImportanceDao().getImportanceIdById(competitionToImportanceId);
-                        String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameById(importanceId);
-                        competitionToImportance = competition + " (" + importance + ")";
-                    }
-                    competitionText.setText(String.format("%s: %s", getString(R.string.competition), competitionToImportance));
-                    String capacity = String.valueOf(day.getCapacity());
-                    capacityText.setText(String.format("%s: %s", getString(R.string.capacity), capacity));
-                }
-            });
+            Day day = dayDao.getDayByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+            String block = day.getBlockId() == null ? "" : sportDataBase.blockDao().getNameById(day.getBlockId());
+            blockText.setText(String.format("%s: %s", getString(R.string.block), block));
+            String stage = day.getStageId() == null ? "" : sportDataBase.stageDao().getNameById(day.getStageId());
+            stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
+            String type = day.getTypeId() == null ? "" : sportDataBase.typeDao().getNameById(day.getTypeId());
+            typeText.setText(String.format("%s: %s", getString(R.string.type), type));
+            String camps = day.getCampId() == null ? "" : sportDataBase.campDao().getNameById(day.getCampId());
+            campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
+            Long competitionToImportanceId = day.getCompetitionToImportanceId();
+            String competitionToImportance;
+            if (competitionToImportanceId == null) {
+                competitionToImportance = "";
+            } else {
+                Long competitionId = sportDataBase.competitionToImportanceDao().getCompetitionIdById(competitionToImportanceId);
+                String competition = sportDataBase.competitionDao().getNameById(competitionId);
+                Long importanceId = sportDataBase.competitionToImportanceDao().getImportanceIdById(competitionToImportanceId);
+                String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameById(importanceId);
+                competitionToImportance = competition + " (" + importance + ")";
+            }
+            competitionText.setText(String.format("%s: %s", getString(R.string.competition), competitionToImportance));
+            String capacity = String.valueOf(day.getCapacity());
+            capacityText.setText(String.format("%s: %s", getString(R.string.capacity), capacity));
         } catch (ParseException e) {
             e.printStackTrace();
         }

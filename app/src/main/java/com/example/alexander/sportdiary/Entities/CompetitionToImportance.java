@@ -49,7 +49,7 @@ public class CompetitionToImportance {
         this.importanceId = importanceId;
     }
 
-    public long getCompetitionId() {
+    public Long getCompetitionId() {
         return competitionId;
     }
 
