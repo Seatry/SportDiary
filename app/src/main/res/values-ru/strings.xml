@@ -115,6 +115,7 @@
     <string name="repeat">Повтор</string>
     <string name="pulse">Пульс</string>
     <string name="measurements">Измерения</string>
+    <string name="date_in_season">Дата должна быть в данном сезоне</string>
 
 
 </resources>

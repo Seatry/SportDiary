@@ -119,6 +119,7 @@
     <string name="repeat">Repeat</string>
     <string name="pulse">Pulse</string>
     <string name="measurements">Measurements</string>
+    <string name="date_in_season">Date should be in this season</string>
 
 
 </resources>

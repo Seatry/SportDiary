@@ -39,6 +39,8 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
     private Day updateDay = new Day();
     private long seasonPlanId;
     private SeasonPlan seasonPlan;
+    private Date maxDate;
+    private Date minDate;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -54,6 +56,8 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
         importanceSpinner = v.findViewById(R.id.competitionImportanceSpinner);
 
         seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
+        maxDate = DateUtil.addDays(seasonPlan.getStart(), 365);
+        minDate = seasonPlan.getStart();
 
         editDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,8 +83,8 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
                     datePickerDialog = new DatePickerDialog(MainActivity.getInstance());
                     datePickerDialog.setOnDateSetListener(listener);
                 }
-                datePickerDialog.getDatePicker().setMaxDate(DateUtil.addDays(seasonPlan.getStart(), 365).getTime());
-                datePickerDialog.getDatePicker().setMinDate(seasonPlan.getStart().getTime());
+                datePickerDialog.getDatePicker().setMaxDate(maxDate.getTime());
+                datePickerDialog.getDatePicker().setMinDate(minDate.getTime());
                 datePickerDialog.show();
             }
         });
@@ -131,6 +135,10 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
             Toast.makeText(MainActivity.getInstance(), R.string.date_format_err, Toast.LENGTH_SHORT).show();
             return;
         }
+        if (date.after(maxDate) || date.before(minDate)) {
+            Toast.makeText(MainActivity.getInstance(), R.string.date_in_season, Toast.LENGTH_SHORT).show();
+            return;
+        }
         Long importanceId = importanceSpinner.getSelectedItem() == null ? null
                 : sportDataBase.importanceDao().getIdByName(importanceSpinner.getSelectedItem().toString());
         Day existDay = sportDataBase.dayDao().getDayByDateAndSeasonIdWhereCompetitionToImportanceNotNull(date, seasonPlanId);
@@ -157,6 +165,10 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
             date = sdf.parse(editDate.getText().toString());
         } catch (ParseException e) {
             Toast.makeText(MainActivity.getInstance(), R.string.date_format_err, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (date.after(maxDate) || date.before(minDate)) {
+            Toast.makeText(MainActivity.getInstance(), R.string.date_in_season, Toast.LENGTH_SHORT).show();
             return;
         }
         Long importanceId = importanceSpinner.getSelectedItem() == null ? null
