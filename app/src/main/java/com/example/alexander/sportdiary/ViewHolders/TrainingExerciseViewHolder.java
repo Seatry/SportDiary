@@ -35,7 +35,7 @@ public class TrainingExerciseViewHolder extends RecyclerView.ViewHolder {
 
     public void setData(String exercise, String style, String tempo, String zone,
                         String workToRest, String capacity, String time, String borg, String note) {
-        exerciseView.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.exercises_to_training), exercise));
+        exerciseView.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.Exercise), exercise));
         styleView.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.style), style));
         tempoView.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.tempo), tempo));
         zoneView.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.zone), zone));

@@ -63,6 +63,7 @@ public class TrainingExercise {
     private int series = 0;
     private String note = "";
     private int minutes = 0;
+    private int hrAvg = 0;
 
     public TrainingExercise() {
 
@@ -200,5 +201,13 @@ public class TrainingExercise {
 
     public void setMinutes(int minutes) {
         this.minutes = minutes;
+    }
+
+    public int getHrAvg() {
+        return hrAvg;
+    }
+
+    public void setHrAvg(int hrAvg) {
+        this.hrAvg = hrAvg;
     }
 }

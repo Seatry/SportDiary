@@ -108,6 +108,13 @@
     <string name="male">М</string>
     <string name="female">Ж</string>
     <string name="sex">Пол</string>
+    <string name="before">До подхода</string>
+    <string name="after">После подхода</string>
+    <string name="heart_rate">Частота сердечных сокращений</string>
+    <string name="series">Серия</string>
+    <string name="repeat">Повтор</string>
+    <string name="pulse">Пульс</string>
+    <string name="measurements">Измерения</string>
 
 
 </resources>

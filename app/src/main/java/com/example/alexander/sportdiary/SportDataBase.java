@@ -19,6 +19,7 @@ import com.example.alexander.sportdiary.Dao.EditDao.TempoDao;
 import com.example.alexander.sportdiary.Dao.EditDao.TimeDao;
 import com.example.alexander.sportdiary.Dao.EditDao.TrainingPlaceDao;
 import com.example.alexander.sportdiary.Dao.EditDao.TypeDao;
+import com.example.alexander.sportdiary.Dao.HeartRateDao;
 import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
 import com.example.alexander.sportdiary.Dao.EditDao.ZoneDao;
 import com.example.alexander.sportdiary.Dao.TrainingDao;
@@ -40,6 +41,7 @@ import com.example.alexander.sportdiary.Entities.EditEntities.Style;
 import com.example.alexander.sportdiary.Entities.EditEntities.Tempo;
 import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
+import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
 import com.example.alexander.sportdiary.Entities.Training;
@@ -53,8 +55,8 @@ import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
                 Time.class, Borg.class, TrainingsToEquipments.class, TrainingExercise.class,
                 Training.class, TrainingPlace.class, TrainingsToAims.class, Style.class,
                 Tempo.class, Block.class, Camp.class, Competition.class, Importance.class,
-                Stage.class, Type.class, CompetitionToImportance.class
-        }, version = 20)
+                Stage.class, Type.class, CompetitionToImportance.class, HeartRate.class
+        }, version = 21)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
     public abstract ZoneDao zoneDao();
@@ -78,4 +80,5 @@ public abstract class SportDataBase extends RoomDatabase {
     public abstract StageDao stageDao();
     public abstract TypeDao typeDao();
     public abstract CompetitionToImportanceDao competitionToImportanceDao();
+    public abstract HeartRateDao heartRateDao();
 }

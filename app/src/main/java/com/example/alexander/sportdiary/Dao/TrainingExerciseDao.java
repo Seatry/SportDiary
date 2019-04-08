@@ -28,4 +28,7 @@ public interface TrainingExerciseDao {
 
     @Query("SELECT * FROM TrainingExercise WHERE training_id = :id")
     LiveData<List<TrainingExercise>> getAllByTrainingId(long id);
+
+    @Query("UPDATE TrainingExercise SET hrAvg = :hr WHERE id = :exerciseId")
+    void updateHrById(int hr, long exerciseId);
 }

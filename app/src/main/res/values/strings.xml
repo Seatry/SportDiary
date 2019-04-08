@@ -112,6 +112,13 @@
     <string name="male">M</string>
     <string name="female">F</string>
     <string name="sex">sex</string>
+    <string name="before">Before approach</string>
+    <string name="after">After approach</string>
+    <string name="heart_rate">Heart rate</string>
+    <string name="series">Series</string>
+    <string name="repeat">Repeat</string>
+    <string name="pulse">Pulse</string>
+    <string name="measurements">Measurements</string>
 
 
 </resources>

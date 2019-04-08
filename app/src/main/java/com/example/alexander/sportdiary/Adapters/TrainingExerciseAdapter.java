@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.example.alexander.sportdiary.EditOption;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Fragments.AddTrainingExerciseFragment;
+import com.example.alexander.sportdiary.Fragments.HeartRateFragment;
 import com.example.alexander.sportdiary.Fragments.TrainingExerciseActivity;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
@@ -56,13 +57,13 @@ public class TrainingExerciseAdapter extends RecyclerView.Adapter<TrainingExerci
                 //creating a popup menu
                 PopupMenu popup = new PopupMenu(MainActivity.getInstance(), trainingExerciseViewHolder.itemView);
                 //inflating menu from xml resource
-                popup.inflate(R.menu.edit_options);
+                popup.inflate(R.menu.exercise_opts);
                 //adding click listener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
-                            case R.id.update:
+                            case R.id.exerciseUpdate:
                                 AddTrainingExerciseFragment addTrainingExerciseFragment = new AddTrainingExerciseFragment();
                                 addTrainingExerciseFragment
                                         .setTrainingId(trainingExercises.get(i).getTrainingId())
@@ -71,13 +72,18 @@ public class TrainingExerciseAdapter extends RecyclerView.Adapter<TrainingExerci
                                         .setUpdateTrainingExercise(trainingExercises.get(i));
                                 addTrainingExerciseFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "updateTrainingExercise");
                                 break;
-                            case R.id.delete:
+                            case R.id.exerciseDelete:
                                 AsyncTask.execute(new Runnable() {
                                     @Override
                                     public void run() {
                                         sportDataBase.trainingExerciseDao().delete(trainingExercises.get(i));
                                     }
                                 });
+                                break;
+                            case R.id.heartRates:
+                                HeartRateFragment heartRateFragment = new HeartRateFragment();
+                                heartRateFragment.setExerciseId(trainingExercises.get(i).getId());
+                                heartRateFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "heartRates");
                                 break;
                         }
                         return false;
