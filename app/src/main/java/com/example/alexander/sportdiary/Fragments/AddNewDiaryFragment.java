@@ -8,8 +8,10 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Dao.DayDao;
@@ -31,6 +33,10 @@ import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 public class AddNewDiaryFragment extends DialogFragment implements View.OnClickListener {
     private EditText editNameText;
     private EditText editStartText;
+    private Spinner maleSpinner;
+    private EditText editHrMax;
+    private EditText editHrRest;
+    private EditText editPerformance;
     private SeasonPlanDao dao;
     private DayDao dayDao;
 
@@ -56,6 +62,15 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
                 datePickerDialog.show();
             }
         });
+        maleSpinner = v.findViewById(R.id.maleSpinner);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.getInstance(), android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.addAll(getString(R.string.male), getString(R.string.female));
+        adapter.notifyDataSetChanged();
+        maleSpinner.setAdapter(adapter);
+        editHrMax = v.findViewById(R.id.hrMax);
+        editHrRest = v.findViewById(R.id.hrRest);
+        editPerformance = v.findViewById(R.id.performance);
 
         dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
         dayDao = MainActivity.getInstance().getDatabase().dayDao();
@@ -78,6 +93,18 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
     public void add()  {
         SeasonPlan seasonPlan = new SeasonPlan();
         seasonPlan.setName(editNameText.getText().toString());
+        if (editHrMax.getText().length() > 0) {
+            seasonPlan.setHrMax(Integer.parseInt(editHrMax.getText().toString()));
+        }
+        if (editHrRest.getText().length() > 0) {
+            seasonPlan.setHrRest(Integer.parseInt(editHrRest.getText().toString()));
+        }
+        if (editPerformance.getText().length() > 0) {
+            seasonPlan.setLastPerformance(Integer.parseInt(editPerformance.getText().toString()));
+        }
+        if (maleSpinner.getSelectedItem() != null) {
+            seasonPlan.setMale(maleSpinner.getSelectedItem().toString());
+        }
         try {
             String dateText = editStartText.getText().toString();
             final Date date = sdf.parse(dateText);

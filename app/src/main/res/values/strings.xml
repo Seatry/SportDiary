@@ -105,6 +105,13 @@
     <string name="info_for">Info for </string>
     <string name="for_week"> week</string>
     <string name="update_week_info">Update week info</string>
+    <string name="max_heart_rate">Max heart rate</string>
+    <string name="resting_heart_rate">Resting heart rate</string>
+    <string name="last_performance">Last performance</string>
+    <string name="remove">Remove</string>
+    <string name="male">M</string>
+    <string name="female">F</string>
+    <string name="sex">sex</string>
 
 
 </resources>

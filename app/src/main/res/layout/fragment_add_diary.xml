@@ -27,13 +27,51 @@
         android:inputType="date"
         android:layout_below="@id/add_diary_name"
         android:hint="@string/start"/>
+    <LinearLayout
+        android:id="@+id/maleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/add_diary_start"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/sex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/maleSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/hrMax"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@+id/maleLayout"
+        android:hint="@string/max_heart_rate"/>
+    <EditText
+        android:id="@+id/hrRest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@+id/hrMax"
+        android:hint="@string/resting_heart_rate"/>
+    <EditText
+        android:id="@+id/performance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@+id/hrRest"
+        android:hint="@string/last_performance"/>
+
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/cancelAddDiary"
         android:text="@string/cancel"
-        android:layout_below="@id/add_diary_start"
+        android:layout_below="@id/performance"
         android:layout_toLeftOf="@id/okAddDiary"
         android:layout_toStartOf="@id/okAddDiary" />
 
@@ -42,7 +80,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/okAddDiary"
         android:text="@string/add"
-        android:layout_below="@id/add_diary_start"
+        android:layout_below="@id/performance"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 

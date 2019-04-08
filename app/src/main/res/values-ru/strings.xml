@@ -101,6 +101,13 @@
     <string name="info_for">Информация по</string>
     <string name="for_week">недели</string>
     <string name="update_week_info">Изменить информацию по недели</string>
+    <string name="max_heart_rate">Максимальное ЧСС</string>
+    <string name="resting_heart_rate">ЧСС покоя</string>
+    <string name="last_performance">Прошлая производителньость</string>
+    <string name="remove">Удалить</string>
+    <string name="male">М</string>
+    <string name="female">Ж</string>
+    <string name="sex">Пол</string>
 
 
 </resources>

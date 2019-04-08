@@ -54,7 +54,7 @@ import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
                 Training.class, TrainingPlace.class, TrainingsToAims.class, Style.class,
                 Tempo.class, Block.class, Camp.class, Competition.class, Importance.class,
                 Stage.class, Type.class, CompetitionToImportance.class
-        }, version = 19)
+        }, version = 20)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
     public abstract ZoneDao zoneDao();

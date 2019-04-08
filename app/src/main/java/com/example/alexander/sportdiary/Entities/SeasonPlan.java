@@ -17,6 +17,10 @@ public class SeasonPlan {
 
     private String name;
     private Date start;
+    private String male;
+    private int hrMax = 200;
+    private int hrRest = 60;
+    private int lastPerformance = 0;
 
     public SeasonPlan(String name, Date start) {
         this.name = name;
@@ -48,5 +52,37 @@ public class SeasonPlan {
 
     public void setStart(Date start) {
         this.start = start;
+    }
+
+    public String getMale() {
+        return male;
+    }
+
+    public void setMale(String male) {
+        this.male = male;
+    }
+
+    public int getHrMax() {
+        return hrMax;
+    }
+
+    public void setHrMax(int hrMax) {
+        this.hrMax = hrMax;
+    }
+
+    public int getHrRest() {
+        return hrRest;
+    }
+
+    public void setHrRest(int hrRest) {
+        this.hrRest = hrRest;
+    }
+
+    public int getLastPerformance() {
+        return lastPerformance;
+    }
+
+    public void setLastPerformance(int lastPerformance) {
+        this.lastPerformance = lastPerformance;
     }
 }

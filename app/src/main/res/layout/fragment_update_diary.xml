@@ -4,24 +4,28 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/fragment_update_diary">
-    <TextView
+    <LinearLayout
         android:id="@+id/update_diary_title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/update_diary"
-        android:textAppearance="?android:textAppearanceLarge"/>
-    <Button
-        android:id="@+id/removeDiary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/update_diary_title"
-        android:text="-"/>
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/update_diary"
+            android:textAppearance="?android:textAppearanceLarge"/>
+        <Button
+            android:id="@+id/removeDiary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"/>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/update_diary_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/removeDiary"
+        android:layout_below="@+id/update_diary_title"
         android:inputType="text"
         android:hint="@string/name">
     </EditText>
@@ -33,13 +37,50 @@
         android:inputType="date"
         android:layout_below="@id/update_diary_name"
         android:hint="@string/start"/>
+    <LinearLayout
+        android:id="@+id/update_maleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/update_diary_start"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/sex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/update_maleSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/update_hrMax"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@+id/update_maleLayout"
+        android:hint="@string/max_heart_rate"/>
+    <EditText
+        android:id="@+id/update_hrRest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@+id/update_hrMax"
+        android:hint="@string/resting_heart_rate"/>
+    <EditText
+        android:id="@+id/update_performance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@+id/update_hrRest"
+        android:hint="@string/last_performance"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/cancelUpdateDiary"
         android:text="@string/cancel"
-        android:layout_below="@id/update_diary_start"
+        android:layout_below="@id/update_performance"
         android:layout_toLeftOf="@id/okUpdateDiary"
         android:layout_toStartOf="@id/okUpdateDiary" />
 
@@ -48,7 +89,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/okUpdateDiary"
         android:text="@string/save"
-        android:layout_below="@id/update_diary_start"
+        android:layout_below="@id/update_performance"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 

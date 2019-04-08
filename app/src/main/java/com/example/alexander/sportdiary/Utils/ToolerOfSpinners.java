@@ -13,7 +13,6 @@ import java.util.List;
 
 public class ToolerOfSpinners {
     public static <T extends Edit> void toolSpinner(final EditDao<T> dao, final Spinner spinner, @Nullable final String itemToSelect) {
-        System.out.println(itemToSelect == null ? "NULL" : itemToSelect);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.getInstance(), android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         AsyncTask.execute(new Runnable() {
