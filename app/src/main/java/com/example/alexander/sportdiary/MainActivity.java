@@ -13,11 +13,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
@@ -36,9 +38,9 @@ import com.example.alexander.sportdiary.Entities.EditEntities.Tempo;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
 import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
+import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
-import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
@@ -58,7 +60,29 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 
-import static com.example.alexander.sportdiary.MenuItemIds.*;
+import static android.view.View.GONE;
+import static com.example.alexander.sportdiary.MenuItemIds.ADD_DIARY;
+import static com.example.alexander.sportdiary.MenuItemIds.AIMS;
+import static com.example.alexander.sportdiary.MenuItemIds.BLOCKS;
+import static com.example.alexander.sportdiary.MenuItemIds.BORG_RATINGS;
+import static com.example.alexander.sportdiary.MenuItemIds.CALENDAR;
+import static com.example.alexander.sportdiary.MenuItemIds.CAMPS;
+import static com.example.alexander.sportdiary.MenuItemIds.COMPETITIONS;
+import static com.example.alexander.sportdiary.MenuItemIds.COMPETITION_SCHEDULE;
+import static com.example.alexander.sportdiary.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.MenuItemIds.EDIT_GROUP;
+import static com.example.alexander.sportdiary.MenuItemIds.EQUIPMENTS;
+import static com.example.alexander.sportdiary.MenuItemIds.EXERCISES;
+import static com.example.alexander.sportdiary.MenuItemIds.IMPORTANCE;
+import static com.example.alexander.sportdiary.MenuItemIds.OVERALL_PLAN;
+import static com.example.alexander.sportdiary.MenuItemIds.STAGES;
+import static com.example.alexander.sportdiary.MenuItemIds.STATISTICS;
+import static com.example.alexander.sportdiary.MenuItemIds.STYLES;
+import static com.example.alexander.sportdiary.MenuItemIds.TEMPOS;
+import static com.example.alexander.sportdiary.MenuItemIds.TIMES;
+import static com.example.alexander.sportdiary.MenuItemIds.TRAINING_PLACES;
+import static com.example.alexander.sportdiary.MenuItemIds.TYPES;
+import static com.example.alexander.sportdiary.MenuItemIds.ZONES;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -67,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SportDataBase database;
     private Toolbar toolbar;
     private DayFragment dayFragment;
-
+    private DrawerLayout drawer;
 
     public void setDayFragment(DayFragment dayFragment) {
         this.dayFragment = dayFragment;
@@ -115,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         prepareMenuData();
         populateExpandableList();
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -127,10 +151,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         RoomDatabase.Callback dbCallback = new RoomDatabase.Callback() {
             public void onCreate(SupportSQLiteDatabase db) {
-                Executors.newSingleThreadScheduledExecutor().execute(new Runnable() {
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        fill();
+                        new InitializeDataBase().execute();
                     }
                 });
             }
@@ -156,42 +180,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-    }
-
-    // NEED FIX
-    public void fill() {
-        Random random = new Random();
-        Date date = new Date();
-        try {
-            date = sdf.parse("20.05.2010");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        SeasonPlan seasonPlan = new SeasonPlan("Sasha", date);
-        long id = database.seasonPlanDao().insert(seasonPlan);
-        for(int i = 0; i < 366; i++, date = DateUtil.addDays(date, 1)) {
-            database.dayDao().insert(new Day(date, id));
-        }
-        List<Day> days = database.dayDao().getAllBySeasonPlanId(id);
-        for (Day day : days) {
-            long tid = database.trainingDao().insert(new Training(day.getId()));
-            for (int j = 0; j < 3; j++) {
-                int time = random.nextInt(25) + 20;
-                TrainingExercise trainingExercise = new TrainingExercise(tid);
-                trainingExercise.setMinutes(time);
-                long eid = database.trainingExerciseDao().insert(trainingExercise);
-                double hrAvg = 0;
-                for (int k = 0; k < 7; k++) {
-                    int hr = random.nextInt(100) + 80;
-                    HeartRate heartRate = new HeartRate(eid);
-                    heartRate.setHr(hr);
-                    database.heartRateDao().insert(heartRate);
-                    hrAvg += hr;
-                }
-                hrAvg /= 10.0;
-                database.trainingExerciseDao().updateHrById(hrAvg, eid);
-            }
-        }
     }
 
     private void prepareMenuData() {

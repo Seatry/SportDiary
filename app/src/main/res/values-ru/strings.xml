@@ -126,6 +126,7 @@
     <string name="performance">Производительность</string>
     <string name="trimps_graph">График ТРИМПов</string>
     <string name="trimp">ТРИМП</string>
+    <string name="initialize">Инициализация</string>
 
 
 </resources>

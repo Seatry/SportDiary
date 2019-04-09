@@ -130,6 +130,7 @@
     <string name="performance">Performance</string>
     <string name="trimps_graph">Trimps graph</string>
     <string name="trimp">Trimp</string>
+    <string name="initialize">Initialize</string>
 
 
 </resources>
