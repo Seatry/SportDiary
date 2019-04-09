@@ -1,6 +1,7 @@
 package com.example.alexander.sportdiary;
 
 import android.arch.persistence.room.Room;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -39,6 +40,7 @@ import com.example.alexander.sportdiary.Fragments.CompetitionScheduleFragment;
 import com.example.alexander.sportdiary.Fragments.DayFragment;
 import com.example.alexander.sportdiary.Fragments.EditFragment;
 import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
+import com.example.alexander.sportdiary.Fragments.Statistics;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
 
 import java.util.ArrayList;
@@ -406,7 +408,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (seasonPlanId == null) {
                 Toast.makeText(this, R.string.no_diary_selected, Toast.LENGTH_SHORT).show();
             } else {
-
+                Intent intent = new Intent(MainActivity.getInstance(), Statistics.class);
+                intent.putExtra("seasonPlanId", seasonPlanId);
+                this.startActivity(intent);
             }
         } else if (id == ADD_DIARY.getValue()) {
             AddNewDiaryFragment diaryFragment = new AddNewDiaryFragment();

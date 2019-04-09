@@ -116,6 +116,11 @@
     <string name="pulse">Пульс</string>
     <string name="measurements">Измерения</string>
     <string name="date_in_season">Дата должна быть в данном сезоне</string>
+    <string name="input">Ввод</string>
+    <string name="draw">Рисовать</string>
+    <string name="from">С какого числа</string>
+    <string name="to">По какое число</string>
+    <string name="from_to_err">Неверный порядок дат</string>
 
 
 </resources>
