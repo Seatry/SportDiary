@@ -125,6 +125,11 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="from_to_err">from date should be before to date</string>
+    <string name="banister_model">Banister model</string>
+    <string name="date">Date</string>
+    <string name="performance">Performance</string>
+    <string name="trimps_graph">Trimps graph</string>
+    <string name="trimp">Trimp</string>
 
 
 </resources>

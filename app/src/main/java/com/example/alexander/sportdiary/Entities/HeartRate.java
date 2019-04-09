@@ -28,6 +28,10 @@ public class HeartRate {
 
     }
 
+    public HeartRate(long exerciseId) {
+        this.exerciseId = exerciseId;
+    }
+
     public HeartRate(long exerciseId, String time, int series, int repeat) {
         this.exerciseId = exerciseId;
         this.time = time;

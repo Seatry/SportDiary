@@ -120,7 +120,7 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
-                    for(int i = 0; i < 365; i++) {
+                    for(int i = 0; i < 366; i++) {
                         dayDao.insert(new Day(DateUtil.addDays(date, i), id));
                     }
                 }

@@ -63,10 +63,14 @@ public class TrainingExercise {
     private int series = 0;
     private String note = "";
     private int minutes = 0;
-    private int hrAvg = 0;
+    private double hrAvg = 0;
 
     public TrainingExercise() {
 
+    }
+
+    public TrainingExercise(long trainingId) {
+        this.trainingId = trainingId;
     }
 
     public TrainingExercise(long trainingId, @Nullable Long exerciseId, @Nullable Long styleId, @Nullable Long tempoId,
@@ -203,11 +207,11 @@ public class TrainingExercise {
         this.minutes = minutes;
     }
 
-    public int getHrAvg() {
+    public double getHrAvg() {
         return hrAvg;
     }
 
-    public void setHrAvg(int hrAvg) {
+    public void setHrAvg(double hrAvg) {
         this.hrAvg = hrAvg;
     }
 }

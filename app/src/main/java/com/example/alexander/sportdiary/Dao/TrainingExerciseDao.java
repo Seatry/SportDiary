@@ -27,8 +27,11 @@ public interface TrainingExerciseDao {
     LiveData<List<TrainingExercise>> getAll();
 
     @Query("SELECT * FROM TrainingExercise WHERE training_id = :id")
-    LiveData<List<TrainingExercise>> getAllByTrainingId(long id);
+    LiveData<List<TrainingExercise>> getAllLiveByTrainingId(long id);
+
+    @Query("SELECT * FROM TrainingExercise WHERE training_id = :id")
+    List<TrainingExercise> getAllByTrainingId(long id);
 
     @Query("UPDATE TrainingExercise SET hrAvg = :hr WHERE id = :exerciseId")
-    void updateHrById(int hr, long exerciseId);
+    void updateHrById(double hr, long exerciseId);
 }

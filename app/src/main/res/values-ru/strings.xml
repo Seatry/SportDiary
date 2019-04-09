@@ -121,6 +121,11 @@
     <string name="from">С какого числа</string>
     <string name="to">По какое число</string>
     <string name="from_to_err">Неверный порядок дат</string>
+    <string name="banister_model">Модель Банистера</string>
+    <string name="date">Дата</string>
+    <string name="performance">Производительность</string>
+    <string name="trimps_graph">График ТРИМПов</string>
+    <string name="trimp">ТРИМП</string>
 
 
 </resources>

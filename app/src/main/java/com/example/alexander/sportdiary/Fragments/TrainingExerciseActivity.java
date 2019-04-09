@@ -54,7 +54,7 @@ public class TrainingExerciseActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         LiveData<List<TrainingExercise>> trainingLiveData = sportDataBase.trainingExerciseDao()
-                .getAllByTrainingId(trainingId);
+                .getAllLiveByTrainingId(trainingId);
         trainingLiveData.observe(TrainingExerciseActivity.getInstance(), new Observer<List<TrainingExercise>>() {
             @Override
             public void onChanged(@Nullable List<TrainingExercise> elems) {

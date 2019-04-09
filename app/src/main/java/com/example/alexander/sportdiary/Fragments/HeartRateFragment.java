@@ -76,7 +76,7 @@ public class HeartRateFragment extends DialogFragment implements View.OnClickLis
 
     public void update() {
         List<HeartRate> heartRates = adapter.getHeartRates();
-        int hr = 0;
+        double hr = 0;
         for (HeartRate heartRate : heartRates) {
             hr += heartRate.getHr();
             sportDataBase.heartRateDao().update(heartRate);

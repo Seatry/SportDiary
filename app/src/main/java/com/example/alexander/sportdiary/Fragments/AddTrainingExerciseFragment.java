@@ -191,7 +191,7 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
         if (oldSeries != series || oldRepeats != repeats) {
             sportDataBase.heartRateDao().deleteByExerciseIdWithGreaterSeriesOrRepeat(updateTrainingExercise.getId(), series, repeats);
             addHeartRates(series, repeats, updateTrainingExercise.getId());
-            int hr = 0;
+            double hr = 0;
             List<Integer> hrList = sportDataBase.heartRateDao().getHrByExerciseId(updateTrainingExercise.getId());
             if (hrList.size() != 0 ) {
                 for (Integer pulse : hrList) {

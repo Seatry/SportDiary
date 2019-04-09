@@ -56,4 +56,7 @@ public interface DayDao {
 
     @Query("UPDATE Day set capacity = :capacity WHERE id = :dayId")
     void updateCapacityById(int capacity, long dayId);
+
+    @Query("SELECT * FROM Day WHERE season_plan_id = :seasonPlanId")
+    List<Day> getAllBySeasonPlanId(long seasonPlanId);
 }

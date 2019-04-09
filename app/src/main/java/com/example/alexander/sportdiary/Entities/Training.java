@@ -48,6 +48,10 @@ public class Training {
 
     }
 
+    public Training(long dayId) {
+        this.dayId = dayId;
+    }
+
     public Training(long dayId, @Nullable Long timeId, @Nullable Long placeId, @Nullable Long borgId) {
         this.dayId = dayId;
         this.timeId = timeId;

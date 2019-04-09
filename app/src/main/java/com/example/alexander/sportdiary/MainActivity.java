@@ -1,6 +1,8 @@
 package com.example.alexander.sportdiary;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
+import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
@@ -33,8 +36,11 @@ import com.example.alexander.sportdiary.Entities.EditEntities.Tempo;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
 import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
+import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
+import com.example.alexander.sportdiary.Entities.Training;
+import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
 import com.example.alexander.sportdiary.Fragments.CompetitionScheduleFragment;
 import com.example.alexander.sportdiary.Fragments.DayFragment;
@@ -42,10 +48,15 @@ import com.example.alexander.sportdiary.Fragments.EditFragment;
 import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
 import com.example.alexander.sportdiary.Fragments.Statistics;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
+import com.example.alexander.sportdiary.Utils.DateUtil;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Executors;
 
 import static com.example.alexander.sportdiary.MenuItemIds.*;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
@@ -114,10 +125,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
 
+        RoomDatabase.Callback dbCallback = new RoomDatabase.Callback() {
+            public void onCreate(SupportSQLiteDatabase db) {
+                Executors.newSingleThreadScheduledExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        fill();
+                    }
+                });
+            }
+        };
+
         database = Room.databaseBuilder(this, SportDataBase.class, "SportDataBase")
                 .fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
+                .addCallback(dbCallback)
                 .build();
+
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -134,7 +158,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    // NEED FIX
+    public void fill() {
+        Random random = new Random();
+        Date date = new Date();
+        try {
+            date = sdf.parse("20.05.2010");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SeasonPlan seasonPlan = new SeasonPlan("Sasha", date);
+        long id = database.seasonPlanDao().insert(seasonPlan);
+        for(int i = 0; i < 366; i++, date = DateUtil.addDays(date, 1)) {
+            database.dayDao().insert(new Day(date, id));
+        }
+        List<Day> days = database.dayDao().getAllBySeasonPlanId(id);
+        for (Day day : days) {
+            long tid = database.trainingDao().insert(new Training(day.getId()));
+            for (int j = 0; j < 3; j++) {
+                int time = random.nextInt(25) + 20;
+                TrainingExercise trainingExercise = new TrainingExercise(tid);
+                trainingExercise.setMinutes(time);
+                long eid = database.trainingExerciseDao().insert(trainingExercise);
+                double hrAvg = 0;
+                for (int k = 0; k < 7; k++) {
+                    int hr = random.nextInt(100) + 80;
+                    HeartRate heartRate = new HeartRate(eid);
+                    heartRate.setHr(hr);
+                    database.heartRateDao().insert(heartRate);
+                    hrAvg += hr;
+                }
+                hrAvg /= 10.0;
+                database.trainingExerciseDao().updateHrById(hrAvg, eid);
+            }
+        }
+    }
+
     private void prepareMenuData() {
+        headerList.clear();
+        childList.clear();
         MenuModel menuModel = new MenuModel(getString(R.string.lists_edit), true, true, EDIT_GROUP.getValue());
         headerList.add(menuModel);
         List<MenuModel> childModelsList = new ArrayList<>();

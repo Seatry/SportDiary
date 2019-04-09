@@ -17,7 +17,7 @@ public class SeasonPlan {
 
     private String name;
     private Date start;
-    private String male;
+    private String male = "M";
     private int hrMax = 200;
     private int hrRest = 60;
     private int lastPerformance = 0;

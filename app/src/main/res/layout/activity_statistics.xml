@@ -34,4 +34,51 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
+    <TabHost
+        android:id="@+id/graph_tabHost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/inputLayout">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </TabWidget>
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:id="@+id/banisterTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <com.jjoe64.graphview.GraphView
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dip"
+                        android:id="@+id/performanceGraph"
+                        android:layout_margin="20dip"/>
+                    <com.jjoe64.graphview.GraphView
+                        android:layout_margin="20dip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dip"
+                        android:id="@+id/trimpsGraph"
+                        android:layout_below="@+id/performanceGraph"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/questionsGraphTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </RelativeLayout>
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
 </RelativeLayout>
