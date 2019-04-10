@@ -26,14 +26,20 @@
             android:text="@string/competition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <Spinner
-            android:id="@+id/competitionNameSpinner"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <Spinner
-            android:id="@+id/competitionImportanceSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <Spinner
+                android:id="@+id/competitionNameSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <Spinner
+                android:id="@+id/competitionImportanceSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <Button

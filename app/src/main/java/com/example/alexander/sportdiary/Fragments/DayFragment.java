@@ -21,9 +21,22 @@ import com.example.alexander.sportdiary.Adapters.TestAdapter;
 import com.example.alexander.sportdiary.Adapters.TrainingAdapter;
 import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.DayToTest;
+import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
+import com.example.alexander.sportdiary.Entities.EditEntities.Block;
+import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
+import com.example.alexander.sportdiary.Entities.EditEntities.Camp;
+import com.example.alexander.sportdiary.Entities.EditEntities.Competition;
+import com.example.alexander.sportdiary.Entities.EditEntities.Equipment;
+import com.example.alexander.sportdiary.Entities.EditEntities.Importance;
+import com.example.alexander.sportdiary.Entities.EditEntities.RestPlace;
+import com.example.alexander.sportdiary.Entities.EditEntities.Stage;
 import com.example.alexander.sportdiary.Entities.EditEntities.Test;
+import com.example.alexander.sportdiary.Entities.EditEntities.Time;
+import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
+import com.example.alexander.sportdiary.Entities.EditEntities.Type;
 import com.example.alexander.sportdiary.Entities.Rest;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.Training;
@@ -59,6 +72,14 @@ public class DayFragment extends Fragment {
     private TextView campsText;
     private TextView competitionText;
     private TextView capacityText;
+    private LiveData<Long> blockId;
+    private LiveData<Long> stageId;
+    private LiveData<Long> typeId;
+    private LiveData<Long> campId;
+    private LiveData<Long> CiId;
+    private LiveData<List<Training>> trainingLiveData;
+    private LiveData<List<DayToTest>> testLiveData;
+    private LiveData<List<Rest>> restLiveData;
 
     public void setSeasonPlanId(long seasonPlanId) {
         this.seasonPlanId = seasonPlanId;
@@ -130,6 +151,8 @@ public class DayFragment extends Fragment {
         competitionText = v.findViewById(R.id.day_competition_text);
         capacityText = v.findViewById(R.id.day_capacity_text);
         getInfo();
+
+        setEditObservers();
 
         TabHost tabHost = v.findViewById(R.id.day_tabHost);
         tabHost.setup();
@@ -215,10 +238,107 @@ public class DayFragment extends Fragment {
         return v;
     }
 
+    private void setEditObservers() {
+        LiveData<List<TrainingsToAims>> trainingsToAims = sportDataBase.trainingsToAimsDao().getAll();
+        trainingsToAims.observe(MainActivity.getInstance(), new Observer<List<TrainingsToAims>>() {
+            @Override
+            public void onChanged(@Nullable List<TrainingsToAims> trainingsToAims) {
+                trainingAdapter.notifyDataSetChanged();
+            }
+        });
+        LiveData<List<TrainingsToEquipments>> trainingsToEquipments = sportDataBase.trainingsToEquipmentsDao().getAll();
+        trainingsToEquipments.observe(MainActivity.getInstance(), new Observer<List<TrainingsToEquipments>>() {
+            @Override
+            public void onChanged(@Nullable List<TrainingsToEquipments> trainingsToEquipments) {
+                trainingAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.timeDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Time>>() {
+            @Override
+            public void onChanged(@Nullable List<Time> times) {
+                trainingAdapter.notifyDataSetChanged();
+                restAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.trainingPlaceDao().getAll().observe(MainActivity.getInstance(), new Observer<List<TrainingPlace>>() {
+            @Override
+            public void onChanged(@Nullable List<TrainingPlace> trainingPlaces) {
+                trainingAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.aimDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Aim>>() {
+            @Override
+            public void onChanged(@Nullable List<Aim> aims) {
+                trainingAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.equipmentDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Equipment>>() {
+            @Override
+            public void onChanged(@Nullable List<Equipment> equipment) {
+                trainingAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.borgDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Borg>>() {
+            @Override
+            public void onChanged(@Nullable List<Borg> borgs) {
+                trainingAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.testDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Test>>() {
+            @Override
+            public void onChanged(@Nullable List<Test> tests) {
+                testAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.restPlaceDao().getAll().observe(MainActivity.getInstance(), new Observer<List<RestPlace>>() {
+            @Override
+            public void onChanged(@Nullable List<RestPlace> restPlaces) {
+                restAdapter.notifyDataSetChanged();
+            }
+        });
+        sportDataBase.blockDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Block>>() {
+            @Override
+            public void onChanged(@Nullable List<Block> blocks) {
+                getInfo();
+            }
+        });
+        sportDataBase.stageDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Stage>>() {
+            @Override
+            public void onChanged(@Nullable List<Stage> stages) {
+                getInfo();
+            }
+        });
+        sportDataBase.typeDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Type>>() {
+            @Override
+            public void onChanged(@Nullable List<Type> types) {
+                getInfo();
+            }
+        });
+        sportDataBase.campDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Camp>>() {
+            @Override
+            public void onChanged(@Nullable List<Camp> camps) {
+                getInfo();
+            }
+        });
+        sportDataBase.competitionDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Competition>>() {
+            @Override
+            public void onChanged(@Nullable List<Competition> competitions) {
+                getInfo();
+            }
+        });
+        sportDataBase.importanceDao().getAll().observe(MainActivity.getInstance(), new Observer<List<Importance>>() {
+            @Override
+            public void onChanged(@Nullable List<Importance> importanceList) {
+                getInfo();
+            }
+        });
+    }
+
     public void getTrainings() {
         try {
             final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
-            LiveData<List<Training>> trainingLiveData = sportDataBase.trainingDao().getAllLiveByDayId(dayId);
+            if (trainingLiveData != null) trainingLiveData.removeObservers(MainActivity.getInstance());
+            trainingLiveData = sportDataBase.trainingDao().getAllLiveByDayId(dayId);
             trainingLiveData.observe(MainActivity.getInstance(), new Observer<List<Training>>() {
                 @Override
                 public void onChanged(@Nullable List<Training> elems) {
@@ -233,20 +353,6 @@ public class DayFragment extends Fragment {
                     }
                 }
             });
-            LiveData<List<TrainingsToAims>> trainingsToAims = sportDataBase.trainingsToAimsDao().getAll();
-            trainingsToAims.observe(MainActivity.getInstance(), new Observer<List<TrainingsToAims>>() {
-                @Override
-                public void onChanged(@Nullable List<TrainingsToAims> trainingsToAims) {
-                    trainingAdapter.notifyDataSetChanged();
-                }
-            });
-            LiveData<List<TrainingsToEquipments>> trainingsToEquipments = sportDataBase.trainingsToEquipmentsDao().getAll();
-            trainingsToEquipments.observe(MainActivity.getInstance(), new Observer<List<TrainingsToEquipments>>() {
-                @Override
-                public void onChanged(@Nullable List<TrainingsToEquipments> trainingsToEquipments) {
-                    trainingAdapter.notifyDataSetChanged();
-                }
-            });
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -255,7 +361,8 @@ public class DayFragment extends Fragment {
     public void getTests() {
         try {
             final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
-            LiveData<List<DayToTest>> testLiveData = sportDataBase.dayToTestDao().getAllLiveByDayId(dayId);
+            if (testLiveData != null) testLiveData.removeObservers(MainActivity.getInstance());
+            testLiveData = sportDataBase.dayToTestDao().getAllLiveByDayId(dayId);
             testLiveData.observe(MainActivity.getInstance(), new Observer<List<DayToTest>>() {
                 @Override
                 public void onChanged(@Nullable List<DayToTest> elems) {
@@ -271,7 +378,8 @@ public class DayFragment extends Fragment {
     public void getRests() {
         try {
             final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
-            LiveData<List<Rest>> restLiveData = sportDataBase.restDao().getAllLiveByDayId(dayId);
+            if (restLiveData != null) restLiveData.removeObservers(MainActivity.getInstance());
+            restLiveData = sportDataBase.restDao().getAllLiveByDayId(dayId);
             restLiveData.observe(MainActivity.getInstance(), new Observer<List<Rest>>() {
                 @Override
                 public void onChanged(@Nullable List<Rest> elems) {
@@ -286,27 +394,64 @@ public class DayFragment extends Fragment {
 
     public void getInfo() {
         try {
+            Date date = sdf.parse(currentDate);
             Day day = dayDao.getDayByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
-            String block = day.getBlockId() == null ? "" : sportDataBase.blockDao().getNameById(day.getBlockId());
-            blockText.setText(String.format("%s: %s", getString(R.string.block), block));
-            String stage = day.getStageId() == null ? "" : sportDataBase.stageDao().getNameById(day.getStageId());
-            stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
-            String type = day.getTypeId() == null ? "" : sportDataBase.typeDao().getNameById(day.getTypeId());
-            typeText.setText(String.format("%s: %s", getString(R.string.type), type));
-            String camps = day.getCampId() == null ? "" : sportDataBase.campDao().getNameById(day.getCampId());
-            campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
-            Long competitionToImportanceId = day.getCompetitionToImportanceId();
-            String competitionToImportance;
-            if (competitionToImportanceId == null) {
-                competitionToImportance = "";
-            } else {
-                Long competitionId = sportDataBase.competitionToImportanceDao().getCompetitionIdById(competitionToImportanceId);
-                String competition = sportDataBase.competitionDao().getNameById(competitionId);
-                Long importanceId = sportDataBase.competitionToImportanceDao().getImportanceIdById(competitionToImportanceId);
-                String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameById(importanceId);
-                competitionToImportance = competition + " (" + importance + ")";
-            }
-            competitionText.setText(String.format("%s: %s", getString(R.string.competition), competitionToImportance));
+            MainActivity instance = MainActivity.getInstance();
+
+            if (blockId != null) blockId.removeObservers(instance);
+            blockId = dayDao.getLiveBlockIdBySIdAndDate(seasonPlanId, date);
+            blockId.observe(instance, new Observer<Long>() {
+                @Override
+                public void onChanged(@Nullable Long id) {
+                    String block = id == null ? "" : sportDataBase.blockDao().getNameById(id);
+                    blockText.setText(String.format("%s: %s", getString(R.string.block), block));
+                }
+            });
+            if (stageId != null) stageId.removeObservers(instance);
+            stageId = dayDao.getLiveStageIdBySIdAndDate(seasonPlanId, date);
+            stageId.observe(instance, new Observer<Long>() {
+                @Override
+                public void onChanged(@Nullable Long id) {
+                    String stage = id == null ? "" : sportDataBase.stageDao().getNameById(id);
+                    stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
+                }
+            });
+            if (typeId != null) typeId.removeObservers(instance);
+            typeId = dayDao.getLiveTypeIdBySIdAndDate(seasonPlanId, date);
+            typeId.observe(instance, new Observer<Long>() {
+                @Override
+                public void onChanged(@Nullable Long id) {
+                    String type = id == null ? "" : sportDataBase.typeDao().getNameById(id);
+                    typeText.setText(String.format("%s: %s", getString(R.string.type), type));
+                }
+            });
+            if (campId != null) campId.removeObservers(instance);
+            campId = dayDao.getLiveCampIdBySIdAndDate(seasonPlanId, date);
+            campId.observe(instance, new Observer<Long>() {
+                @Override
+                public void onChanged(@Nullable Long id) {
+                    String camps = id == null ? "" : sportDataBase.campDao().getNameById(id);
+                    campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
+                }
+            });
+            if (CiId != null) CiId.removeObservers(instance);
+            CiId = dayDao.getLiveCIIdBySIdAndDate(seasonPlanId, date);
+            CiId.observe(instance, new Observer<Long>() {
+                @Override
+                public void onChanged(@Nullable Long competitionToImportanceId) {
+                    String competitionToImportance;
+                    if (competitionToImportanceId == null) {
+                        competitionToImportance = "";
+                    } else {
+                        Long competitionId = sportDataBase.competitionToImportanceDao().getCompetitionIdById(competitionToImportanceId);
+                        String competition = sportDataBase.competitionDao().getNameById(competitionId);
+                        Long importanceId = sportDataBase.competitionToImportanceDao().getImportanceIdById(competitionToImportanceId);
+                        String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameById(importanceId);
+                        competitionToImportance = competition + " (" + importance + ")";
+                    }
+                    competitionText.setText(String.format("%s: %s", getString(R.string.competition), competitionToImportance));
+                }
+            });
             String capacity = String.valueOf(day.getCapacity());
             capacityText.setText(String.format("%s: %s", getString(R.string.capacity), capacity));
         } catch (ParseException e) {

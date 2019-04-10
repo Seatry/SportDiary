@@ -6,7 +6,9 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 
+import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
 import com.example.alexander.sportdiary.Entities.Day;
+import com.example.alexander.sportdiary.Entities.EditEntities.*;
 import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.Training;
@@ -25,8 +27,38 @@ public class InitializeDataBase extends AsyncTask {
     @Override
     protected Object doInBackground(Object[] objects) {
         Log.i("do", "DO IN BACKGROUND");
+        SportDataBase dataBase = MainActivity.getInstance().getDatabase();
+        for(int i = 1; i < 4; i++) {
+            fillEdit(Exercise.class, "exercise" + i, dataBase.exerciseDao());
+            fillEdit(Zone.class, "zone" + i, dataBase.zoneDao());
+            fillEdit(Aim.class, "aim" + i, dataBase.aimDao());
+            fillEdit(Equipment.class, "equipment" + i, dataBase.equipmentDao());
+            fillEdit(Time.class, "time" + i, dataBase.timeDao());
+            fillEdit(TrainingPlace.class, "trainingPlace" + i, dataBase.trainingPlaceDao());
+            fillEdit(Borg.class, "borg" + i, dataBase.borgDao());
+            fillEdit(Style.class, "style" + i, dataBase.styleDao());
+            fillEdit(Tempo.class, "tempo" + i, dataBase.tempoDao());
+            fillEdit(Competition.class, "competition" + i, dataBase.competitionDao());
+            fillEdit(Importance.class, "importance" + i, dataBase.importanceDao());
+            fillEdit(Block.class, "block" + i, dataBase.blockDao());
+            fillEdit(Stage.class, "stage" + i, dataBase.stageDao());
+            fillEdit(Type.class, "type" + i, dataBase.typeDao());
+            fillEdit(Camp.class, "camp" + i, dataBase.campDao());
+            fillEdit(RestPlace.class, "restPlace" + i, dataBase.restPlaceDao());
+            fillEdit(Test.class, "test" + i, dataBase.testDao());
+        }
         //return createTestBanisterDiary();
         return null;
+    }
+
+    private <T extends Edit> void fillEdit(Class<T> cls, String name, EditDao<T> dao) {
+        try {
+            T elem = cls.newInstance();
+            elem.setName(name);
+            dao.insert(elem);
+        } catch (IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -59,4 +59,19 @@ public interface DayDao {
 
     @Query("SELECT * FROM Day WHERE season_plan_id = :seasonPlanId")
     List<Day> getAllBySeasonPlanId(long seasonPlanId);
+
+    @Query("SELECT block_id FROM DAY WHERE season_plan_id = :id and date = :date")
+    LiveData<Long> getLiveBlockIdBySIdAndDate(long id, Date date);
+
+    @Query("SELECT stage_id FROM DAY WHERE season_plan_id = :id and date = :date")
+    LiveData<Long> getLiveStageIdBySIdAndDate(long id, Date date);
+
+    @Query("SELECT type_id FROM DAY WHERE season_plan_id = :id and date = :date")
+    LiveData<Long> getLiveTypeIdBySIdAndDate(long id, Date date);
+
+    @Query("SELECT camp_id FROM DAY WHERE season_plan_id = :id and date = :date")
+    LiveData<Long> getLiveCampIdBySIdAndDate(long id, Date date);
+
+    @Query("SELECT competition_to_importance_id FROM DAY WHERE season_plan_id = :id and date = :date")
+    LiveData<Long> getLiveCIIdBySIdAndDate(long id, Date date);
 }
