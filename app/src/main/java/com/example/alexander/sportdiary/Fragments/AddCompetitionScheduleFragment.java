@@ -1,7 +1,6 @@
 package com.example.alexander.sportdiary.Fragments;
 
 import android.app.DatePickerDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;

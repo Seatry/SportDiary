@@ -1,6 +1,5 @@
 package com.example.alexander.sportdiary.Fragments;
 
-import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -11,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.MainActivity;

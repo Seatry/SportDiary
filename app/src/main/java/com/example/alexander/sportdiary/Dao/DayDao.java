@@ -74,4 +74,16 @@ public interface DayDao {
 
     @Query("SELECT competition_to_importance_id FROM DAY WHERE season_plan_id = :id and date = :date")
     LiveData<Long> getLiveCIIdBySIdAndDate(long id, Date date);
+
+    @Query("UPDATE Day set health = :san WHERE id = :dayId")
+    void updateHealthById(int san, long dayId);
+
+    @Query("UPDATE Day set activity = :san WHERE id = :dayId")
+    void updateActivityById(int san, long dayId);
+
+    @Query("UPDATE Day set mood = :san WHERE id = :dayId")
+    void updateMoodById(int san, long dayId);
+
+    @Query("UPDATE Day set dream = :dream WHERE id = :dayId")
+    void updateDreamById(double dream, long dayId);
 }

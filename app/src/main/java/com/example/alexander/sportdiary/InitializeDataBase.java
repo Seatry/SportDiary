@@ -8,11 +8,14 @@ import android.widget.ProgressBar;
 
 import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
 import com.example.alexander.sportdiary.Entities.Day;
+import com.example.alexander.sportdiary.Entities.DreamQuestion;
 import com.example.alexander.sportdiary.Entities.EditEntities.*;
 import com.example.alexander.sportdiary.Entities.HeartRate;
+import com.example.alexander.sportdiary.Entities.SanQuestion;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
+import com.example.alexander.sportdiary.Enums.SanType;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 
 import java.text.ParseException;
@@ -20,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import static com.example.alexander.sportdiary.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class InitializeDataBase extends AsyncTask {
@@ -46,6 +49,9 @@ public class InitializeDataBase extends AsyncTask {
             fillEdit(Camp.class, "camp" + i, dataBase.campDao());
             fillEdit(RestPlace.class, "restPlace" + i, dataBase.restPlaceDao());
             fillEdit(Test.class, "test" + i, dataBase.testDao());
+            dataBase.dreamQuestionDao().insert(new DreamQuestion("dream" + i));
+            dataBase.sanQuestionDao().insert(new SanQuestion("positiveH" + i, "negativeH"+i, SanType.HEALTH));
+            dataBase.sanQuestionDao().insert(new SanQuestion("positiveA" + i, "negativeA"+i, SanType.ACTIVITY));
         }
         //return createTestBanisterDiary();
         return null;

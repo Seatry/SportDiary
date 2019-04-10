@@ -142,6 +142,10 @@
     <string name="rest_place">Rest place</string>
     <string name="one_test">Test</string>
     <string name="no_test_err">Choose any test</string>
+    <string name="dream_questionnaire">Dream questionnaire</string>
+    <string name="san_questionnaire">SAN questionnaire</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 
 </resources>

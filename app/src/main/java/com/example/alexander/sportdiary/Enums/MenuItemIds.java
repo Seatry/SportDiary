@@ -1,4 +1,4 @@
-package com.example.alexander.sportdiary;
+package com.example.alexander.sportdiary.Enums;
 
 public enum MenuItemIds {
     EDIT_GROUP,

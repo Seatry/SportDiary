@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Rest;
 import com.example.alexander.sportdiary.Fragments.AddRestFragment;
 import com.example.alexander.sportdiary.MainActivity;

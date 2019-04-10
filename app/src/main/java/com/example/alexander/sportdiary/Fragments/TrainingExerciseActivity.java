@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.alexander.sportdiary.Adapters.TrainingExerciseAdapter;
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;

@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Fragments.AddTrainingFragment;
 import com.example.alexander.sportdiary.Fragments.TrainingExerciseActivity;

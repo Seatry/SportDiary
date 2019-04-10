@@ -6,6 +6,8 @@ import android.arch.persistence.room.RoomDatabase;
 import com.example.alexander.sportdiary.Dao.CompetitionToImportanceDao;
 import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.Dao.DayToTestDao;
+import com.example.alexander.sportdiary.Dao.DreamAnswerDao;
+import com.example.alexander.sportdiary.Dao.DreamQuestionDao;
 import com.example.alexander.sportdiary.Dao.EditDao.AimDao;
 import com.example.alexander.sportdiary.Dao.EditDao.BlockDao;
 import com.example.alexander.sportdiary.Dao.EditDao.BorgDao;
@@ -24,6 +26,8 @@ import com.example.alexander.sportdiary.Dao.EditDao.TrainingPlaceDao;
 import com.example.alexander.sportdiary.Dao.EditDao.TypeDao;
 import com.example.alexander.sportdiary.Dao.HeartRateDao;
 import com.example.alexander.sportdiary.Dao.RestDao;
+import com.example.alexander.sportdiary.Dao.SanAnswerDao;
+import com.example.alexander.sportdiary.Dao.SanQuestionDao;
 import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
 import com.example.alexander.sportdiary.Dao.EditDao.ZoneDao;
 import com.example.alexander.sportdiary.Dao.TrainingDao;
@@ -32,6 +36,8 @@ import com.example.alexander.sportdiary.Dao.TrainingsToAimsDao;
 import com.example.alexander.sportdiary.Dao.TrainingsToEquipmentsDao;
 import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.DayToTest;
+import com.example.alexander.sportdiary.Entities.DreamAnswer;
+import com.example.alexander.sportdiary.Entities.DreamQuestion;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
@@ -50,6 +56,8 @@ import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
 import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.Entities.Rest;
+import com.example.alexander.sportdiary.Entities.SanAnswer;
+import com.example.alexander.sportdiary.Entities.SanQuestion;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
 import com.example.alexander.sportdiary.Entities.Training;
@@ -68,8 +76,9 @@ import java.util.Random;
                 Training.class, TrainingPlace.class, TrainingsToAims.class, Style.class,
                 Tempo.class, Block.class, Camp.class, Competition.class, Importance.class,
                 Stage.class, Type.class, CompetitionToImportance.class, HeartRate.class,
-                RestPlace.class, Test.class, DayToTest.class, Rest.class
-        }, version = 28)
+                RestPlace.class, Test.class, DayToTest.class, Rest.class, DreamQuestion.class,
+                SanQuestion.class, DreamAnswer.class, SanAnswer.class
+        }, version = 29)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
     public abstract ZoneDao zoneDao();
@@ -98,4 +107,8 @@ public abstract class SportDataBase extends RoomDatabase {
     public abstract TestDao testDao();
     public abstract DayToTestDao dayToTestDao();
     public abstract RestDao restDao();
+    public abstract DreamQuestionDao dreamQuestionDao();
+    public abstract SanQuestionDao sanQuestionDao();
+    public abstract SanAnswerDao sanAnswerDao();
+    public abstract DreamAnswerDao dreamAnswerDao();
 }

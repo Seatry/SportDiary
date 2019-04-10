@@ -138,6 +138,10 @@
     <string name="updateRest">Изменить отдых</string>
     <string name="rest_place">Место отдыха</string>
     <string name="no_test_err">Выберите тест</string>
+    <string name="dream_questionnaire">Опросник сна</string>
+    <string name="san_questionnaire">Опросник САН</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
 
 </resources>

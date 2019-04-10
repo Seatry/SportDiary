@@ -7,9 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
-import android.widget.TextView;
 
-import com.example.alexander.sportdiary.EditOption;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;

@@ -95,6 +95,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
+                    <Button
+                        android:id="@+id/sanButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/san_questionnaire"/>
+                    <Button
+                        android:id="@+id/dreamButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dream_questionnaire"/>
                 </LinearLayout>
 
                 <LinearLayout

@@ -27,7 +27,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
-import static com.example.alexander.sportdiary.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class AddNewDiaryFragment extends DialogFragment implements View.OnClickListener {

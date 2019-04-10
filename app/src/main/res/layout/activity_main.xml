@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/nav_header_height"
-            android:background="@android:color/white"
+            android:background="@android:color/background_dark"
             android:dividerHeight="0dp"
             android:groupIndicator="@null" />
     </android.support.design.widget.NavigationView>

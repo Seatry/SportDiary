@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.alexander.sportdiary.Adapters.EditAdapter;
 import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;

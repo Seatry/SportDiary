@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -20,8 +21,7 @@ import com.example.alexander.sportdiary.Adapters.RestAdapter;
 import com.example.alexander.sportdiary.Adapters.TestAdapter;
 import com.example.alexander.sportdiary.Adapters.TrainingAdapter;
 import com.example.alexander.sportdiary.Dao.DayDao;
-import com.example.alexander.sportdiary.EditOption;
-import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.DayToTest;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
@@ -53,7 +53,7 @@ import java.util.List;
 
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
-public class DayFragment extends Fragment {
+public class DayFragment extends Fragment implements View.OnClickListener {
     private long seasonPlanId;
     private String diaryName;
     private CalendarView calendarView;
@@ -80,6 +80,8 @@ public class DayFragment extends Fragment {
     private LiveData<List<Training>> trainingLiveData;
     private LiveData<List<DayToTest>> testLiveData;
     private LiveData<List<Rest>> restLiveData;
+    private Button sanButton;
+    private Button dreamButton;
 
     public void setSeasonPlanId(long seasonPlanId) {
         this.seasonPlanId = seasonPlanId;
@@ -153,6 +155,11 @@ public class DayFragment extends Fragment {
         getInfo();
 
         setEditObservers();
+
+        sanButton = v.findViewById(R.id.sanButton);
+        sanButton.setOnClickListener(this);
+        dreamButton = v.findViewById(R.id.dreamButton);
+        dreamButton.setOnClickListener(this);
 
         TabHost tabHost = v.findViewById(R.id.day_tabHost);
         tabHost.setup();
@@ -464,6 +471,32 @@ public class DayFragment extends Fragment {
             calendarView.setVisibility(View.VISIBLE);
         } else {
             calendarView.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.sanButton:
+                try {
+                    final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+                    SanFragment sanFragment = new SanFragment();
+                    sanFragment.setDayId(dayId);
+                    sanFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "san");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case R.id.dreamButton:
+                try {
+                    final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+                    DreamFragment dreamFragment = new DreamFragment();
+                    dreamFragment.setDayId(dayId);
+                    dreamFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "san");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
     }
 }

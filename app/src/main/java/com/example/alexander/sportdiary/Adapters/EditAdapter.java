@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
 import com.example.alexander.sportdiary.Fragments.AddNewEditFragment;
 import com.example.alexander.sportdiary.MainActivity;

@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;

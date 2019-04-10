@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Adapters.CompetitionScheduleAdapter;
-import com.example.alexander.sportdiary.EditOption;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
