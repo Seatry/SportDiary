@@ -127,6 +127,17 @@
     <string name="trimps_graph">График ТРИМПов</string>
     <string name="trimp">ТРИМП</string>
     <string name="initialize">Инициализация</string>
+    <string name="test">Тесты</string>
+    <string name="one_test">Тест</string>
+    <string name="addTest">Новый тест</string>
+    <string name="updateTest">Изменить тест</string>
+    <string name="rest_places">Места отдыха</string>
+    <string name="addRestPlace">Новое место отдыха</string>
+    <string name="updateRestPlace">Изменить место отдыха</string>
+    <string name="addRest">Новый отдых</string>
+    <string name="updateRest">Изменить отдых</string>
+    <string name="rest_place">Место отдыха</string>
+    <string name="no_test_err">Выберите тест</string>
 
 
 </resources>

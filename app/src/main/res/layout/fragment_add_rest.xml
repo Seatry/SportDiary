@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_add_rest">
+
+    <TextView
+        android:id="@+id/restTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceLarge"/>
+
+    <LinearLayout
+        android:id="@+id/restTimeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/restTitle">
+        <TextView
+            android:text="@string/time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <Spinner
+            android:id="@+id/restTimeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/restPlaceLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/restTimeLayout">
+        <TextView
+            android:text="@string/rest_place"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <Spinner
+            android:id="@+id/restPlaceSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancelAddRest"
+        android:text="@string/cancel"
+        android:layout_below="@id/restPlaceLayout"
+        android:layout_toLeftOf="@id/okAddRest"
+        android:layout_toStartOf="@id/okAddRest" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/okAddRest"
+        android:text="@string/add"
+        android:layout_below="@id/restPlaceLayout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>

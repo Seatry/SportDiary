@@ -131,6 +131,17 @@
     <string name="trimps_graph">Trimps graph</string>
     <string name="trimp">Trimp</string>
     <string name="initialize">Initialize</string>
+    <string name="test">Tests</string>
+    <string name="addTest">New Test</string>
+    <string name="updateTest">Update Test</string>
+    <string name="rest_places">Rest places</string>
+    <string name="addRestPlace">New rest place</string>
+    <string name="updateRestPlace">Update rest place</string>
+    <string name="addRest">New rest</string>
+    <string name="updateRest">Update rest</string>
+    <string name="rest_place">Rest place</string>
+    <string name="one_test">Test</string>
+    <string name="no_test_err">Choose any test</string>
 
 
 </resources>

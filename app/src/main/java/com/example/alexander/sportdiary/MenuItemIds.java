@@ -22,7 +22,9 @@ public enum MenuItemIds {
     STATISTICS,
     CALENDAR,
     DIARY_GROUP,
-    ADD_DIARY;
+    ADD_DIARY,
+    REST_PLACE,
+    TEST;
 
     public int getValue() {
         int start = 10000;
@@ -49,6 +51,8 @@ public enum MenuItemIds {
             case OVERALL_PLAN: return start+19;
             case COMPETITION_SCHEDULE: return start+20;
             case CALENDAR: return start+21;
+            case TEST: return start+22;
+            case REST_PLACE: return start+23;
         }
         return -1;
     }

@@ -1,8 +1,6 @@
 package com.example.alexander.sportdiary;
 
 import android.os.AsyncTask;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -27,19 +25,23 @@ public class InitializeDataBase extends AsyncTask {
     @Override
     protected Object doInBackground(Object[] objects) {
         Log.i("do", "DO IN BACKGROUND");
-        return createTestBanisterDiary();
+        //return createTestBanisterDiary();
+        return null;
     }
 
     @Override
     protected void onPostExecute(Object object) {
-        SeasonPlan seasonPlan = (SeasonPlan) object;
-        long id = seasonPlan.getId();
-
         Log.i("post", "POST EXECUTE");
         ProgressBar progressBar = MainActivity.getInstance().findViewById(R.id.loadBar);
         progressBar.setVisibility(View.GONE);
         ExpandableListView listView = MainActivity.getInstance().findViewById(R.id.expandableListView);
         listView.setEnabled(true);
+        if (object == null) {
+            super.onPostExecute(object);
+            return;
+        }
+        SeasonPlan seasonPlan = (SeasonPlan) object;
+        long id = seasonPlan.getId();
 
         MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
         List<MenuModel> childs = MainActivity.getChildList().get(menuModel);

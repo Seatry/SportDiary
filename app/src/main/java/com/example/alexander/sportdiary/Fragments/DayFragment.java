@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,14 +16,17 @@ import android.widget.CalendarView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.example.alexander.sportdiary.Adapters.EditAdapter;
+import com.example.alexander.sportdiary.Adapters.RestAdapter;
+import com.example.alexander.sportdiary.Adapters.TestAdapter;
 import com.example.alexander.sportdiary.Adapters.TrainingAdapter;
 import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.EditOption;
 import com.example.alexander.sportdiary.Entities.Day;
+import com.example.alexander.sportdiary.Entities.DayToTest;
+import com.example.alexander.sportdiary.Entities.EditEntities.Test;
+import com.example.alexander.sportdiary.Entities.Rest;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.Training;
-import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
 import com.example.alexander.sportdiary.MainActivity;
@@ -33,10 +35,8 @@ import com.example.alexander.sportdiary.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
@@ -46,8 +46,12 @@ public class DayFragment extends Fragment {
     private CalendarView calendarView;
     private String currentDate;
     private DayDao dayDao;
-    private RecyclerView recyclerView;
-    private TrainingAdapter adapter;
+    private RecyclerView trainingRecyclerView;
+    private TrainingAdapter trainingAdapter;
+    private RecyclerView testRecyclerView;
+    private TestAdapter testAdapter;
+    private RecyclerView restRecyclerView;
+    private RestAdapter restAdapter;
     private SportDataBase sportDataBase;
     private TextView blockText;
     private TextView stageText;
@@ -92,16 +96,32 @@ public class DayFragment extends Fragment {
                 currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
                 MainActivity.getInstance().setTitle(diaryName + " " + currentDate);
                 getTrainings();
+                getTests();
+                getRests();
                 getInfo();
             }
         });
 
-        recyclerView = v.findViewById(R.id.trainingItems);
+        trainingRecyclerView = v.findViewById(R.id.trainingItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new TrainingAdapter();
-        recyclerView.setAdapter(adapter);
+        trainingRecyclerView.setLayoutManager(layoutManager);
+        trainingAdapter = new TrainingAdapter();
+        trainingRecyclerView.setAdapter(trainingAdapter);
         getTrainings();
+
+        testRecyclerView = v.findViewById(R.id.testItems);
+        LinearLayoutManager layoutManager2 = new LinearLayoutManager(getContext());
+        testRecyclerView.setLayoutManager(layoutManager2);
+        testAdapter = new TestAdapter();
+        testRecyclerView.setAdapter(testAdapter);
+        getTests();
+
+        restRecyclerView = v.findViewById(R.id.restItems);
+        LinearLayoutManager layoutManager3 = new LinearLayoutManager(getContext());
+        restRecyclerView.setLayoutManager(layoutManager3);
+        restAdapter = new RestAdapter();
+        restRecyclerView.setAdapter(restAdapter);
+        getRests();
 
         blockText = v.findViewById(R.id.blockText);
         stageText = v.findViewById(R.id.stageText);
@@ -140,18 +160,34 @@ public class DayFragment extends Fragment {
         addTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+                try {
+                    long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+                    AddTestFragment addTestFragment = new AddTestFragment();
+                    addTestFragment
+                            .setDayId(dayId)
+                            .setOption(EditOption.INSERT)
+                            .setTitle(getString(R.string.addTest));
+                    addTestFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "addTests");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }}
         });
 
         FloatingActionButton addRest = v.findViewById(R.id.addRest);
         addRest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+                try {
+                    long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+                    AddRestFragment addRestFragment = new AddRestFragment();
+                    addRestFragment
+                            .setDayId(dayId)
+                            .setOption(EditOption.INSERT)
+                            .setTitle(getString(R.string.addRest));
+                    addRestFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "addRest");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }}
         });
 
         tabSpec = tabHost.newTabSpec("day2");
@@ -186,8 +222,8 @@ public class DayFragment extends Fragment {
             trainingLiveData.observe(MainActivity.getInstance(), new Observer<List<Training>>() {
                 @Override
                 public void onChanged(@Nullable List<Training> elems) {
-                    adapter.setTrainings(elems);
-                    adapter.notifyDataSetChanged();
+                    trainingAdapter.setTrainings(elems);
+                    trainingAdapter.notifyDataSetChanged();
                     if (elems != null) {
                         int capacity = 0;
                         for(Training training : elems) {
@@ -201,14 +237,46 @@ public class DayFragment extends Fragment {
             trainingsToAims.observe(MainActivity.getInstance(), new Observer<List<TrainingsToAims>>() {
                 @Override
                 public void onChanged(@Nullable List<TrainingsToAims> trainingsToAims) {
-                    adapter.notifyDataSetChanged();
+                    trainingAdapter.notifyDataSetChanged();
                 }
             });
             LiveData<List<TrainingsToEquipments>> trainingsToEquipments = sportDataBase.trainingsToEquipmentsDao().getAll();
             trainingsToEquipments.observe(MainActivity.getInstance(), new Observer<List<TrainingsToEquipments>>() {
                 @Override
                 public void onChanged(@Nullable List<TrainingsToEquipments> trainingsToEquipments) {
-                    adapter.notifyDataSetChanged();
+                    trainingAdapter.notifyDataSetChanged();
+                }
+            });
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getTests() {
+        try {
+            final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+            LiveData<List<DayToTest>> testLiveData = sportDataBase.dayToTestDao().getAllLiveByDayId(dayId);
+            testLiveData.observe(MainActivity.getInstance(), new Observer<List<DayToTest>>() {
+                @Override
+                public void onChanged(@Nullable List<DayToTest> elems) {
+                    testAdapter.setTests(elems);
+                    testAdapter.notifyDataSetChanged();
+                }
+            });
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getRests() {
+        try {
+            final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+            LiveData<List<Rest>> restLiveData = sportDataBase.restDao().getAllLiveByDayId(dayId);
+            restLiveData.observe(MainActivity.getInstance(), new Observer<List<Rest>>() {
+                @Override
+                public void onChanged(@Nullable List<Rest> elems) {
+                    restAdapter.setRests(elems);
+                    restAdapter.notifyDataSetChanged();
                 }
             });
         } catch (ParseException e) {

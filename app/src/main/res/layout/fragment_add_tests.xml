@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_add_tests">
+
+    <TextView
+        android:id="@+id/testTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceLarge"/>
+
+    <LinearLayout
+        android:id="@+id/testLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/testTitle">
+        <TextView
+            android:text="@string/one_test"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <Spinner
+            android:id="@+id/testSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancelAddTest"
+        android:text="@string/cancel"
+        android:layout_below="@id/testLayout"
+        android:layout_toLeftOf="@id/okAddTest"
+        android:layout_toStartOf="@id/okAddTest" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/okAddTest"
+        android:text="@string/add"
+        android:layout_below="@id/testLayout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>

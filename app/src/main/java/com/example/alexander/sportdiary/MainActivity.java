@@ -32,9 +32,11 @@ import com.example.alexander.sportdiary.Entities.EditEntities.Competition;
 import com.example.alexander.sportdiary.Entities.EditEntities.Equipment;
 import com.example.alexander.sportdiary.Entities.EditEntities.Exercise;
 import com.example.alexander.sportdiary.Entities.EditEntities.Importance;
+import com.example.alexander.sportdiary.Entities.EditEntities.RestPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Stage;
 import com.example.alexander.sportdiary.Entities.EditEntities.Style;
 import com.example.alexander.sportdiary.Entities.EditEntities.Tempo;
+import com.example.alexander.sportdiary.Entities.EditEntities.Test;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
 import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
@@ -75,10 +77,12 @@ import static com.example.alexander.sportdiary.MenuItemIds.EQUIPMENTS;
 import static com.example.alexander.sportdiary.MenuItemIds.EXERCISES;
 import static com.example.alexander.sportdiary.MenuItemIds.IMPORTANCE;
 import static com.example.alexander.sportdiary.MenuItemIds.OVERALL_PLAN;
+import static com.example.alexander.sportdiary.MenuItemIds.REST_PLACE;
 import static com.example.alexander.sportdiary.MenuItemIds.STAGES;
 import static com.example.alexander.sportdiary.MenuItemIds.STATISTICS;
 import static com.example.alexander.sportdiary.MenuItemIds.STYLES;
 import static com.example.alexander.sportdiary.MenuItemIds.TEMPOS;
+import static com.example.alexander.sportdiary.MenuItemIds.TEST;
 import static com.example.alexander.sportdiary.MenuItemIds.TIMES;
 import static com.example.alexander.sportdiary.MenuItemIds.TRAINING_PLACES;
 import static com.example.alexander.sportdiary.MenuItemIds.TYPES;
@@ -217,6 +221,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         childModel = new MenuModel(getString(R.string.types), false, false, TYPES.getValue());
         childModelsList.add(childModel);
         childModel = new MenuModel(getString(R.string.camps), false, false, CAMPS.getValue());
+        childModelsList.add(childModel);
+        childModel = new MenuModel(getString(R.string.rest_places), false, false, REST_PLACE.getValue());
+        childModelsList.add(childModel);
+        childModel = new MenuModel(getString(R.string.test), false, false, TEST.getValue());
         childModelsList.add(childModel);
 
         if (menuModel.isHasChildren()) {
@@ -438,6 +446,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             campEditFragment.setClass(Camp.class, getString(R.string.camps),
                     database.campDao(), getString(R.string.addCamp), getString(R.string.updateCamp));
             campEditFragment.show(getSupportFragmentManager(), "campDialog");
+        } else if (id == REST_PLACE.getValue()) {
+            EditFragment<RestPlace> restPlaceEditFragment = new EditFragment<>();
+            restPlaceEditFragment.setClass(RestPlace.class, getString(R.string.rest_places),
+                    database.restPlaceDao(), getString(R.string.addRestPlace), getString(R.string.updateRestPlace));
+            restPlaceEditFragment.show(getSupportFragmentManager(), "restPlaceDialog");
+        } else if (id == TEST.getValue()) {
+            EditFragment<Test> testEditFragment = new EditFragment<>();
+            testEditFragment.setClass(Test.class, getString(R.string.test),
+                    database.testDao(), getString(R.string.addTest), getString(R.string.updateTest));
+            testEditFragment.show(getSupportFragmentManager(), "testDialog");
         } else if (id == OVERALL_PLAN.getValue()) {
             if (seasonPlanId == null) {
                 Toast.makeText(this, R.string.no_diary_selected, Toast.LENGTH_SHORT).show();
