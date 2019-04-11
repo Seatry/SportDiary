@@ -78,7 +78,7 @@ import java.util.Random;
                 Stage.class, Type.class, CompetitionToImportance.class, HeartRate.class,
                 RestPlace.class, Test.class, DayToTest.class, Rest.class, DreamQuestion.class,
                 SanQuestion.class, DreamAnswer.class, SanAnswer.class
-        }, version = 29)
+        }, version = 30)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
     public abstract ZoneDao zoneDao();

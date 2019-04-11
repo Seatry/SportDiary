@@ -76,13 +76,13 @@ public interface DayDao {
     LiveData<Long> getLiveCIIdBySIdAndDate(long id, Date date);
 
     @Query("UPDATE Day set health = :san WHERE id = :dayId")
-    void updateHealthById(int san, long dayId);
+    void updateHealthById(double san, long dayId);
 
     @Query("UPDATE Day set activity = :san WHERE id = :dayId")
-    void updateActivityById(int san, long dayId);
+    void updateActivityById(double san, long dayId);
 
     @Query("UPDATE Day set mood = :san WHERE id = :dayId")
-    void updateMoodById(int san, long dayId);
+    void updateMoodById(double san, long dayId);
 
     @Query("UPDATE Day set dream = :dream WHERE id = :dayId")
     void updateDreamById(double dream, long dayId);

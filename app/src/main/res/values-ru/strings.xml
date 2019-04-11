@@ -142,6 +142,9 @@
     <string name="san_questionnaire">Опросник САН</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="health">Самочувствие</string>
+    <string name="activity">Активность</string>
+    <string name="mood">Настроение</string>
 
 
 </resources>

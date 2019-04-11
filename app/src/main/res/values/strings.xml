@@ -146,6 +146,9 @@
     <string name="san_questionnaire">SAN questionnaire</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="health">Health</string>
+    <string name="activity">Activity</string>
+    <string name="mood">Mood</string>
 
 
 </resources>

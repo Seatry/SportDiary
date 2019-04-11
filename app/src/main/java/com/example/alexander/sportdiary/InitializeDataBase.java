@@ -53,8 +53,8 @@ public class InitializeDataBase extends AsyncTask {
             dataBase.sanQuestionDao().insert(new SanQuestion("positiveH" + i, "negativeH"+i, SanType.HEALTH));
             dataBase.sanQuestionDao().insert(new SanQuestion("positiveA" + i, "negativeA"+i, SanType.ACTIVITY));
         }
-        //return createTestBanisterDiary();
-        return null;
+        return createTestDiary();
+//        return null;
     }
 
     private <T extends Edit> void fillEdit(Class<T> cls, String name, EditDao<T> dao) {
@@ -101,7 +101,7 @@ public class InitializeDataBase extends AsyncTask {
         super.onPreExecute();
     }
 
-    private SeasonPlan createTestBanisterDiary() {
+    private SeasonPlan createTestDiary() {
         SportDataBase database = MainActivity.getInstance().getDatabase();
         Log.i("diary", "Create Test Banister Diary");
         Random random = new Random();
@@ -111,10 +111,15 @@ public class InitializeDataBase extends AsyncTask {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        SeasonPlan seasonPlan = new SeasonPlan("Banister", date);
+        SeasonPlan seasonPlan = new SeasonPlan("Test", date);
         long id = database.seasonPlanDao().insert(seasonPlan);
         for(int i = 0; i < 366; i++, date = DateUtil.addDays(date, 1)) {
-            long did = database.dayDao().insert(new Day(date, id));
+            Day day = new Day(date, id);
+            day.setDream(random.nextDouble() * 50 + 50);
+            day.setHealth(random.nextDouble() * 6 + 3);
+            day.setActivity(random.nextDouble() * 3);
+            day.setMood(random.nextDouble() * 6 + 3);
+            long did = database.dayDao().insert(day);
             long tid = database.trainingDao().insert(new Training(did));
             for (int j = 0; j < 2; j++) {
                 int time = random.nextInt(25) + 20;

@@ -88,24 +88,28 @@ public class SanFragment extends DialogFragment implements View.OnClickListener 
             }
         }
         List<SanAnswer> answers = sportDataBase.sanAnswerDao().getAllByDayId(dayId);
-        int health = 0, activity = 0, mood = 0;
+        double health = 0, activity = 0, mood = 0;
+        int h = 0, a = 0, m = 0;
         for (SanAnswer answer : answers) {
             SanQuestion question = sportDataBase.sanQuestionDao().getById(answer.getQuestionId());
             switch (question.getType()) {
                 case HEALTH:
                     health += answer.getAnswer() + 4;
+                    h++;
                     break;
                 case ACTIVITY:
                     activity += answer.getAnswer() + 4;
+                    a++;
                     break;
                 case MOOD:
                     mood += answer.getAnswer() + 4;
+                    m++;
                     break;
             }
         }
-        sportDataBase.dayDao().updateHealthById(health, dayId);
-        sportDataBase.dayDao().updateActivityById(activity, dayId);
-        sportDataBase.dayDao().updateMoodById(mood, dayId);
+        sportDataBase.dayDao().updateHealthById(health / h, dayId);
+        sportDataBase.dayDao().updateActivityById(activity / a, dayId);
+        sportDataBase.dayDao().updateMoodById(mood / m, dayId);
     }
 
     public void setDayId(long dayId) {

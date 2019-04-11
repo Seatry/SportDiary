@@ -43,9 +43,9 @@ public class Day {
 
     private Date date;
     private int capacity = 0;
-    private int health = 0;
-    private int mood = 0;
-    private int activity = 0;
+    private double health = 0;
+    private double mood = 0;
+    private double activity = 0;
     private double dream = 0;
 
     public Day() {
@@ -165,27 +165,27 @@ public class Day {
         this.dream = dream;
     }
 
-    public int getHealth() {
+    public double getHealth() {
         return health;
     }
 
-    public void setHealth(int health) {
+    public void setHealth(double health) {
         this.health = health;
     }
 
-    public int getMood() {
+    public double getMood() {
         return mood;
     }
 
-    public void setMood(int mood) {
+    public void setMood(double mood) {
         this.mood = mood;
     }
 
-    public int getActivity() {
+    public double getActivity() {
         return activity;
     }
 
-    public void setActivity(int activity) {
+    public void setActivity(double activity) {
         this.activity = activity;
     }
 }

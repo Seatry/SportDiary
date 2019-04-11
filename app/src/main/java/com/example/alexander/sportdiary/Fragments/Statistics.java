@@ -2,9 +2,12 @@ package com.example.alexander.sportdiary.Fragments;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +27,7 @@ import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
@@ -52,6 +56,21 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
     private Date minDate;
     private GraphView banisterGraph;
     private GraphView trimpsGraph;
+    private GraphView dreamGraph;
+    private GraphView sanGraph;
+    private HashMap<Date, Double> performanceToDate = new HashMap<>();
+    private HashMap<Date, Double> trimpToDate = new HashMap<>();
+    private HashMap<Date, Double> dreamToDate = new HashMap<>();
+    private HashMap<Date, Double> healthToDate = new HashMap<>();
+    private HashMap<Date, Double> activityToDate = new HashMap<>();
+    private HashMap<Date, Double> moodToDate = new HashMap<>();
+    private LineGraphSeries<DataPoint> banisterSeries = new LineGraphSeries<>(new DataPoint[]{});
+    private LineGraphSeries<DataPoint> trimpSeries = new LineGraphSeries<>(new DataPoint[]{});
+    private LineGraphSeries<DataPoint> dreamSeries = new LineGraphSeries<>(new DataPoint[]{});
+    private LineGraphSeries<DataPoint> healthSeries = new LineGraphSeries<>(new DataPoint[]{});
+    private LineGraphSeries<DataPoint> activitySeries = new LineGraphSeries<>(new DataPoint[]{});
+    private LineGraphSeries<DataPoint> moodSeries = new LineGraphSeries<>(new DataPoint[]{});
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +82,8 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(R.string.statistics);
 
+        Log.i("CREATE", "ON CREATE");
+
         instance = this;
 
         Intent intent = getIntent();
@@ -70,6 +91,10 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
 
         inputLayout = findViewById(R.id.inputLayout);
         sportDataBase = MainActivity.getInstance().getDatabase();
+        seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
+
+        preCalculate();
+        setSeriesListeners();
 
         fromEdit = findViewById(R.id.fromEdit);
         toEdit = findViewById(R.id.toEdit);
@@ -89,23 +114,171 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
         tabSpec.setIndicator(getString(R.string.Questionnaire));
         tabHost.addTab(tabSpec);
 
+        toolGraphs();
+
+        maxDate = DateUtil.addDays(seasonPlan.getStart(), 365);
+        minDate = seasonPlan.getStart();
+
+        setDatePickerDialog(fromEdit);
+        setDatePickerDialog(toEdit);
+    }
+
+    public void toolGraphs() {
         banisterGraph = findViewById(R.id.performanceGraph);
         banisterGraph.setTitle(getString(R.string.banister_model));
         banisterGraph.getGridLabelRenderer().setHorizontalAxisTitle(getString(R.string.date));
         banisterGraph.getGridLabelRenderer().setVerticalAxisTitle(getString(R.string.performance));
         banisterGraph.getGridLabelRenderer().setHorizontalLabelsAngle(35);
+
         trimpsGraph = findViewById(R.id.trimpsGraph);
         trimpsGraph.setTitle(getString(R.string.trimps_graph));
         trimpsGraph.getGridLabelRenderer().setHorizontalAxisTitle(getString(R.string.date));
         trimpsGraph.getGridLabelRenderer().setVerticalAxisTitle(getString(R.string.trimp));
         trimpsGraph.getGridLabelRenderer().setHorizontalLabelsAngle(35);
 
-        seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
-        maxDate = DateUtil.addDays(seasonPlan.getStart(), 365);
-        minDate = seasonPlan.getStart();
+        dreamGraph = findViewById(R.id.dreamGraph);
+        dreamGraph.setTitle(getString(R.string.dream_questionnaire));
+        dreamGraph.getGridLabelRenderer().setHorizontalAxisTitle(getString(R.string.date));
+        dreamGraph.getGridLabelRenderer().setHorizontalLabelsAngle(35);
 
-        setDatePickerDialog(fromEdit);
-        setDatePickerDialog(toEdit);
+        sanGraph = findViewById(R.id.sanGraph);
+        sanGraph.setTitle(getString(R.string.san_questionnaire));
+        sanGraph.getGridLabelRenderer().setHorizontalAxisTitle(getString(R.string.date));
+        sanGraph.getGridLabelRenderer().setHorizontalLabelsAngle(35);
+
+        banisterGraph.addSeries(banisterSeries);
+        trimpsGraph.addSeries(trimpSeries);
+        dreamGraph.addSeries(dreamSeries);
+
+        sanGraph.addSeries(healthSeries);
+        sanGraph.addSeries(activitySeries);
+        sanGraph.addSeries(moodSeries);
+
+        healthSeries.setTitle(getString(R.string.health));
+        activitySeries.setTitle(getString(R.string.activity));
+        activitySeries.setColor(Color.RED);
+        moodSeries.setTitle(getString(R.string.mood));
+        moodSeries.setColor(Color.GREEN);
+
+        sanGraph.getLegendRenderer().setVisible(true);
+        sanGraph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+
+        banisterGraph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, sdf));
+        banisterGraph.getViewport().setXAxisBoundsManual(true);
+
+        trimpsGraph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, sdf));
+        trimpsGraph.getViewport().setXAxisBoundsManual(true);
+
+        dreamGraph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, sdf));
+        dreamGraph.getViewport().setXAxisBoundsManual(true);
+
+        sanGraph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, sdf));
+        sanGraph.getViewport().setXAxisBoundsManual(true);
+    }
+
+    public void setSeriesListeners() {
+        banisterSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis((long) dataPoint.getX());
+                String x = sdf.format(cal.getTime());
+                String y = String.valueOf(dataPoint.getY());
+                Toast.makeText(Statistics.getInstance(), "Banister model: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        trimpSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis((long) dataPoint.getX());
+                String x = sdf.format(cal.getTime());
+                String y = String.valueOf(dataPoint.getY());
+                Toast.makeText(Statistics.getInstance(), "TRIMP graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dreamSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis((long) dataPoint.getX());
+                String x = sdf.format(cal.getTime());
+                String y = String.valueOf(dataPoint.getY());
+                Toast.makeText(Statistics.getInstance(), "Dream graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        healthSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis((long) dataPoint.getX());
+                String x = sdf.format(cal.getTime());
+                String y = String.valueOf(dataPoint.getY());
+                Toast.makeText(Statistics.getInstance(), "Health graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        activitySeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis((long) dataPoint.getX());
+                String x = sdf.format(cal.getTime());
+                String y = String.valueOf(dataPoint.getY());
+                Toast.makeText(Statistics.getInstance(), "Activity graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        moodSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis((long) dataPoint.getX());
+                String x = sdf.format(cal.getTime());
+                String y = String.valueOf(dataPoint.getY());
+                Toast.makeText(Statistics.getInstance(), "Mood graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void preCalculate() {
+        Log.i("CALCULATE", "START CALCULATE");
+        double y = seasonPlan.getMale().equals("M") ? 1.92 : 1.67;
+        double hrMax = seasonPlan.getHrMax();
+        double hrRest = seasonPlan.getHrRest();
+        int lastPerformance = seasonPlan.getLastPerformance();
+        double k1 = 1, k2 = 1.9, r1 = 49.5, r2 = 11;
+        double fitness = 0, fatigue = 0;
+
+        List<Day> dayList = sportDataBase.dayDao().getAllBySeasonPlanId(seasonPlanId);
+        for (Day day : dayList) {
+            double trimp = 0;
+            List<Training> trainings = sportDataBase.trainingDao().getAllByDayId(day.getId());
+            for (Training training : trainings) {
+                List<TrainingExercise> exercises = sportDataBase.trainingExerciseDao().getAllByTrainingId(training.getId());
+                for (TrainingExercise exercise : exercises) {
+                    int time = exercise.getMinutes();
+                    double hrAvg = exercise.getHrAvg();
+                    double hrReserve = (hrAvg - hrRest) / (hrMax - hrRest);
+                    trimp += time * hrReserve * 0.64 * Math.exp(y * hrReserve);
+                }
+            }
+
+            fitness = fitness * Math.exp(-1. / r1) + trimp;
+            fatigue = fatigue * Math.exp(-1. / r2) + trimp;
+            double performance = lastPerformance + fitness * k1  - fatigue * k2;
+
+            performanceToDate.put(day.getDate(), performance);
+            trimpToDate.put(day.getDate(), trimp);
+            dreamToDate.put(day.getDate(), day.getDream());
+            healthToDate.put(day.getDate(), day.getHealth());
+            activityToDate.put(day.getDate(), day.getActivity());
+            moodToDate.put(day.getDate(), day.getMood());
+        }
+        Log.i("CALCULATE", "FINISH CALCULATE");
     }
 
     private void setDatePickerDialog(final EditText editText) {
@@ -187,78 +360,44 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
             Toast.makeText(this, getString(R.string.from_to_err), Toast.LENGTH_SHORT).show();
             return;
         }
-        double y = seasonPlan.getMale().equals("M") ? 1.92 : 1.67;
-        double hrMax = seasonPlan.getHrMax();
-        double hrRest = seasonPlan.getHrRest();
-        int lastPerformance = seasonPlan.getLastPerformance();
-        double k1 = 1, k2 = 1.9, r1 = 49.5, r2 = 11;
-        List<Day> dayList = sportDataBase.dayDao().getAllBySeasonPlanId(seasonPlanId);
-        HashMap<Date, Double> trimpToDate = new HashMap<>();
-        for (Day day : dayList) {
-            double trimp = 0;
-            List<Training> trainings = sportDataBase.trainingDao().getAllByDayId(day.getId());
-            for (Training training : trainings) {
-                List<TrainingExercise> exercises = sportDataBase.trainingExerciseDao().getAllByTrainingId(training.getId());
-                for (TrainingExercise exercise : exercises) {
-                    int time = exercise.getMinutes();
-                    double hrAvg = exercise.getHrAvg();
-                    double hrReserve = (hrAvg - hrRest) / (hrMax - hrRest);
-                    trimp += time * hrReserve * 0.64 * Math.exp(y * hrReserve);
-                }
-            }
-            trimpToDate.put(day.getDate(), trimp);
-        }
 
-        LineGraphSeries<DataPoint> banisterSeries = new LineGraphSeries<>(new DataPoint[]{});
-        LineGraphSeries<DataPoint> trimpSeries = new LineGraphSeries<>(new DataPoint[]{});
+        trimpSeries.resetData(new DataPoint[]{});
+        banisterSeries.resetData(new DataPoint[]{});
+        dreamSeries.resetData(new DataPoint[]{});
+        healthSeries.resetData(new DataPoint[]{});
+        activitySeries.resetData(new DataPoint[]{});
+        moodSeries.resetData(new DataPoint[]{});
 
         int count = 0;
-        double fitness = 0, fatigue = 0;
-        for(Date start = seasonPlan.getStart(); start.before(from); start = DateUtil.addDays(start, 1)) {
-            fitness = fitness * Math.exp(-1. / r1) + trimpToDate.get(start);
-            fatigue = fatigue * Math.exp(-1. / r2) + trimpToDate.get(start);
-        }
+
         for (Date start = from; start.before(to); start = DateUtil.addDays(start, 1), count++) {
-            fitness = fitness * Math.exp(-1. / r1) + trimpToDate.get(start);
-            fatigue = fatigue * Math.exp(-1. / r2) + trimpToDate.get(start);
-            double performance = lastPerformance + fitness * k1  - fatigue * k2;
-            banisterSeries.appendData(new DataPoint(start.getTime(), performance), false, 365);
+            banisterSeries.appendData(new DataPoint(start.getTime(), performanceToDate.get(start)), false, 365);
             trimpSeries.appendData(new DataPoint(start.getTime(), trimpToDate.get(start)), false, 365);
+            dreamSeries.appendData(new DataPoint(start.getTime(), dreamToDate.get(start)), false, 365);
+            healthSeries.appendData(new DataPoint(start.getTime(), healthToDate.get(start)), false, 365);
+            activitySeries.appendData(new DataPoint(start.getTime(), activityToDate.get(start)), false, 365);
+            moodSeries.appendData(new DataPoint(start.getTime(), moodToDate.get(start)), false, 365);
         }
 
-        banisterSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "Banister model: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        trimpSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "TRIMP graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        banisterGraph.removeAllSeries();
-        trimpsGraph.removeAllSeries();
-        banisterGraph.addSeries(banisterSeries);
-        trimpsGraph.addSeries(trimpSeries);
-        banisterGraph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, sdf));
-        trimpsGraph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, sdf));
         banisterGraph.getGridLabelRenderer().setNumHorizontalLabels(count < 7 ? count : 7);
-        trimpsGraph.getGridLabelRenderer().setNumHorizontalLabels(count < 7 ? count : 7);
         banisterGraph.getViewport().setMinX(from.getTime());
         banisterGraph.getViewport().setMaxX(to.getTime());
+
+        trimpsGraph.getGridLabelRenderer().setNumHorizontalLabels(count < 7 ? count : 7);
         trimpsGraph.getViewport().setMinX(from.getTime());
         trimpsGraph.getViewport().setMaxX(to.getTime());
+
+        dreamGraph.getGridLabelRenderer().setNumHorizontalLabels(count < 7 ? count : 7);
+        dreamGraph.getViewport().setMinX(from.getTime());
+        dreamGraph.getViewport().setMaxX(to.getTime());
+
+        sanGraph.getGridLabelRenderer().setNumHorizontalLabels(count < 7 ? count : 7);
+        sanGraph.getViewport().setMinX(from.getTime());
+        sanGraph.getViewport().setMaxX(to.getTime());
+
+        banisterGraph.onDataChanged(false, true);
+        trimpsGraph.onDataChanged(false, true);
+        dreamGraph.onDataChanged(false, true);
+        sanGraph.onDataChanged(false, true);
     }
 }
