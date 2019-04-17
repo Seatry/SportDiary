@@ -2,7 +2,6 @@ package com.example.alexander.sportdiary.Fragments;
 
 import android.app.DatePickerDialog;
 import android.database.sqlite.SQLiteConstraintException;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -14,21 +13,22 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.alexander.sportdiary.Dao.DayDao;
-import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
-import com.example.alexander.sportdiary.Entities.Day;
-import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
-import com.example.alexander.sportdiary.MenuModel;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.*;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.*;
+import static com.example.alexander.sportdiary.CollectionContracts.Day.*;
 
 public class AddNewDiaryFragment extends DialogFragment implements View.OnClickListener {
     private EditText editNameText;
@@ -37,8 +37,7 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
     private EditText editHrMax;
     private EditText editHrRest;
     private EditText editPerformance;
-    private SeasonPlanDao dao;
-    private DayDao dayDao;
+    private FirebaseFirestore db;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -72,8 +71,7 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
         editHrRest = v.findViewById(R.id.hrRest);
         editPerformance = v.findViewById(R.id.performance);
 
-        dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
-        dayDao = MainActivity.getInstance().getDatabase().dayDao();
+        db =  MainActivity.getInstance().getDb();
 
         return v;
     }
@@ -91,40 +89,36 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
     }
 
     public void add()  {
-        SeasonPlan seasonPlan = new SeasonPlan();
-        seasonPlan.setName(editNameText.getText().toString());
-        if (editHrMax.getText().length() > 0) {
-            seasonPlan.setHrMax(Integer.parseInt(editHrMax.getText().toString()));
-        }
-        if (editHrRest.getText().length() > 0) {
-            seasonPlan.setHrRest(Integer.parseInt(editHrRest.getText().toString()));
-        }
-        if (editPerformance.getText().length() > 0) {
-            seasonPlan.setLastPerformance(Integer.parseInt(editPerformance.getText().toString()));
-        }
-        if (maleSpinner.getSelectedItem() != null) {
-            seasonPlan.setMale(maleSpinner.getSelectedItem().toString());
-        }
+        Map<String, Object> diary = new HashMap<>();
+        diary.put(USER_ID, MainActivity.getUserId());
+        diary.put(NAME, editNameText.getText().toString());
+        diary.put(HR_MAX, editHrMax.getText().length() > 0 ? Integer.parseInt(editHrMax.getText().toString()) : 200);
+        diary.put(HR_REST, editHrRest.getText().length() > 0 ? Integer.parseInt(editHrRest.getText().toString()) : 60);
+        diary.put(LAST_PERFORMANCE, editPerformance.getText().length() > 0 ? Integer.parseInt(editPerformance.getText().toString()) : 0);
+        diary.put(MALE, maleSpinner.getSelectedItem() != null ? maleSpinner.getSelectedItem().toString() : getString(R.string.male));
         try {
             String dateText = editStartText.getText().toString();
             final Date date = sdf.parse(dateText);
-            seasonPlan.setStart(date);
-            final long id = dao.insert(seasonPlan);
-            MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
-            List<MenuModel> childs = MainActivity.getChildList().get(menuModel);
-            String diaryName = seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart());
-            MenuModel childModel = new MenuModel(diaryName, false, false, (int) id);
-            childs.add(childModel);
-            MainActivity.putToChildList(menuModel, childs);
-            MainActivity.getExpandableListAdapter().notifyDataSetChanged();
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    for(int i = 0; i < 366; i++) {
-                        dayDao.insert(new Day(DateUtil.addDays(date, i), id));
-                    }
-                }
-            });
+            diary.put(START, date);
+
+           db.collection(DIARIES)
+                    .add(diary)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            String id = documentReference.getId();
+                            Map<String, Object> day = new HashMap<>();
+                            day.put(CAPACITY, 0);
+                            day.put(HEALTH, 0);
+                            day.put(MOOD, 0);
+                            day.put(ACTIVITY, 0);
+                            day.put(DREAM, 0);
+                            for (int i = 0; i < 366; i++) {
+                                day.put(DATE, DateUtil.addDays(date, i));
+                                db.collection(DIARIES).document(id).collection(DAYS).add(day);
+                            }
+                        }
+                    });
 
             dismiss();
         } catch (SQLiteConstraintException e) {

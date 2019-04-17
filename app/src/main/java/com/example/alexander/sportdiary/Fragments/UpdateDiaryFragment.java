@@ -2,7 +2,6 @@ package com.example.alexander.sportdiary.Fragments;
 
 import android.app.DatePickerDialog;
 import android.database.sqlite.SQLiteConstraintException;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -14,20 +13,25 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.alexander.sportdiary.Dao.DayDao;
-import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
-import com.example.alexander.sportdiary.Entities.Day;
-import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
-import com.example.alexander.sportdiary.MenuModel;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.*;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.*;
+import static com.example.alexander.sportdiary.CollectionContracts.Day.*;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class UpdateDiaryFragment extends DialogFragment implements View.OnClickListener {
@@ -37,12 +41,12 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     private EditText editHrMax;
     private EditText editHrRest;
     private EditText editPerformance;
-    private int id;
-    private SeasonPlanDao dao;
-    private DayDao dayDao;
-    private SeasonPlan seasonPlan;
+    private String id;
+    private DocumentReference diary;
+    private FirebaseFirestore db;
 
-    public void setItemId(int id) {
+
+    public void setItemId(String id) {
         this.id = id;
     }
 
@@ -57,8 +61,13 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         editStartText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(seasonPlan.getStart());
+                final Calendar cal = Calendar.getInstance();
+                diary.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        cal.setTime(documentSnapshot.getTimestamp(START).toDate());
+                    }
+                });
                 int year = cal.get(Calendar.YEAR);
                 int month = cal.get(Calendar.MONTH);
                 int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -85,16 +94,20 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         editHrRest = v.findViewById(R.id.update_hrRest);
         editPerformance = v.findViewById(R.id.update_performance);
 
-        dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
-        dayDao = MainActivity.getInstance().getDatabase().dayDao();
+        db =  MainActivity.getInstance().getDb();
+        diary = db.collection(DIARIES).document(id);
 
-        seasonPlan = dao.getSeasonPlanById(id);
-        editNameText.setText(seasonPlan.getName());
-        editStartText.setText(sdf.format(seasonPlan.getStart()));
-        maleSpinner.setSelection(seasonPlan.getMale().equals(getString(R.string.male)) ? 0 : 1);
-        editHrMax.setText(String.valueOf(seasonPlan.getHrMax()));
-        editHrRest.setText(String.valueOf(seasonPlan.getHrRest()));
-        editPerformance.setText(String.valueOf(seasonPlan.getLastPerformance()));
+        diary.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                editNameText.setText(documentSnapshot.get(NAME).toString());
+                editStartText.setText(sdf.format(documentSnapshot.getTimestamp(START).toDate()));
+                maleSpinner.setSelection(documentSnapshot.get(MALE).toString().equals(getString(R.string.male)) ? 0 : 1);
+                editHrMax.setText(documentSnapshot.get(HR_MAX).toString());
+                editHrRest.setText(documentSnapshot.get(HR_REST).toString());
+                editPerformance.setText(documentSnapshot.get(LAST_PERFORMANCE).toString());
+            }
+        });
 
         return v;
     }
@@ -114,40 +127,39 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     }
 
     public void update() {
-
+        String name = editNameText.getText().toString();
+        Map<String, Object> diaryMap = new HashMap<>();
+        diaryMap.put(USER_ID, MainActivity.getUserId());
+        diaryMap.put(NAME, editNameText.getText().toString());
+        diaryMap.put(HR_MAX, editHrMax.getText().length() > 0 ? Integer.parseInt(editHrMax.getText().toString()) : 200);
+        diaryMap.put(HR_REST, editHrRest.getText().length() > 0 ? Integer.parseInt(editHrRest.getText().toString()) : 60);
+        diaryMap.put(LAST_PERFORMANCE, editPerformance.getText().length() > 0 ? Integer.parseInt(editPerformance.getText().toString()) : 0);
+        diaryMap.put(MALE, maleSpinner.getSelectedItem() != null ? maleSpinner.getSelectedItem().toString() : "М");
         try {
-            seasonPlan.setName(editNameText.getText().toString());
-            if (editHrMax.getText().length() > 0) {
-                seasonPlan.setHrMax(Integer.parseInt(editHrMax.getText().toString()));
-            }
-            if (editHrRest.getText().length() > 0) {
-                seasonPlan.setHrRest(Integer.parseInt(editHrRest.getText().toString()));
-            }
-            if (editPerformance.getText().length() > 0) {
-                seasonPlan.setLastPerformance(Integer.parseInt(editPerformance.getText().toString()));
-            }
-            if (maleSpinner.getSelectedItem() != null) {
-                seasonPlan.setMale(maleSpinner.getSelectedItem().toString());
-            }
             String dateText = editStartText.getText().toString();
             final Date date = sdf.parse(dateText);
-            seasonPlan.setStart(date);
-            dao.update(seasonPlan);
+            diaryMap.put(START, date);
 
-            AsyncTask.execute(new Runnable() {
+            diary.update(diaryMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
-                public void run() {
-                    dayDao.deleteBySeasonPlanId(id);
-                    for(int i = 0; i < 365; i++) {
-                        dayDao.insert(new Day(DateUtil.addDays(date, i), id));
-                    }
+                public void onSuccess(Void aVoid) {
+                    diary.collection(DAYS).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            Date newDate = date;
+                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                documentSnapshot.getReference().update(DATE, newDate);
+                                newDate = DateUtil.addDays(date, 1);
+                            }
+                        }
+                    });
                 }
             });
 
-            if (MainActivity.getSeasonPlanId() != null && MainActivity.getSeasonPlanId() == id) {
+            if (MainActivity.getSeasonPlanId() != null && MainActivity.getSeasonPlanId().equals(id)) {
                 DayFragment dayFragment = new DayFragment();
-                dayFragment.setSeasonPlanId(id);
-                MainActivity.getInstance().setTitle("(" + seasonPlan.getName().charAt(0) + ")");
+//                dayFragment.setSeasonPlanId(id);
+                MainActivity.getInstance().setTitle("(" + name.charAt(0) + ")");
                 MainActivity.getInstance().getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_frame, dayFragment)
@@ -155,10 +167,6 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
                 MainActivity.getInstance().setDayFragment(dayFragment);
             }
 
-            MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
-            MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
-            diary.setMenuName(seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart()));
-            MainActivity.getExpandableListAdapter().notifyDataSetChanged();
             dismiss();
         } catch (SQLiteConstraintException e) {
             e.printStackTrace();
@@ -171,12 +179,7 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     }
 
     public void remove() {
-        SeasonPlan seasonPlan = dao.getSeasonPlanById(id);
-        dao.delete(seasonPlan);
-        MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
-        MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
-        MainActivity.getChildList().get(menuModel).remove(diary);
-        MainActivity.getExpandableListAdapter().notifyDataSetChanged();
+        this.diary.delete();
         dismiss();
     }
 

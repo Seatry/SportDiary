@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Спортивный Дневник</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
     <string name="Exercises">Упражнения</string>
     <string name="Zones">Зоны</string>
     <string name="addZone">Новая Зона</string>
@@ -145,6 +150,14 @@
     <string name="health">Самочувствие</string>
     <string name="activity">Активность</string>
     <string name="mood">Настроение</string>
-
+    <string name="label_google_sign_in">Firebase + Google Sign In</string>
+    <string name="desc_google_sign_in">Use a Google Sign In credential to authenticate with Firebase.</string>
+    <string name="google_title_text">Google Sign In</string>
+    <string name="firebase_user_management">Firebase User Management</string>
+    <string name="loading">Loading…</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="desc_firebase_lockup">Firebase logo and name</string>
 
 </resources>

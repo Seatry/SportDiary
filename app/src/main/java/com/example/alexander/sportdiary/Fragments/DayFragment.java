@@ -59,11 +59,8 @@ public class DayFragment extends Fragment implements View.OnClickListener {
     private CalendarView calendarView;
     private String currentDate;
     private DayDao dayDao;
-    private RecyclerView trainingRecyclerView;
     private TrainingAdapter trainingAdapter;
-    private RecyclerView testRecyclerView;
     private TestAdapter testAdapter;
-    private RecyclerView restRecyclerView;
     private RestAdapter restAdapter;
     private SportDataBase sportDataBase;
     private TextView blockText;
@@ -80,8 +77,6 @@ public class DayFragment extends Fragment implements View.OnClickListener {
     private LiveData<List<Training>> trainingLiveData;
     private LiveData<List<DayToTest>> testLiveData;
     private LiveData<List<Rest>> restLiveData;
-    private Button sanButton;
-    private Button dreamButton;
 
     public void setSeasonPlanId(long seasonPlanId) {
         this.seasonPlanId = seasonPlanId;
@@ -125,21 +120,21 @@ public class DayFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        trainingRecyclerView = v.findViewById(R.id.trainingItems);
+        RecyclerView trainingRecyclerView = v.findViewById(R.id.trainingItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         trainingRecyclerView.setLayoutManager(layoutManager);
         trainingAdapter = new TrainingAdapter();
         trainingRecyclerView.setAdapter(trainingAdapter);
         getTrainings();
 
-        testRecyclerView = v.findViewById(R.id.testItems);
+        RecyclerView testRecyclerView = v.findViewById(R.id.testItems);
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(getContext());
         testRecyclerView.setLayoutManager(layoutManager2);
         testAdapter = new TestAdapter();
         testRecyclerView.setAdapter(testAdapter);
         getTests();
 
-        restRecyclerView = v.findViewById(R.id.restItems);
+        RecyclerView restRecyclerView = v.findViewById(R.id.restItems);
         LinearLayoutManager layoutManager3 = new LinearLayoutManager(getContext());
         restRecyclerView.setLayoutManager(layoutManager3);
         restAdapter = new RestAdapter();
@@ -156,9 +151,9 @@ public class DayFragment extends Fragment implements View.OnClickListener {
 
         setEditObservers();
 
-        sanButton = v.findViewById(R.id.sanButton);
+        Button sanButton = v.findViewById(R.id.sanButton);
         sanButton.setOnClickListener(this);
-        dreamButton = v.findViewById(R.id.dreamButton);
+        Button dreamButton = v.findViewById(R.id.dreamButton);
         dreamButton.setOnClickListener(this);
 
         TabHost tabHost = v.findViewById(R.id.day_tabHost);

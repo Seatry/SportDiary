@@ -7,10 +7,10 @@ public class MenuModel {
 
     private String menuName;
     private boolean hasChildren, isGroup;
-    private int id;
+    private String id;
 
 
-    public MenuModel(String menuName, boolean isGroup, boolean hasChildren, int id) {
+    public MenuModel(String menuName, boolean isGroup, boolean hasChildren, String id) {
 
         this.menuName = menuName;
         this.isGroup = isGroup;
@@ -18,9 +18,9 @@ public class MenuModel {
         this.id = id;
     }
 
-    public static MenuModel getMenuModelById(List<MenuModel> menuModels, int id) {
+    public static MenuModel getMenuModelById(List<MenuModel> menuModels, String id) {
         for(MenuModel menuModel : menuModels) {
-            if (menuModel.getId() == id) {
+            if (menuModel.getId().equals(id)) {
                 return menuModel;
             }
         }
@@ -51,11 +51,11 @@ public class MenuModel {
         this.menuName = menuName;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 }
