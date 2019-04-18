@@ -3,6 +3,7 @@ package com.example.alexander.sportdiary.Fragments;
 import android.app.DatePickerDialog;
 import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.example.alexander.sportdiary.Utils.DateUtil;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -100,23 +102,28 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             String dateText = editStartText.getText().toString();
             final Date date = sdf.parse(dateText);
             diary.put(START, date);
-
-           db.collection(DIARIES)
+            db.collection(DIARIES)
                     .add(diary)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            String id = documentReference.getId();
-                            Map<String, Object> day = new HashMap<>();
+                            final String id = documentReference.getId();
+                            final Map<String, Object> day = new HashMap<>();
                             day.put(CAPACITY, 0);
                             day.put(HEALTH, 0);
                             day.put(MOOD, 0);
                             day.put(ACTIVITY, 0);
                             day.put(DREAM, 0);
-                            for (int i = 0; i < 366; i++) {
-                                day.put(DATE, DateUtil.addDays(date, i));
-                                db.collection(DIARIES).document(id).collection(DAYS).add(day);
-                            }
+                            db.runBatch(new WriteBatch.Function() {
+                                @Override
+                                public void apply(@NonNull WriteBatch writeBatch) {
+                                    for (int i = 0; i < 366; i++) {
+                                        day.put(DATE, DateUtil.addDays(date, i));
+                                        writeBatch.set(db.collection(DIARIES).document(id)
+                                                .collection(DAYS).document(String.valueOf(i)), day);
+                                    }
+                                }
+                            });
                         }
                     });
 

@@ -55,6 +55,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private DayFragment dayFragment;
     private static String userId;
+    private HttpsCallableReference recursiveDeleteFunction;
 
     public static String getUserId() {
         return userId;
@@ -132,7 +135,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPersistenceEnabled(true)
                 .build();
         db.setFirestoreSettings(settings);
-
+        FirebaseFunctions firebaseFunctions = FirebaseFunctions.getInstance();
+//        firebaseFunctions.getHttpsCallable("mintAdminToken").call(userId);
+        recursiveDeleteFunction = firebaseFunctions.getHttpsCallable("recursiveDelete");
 
         database = Room.databaseBuilder(this, SportDataBase.class, "SportDataBase")
                 .fallbackToDestructiveMigration()
@@ -522,5 +527,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public FirebaseFirestore getDb() {
         return db;
+    }
+
+    public HttpsCallableReference getRecursiveDeleteFunction() {
+        return recursiveDeleteFunction;
     }
 }

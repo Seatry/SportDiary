@@ -3,7 +3,9 @@ package com.example.alexander.sportdiary.Fragments;
 import android.app.DatePickerDialog;
 import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +18,16 @@ import android.widget.Toast;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.functions.HttpsCallableResult;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -44,7 +50,7 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     private String id;
     private DocumentReference diary;
     private FirebaseFirestore db;
-
+    private String start;
 
     public void setItemId(String id) {
         this.id = id;
@@ -100,9 +106,12 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         diary.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Log.d("success", "diary update fragment");
+                if (documentSnapshot == null) return;
                 editNameText.setText(documentSnapshot.get(NAME).toString());
-                editStartText.setText(sdf.format(documentSnapshot.getTimestamp(START).toDate()));
-                maleSpinner.setSelection(documentSnapshot.get(MALE).toString().equals(getString(R.string.male)) ? 0 : 1);
+                start = sdf.format(documentSnapshot.getTimestamp(START).toDate());
+                editStartText.setText(start);
+                maleSpinner.setSelection(documentSnapshot.get(MALE).toString().equals(MainActivity.getInstance().getString(R.string.male)) ? 0 : 1);
                 editHrMax.setText(documentSnapshot.get(HR_MAX).toString());
                 editHrRest.setText(documentSnapshot.get(HR_REST).toString());
                 editPerformance.setText(documentSnapshot.get(LAST_PERFORMANCE).toString());
@@ -136,20 +145,22 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         diaryMap.put(LAST_PERFORMANCE, editPerformance.getText().length() > 0 ? Integer.parseInt(editPerformance.getText().toString()) : 0);
         diaryMap.put(MALE, maleSpinner.getSelectedItem() != null ? maleSpinner.getSelectedItem().toString() : "М");
         try {
-            String dateText = editStartText.getText().toString();
+            final String dateText = editStartText.getText().toString();
             final Date date = sdf.parse(dateText);
             diaryMap.put(START, date);
 
             diary.update(diaryMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    diary.collection(DAYS).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    if (start.equals(dateText)) return;
+                    db.runBatch(new WriteBatch.Function() {
                         @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            Date newDate = date;
-                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                documentSnapshot.getReference().update(DATE, newDate);
-                                newDate = DateUtil.addDays(date, 1);
+                        public void apply(@NonNull WriteBatch writeBatch) {
+                            for (int i = 0; i < 366; i++) {
+                                writeBatch.update(db.collection(DIARIES)
+                                        .document(id)
+                                        .collection(DAYS)
+                                        .document(String.valueOf(i)), DATE, DateUtil.addDays(date, i));
                             }
                         }
                     });
@@ -179,6 +190,18 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     }
 
     public void remove() {
+        Log.d("delete", "/" + DIARIES + "/" + diary.getId());
+        Map<String, Object> data = new HashMap<>();
+        data.put("path", "/" + DIARIES + "/" + diary.getId());
+        MainActivity.getInstance().getRecursiveDeleteFunction().call(data)
+                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("delete", "Diary deleted");
+                        }
+                    }
+                });
         this.diary.delete();
         dismiss();
     }
