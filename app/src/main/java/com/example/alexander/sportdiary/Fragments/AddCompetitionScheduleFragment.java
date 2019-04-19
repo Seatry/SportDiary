@@ -3,43 +3,54 @@ package com.example.alexander.sportdiary.Fragments;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.alexander.sportdiary.CollectionContracts.Edit;
 import com.example.alexander.sportdiary.Enums.EditOption;
-import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
-import com.example.alexander.sportdiary.Entities.Day;
-import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.COMPETITIONS;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.DAYS;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.DAY_COMPETITIONS;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.DIARIES;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.IMPORTANCES;
+import static com.example.alexander.sportdiary.CollectionContracts.DayCompetition.COMPETITION_ID;
+import static com.example.alexander.sportdiary.CollectionContracts.DayCompetition.IMPORTANCE_ID;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.START;
+import static com.example.alexander.sportdiary.CollectionContracts.Edit.NAME;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 import static com.example.alexander.sportdiary.Utils.ToolerOfSpinners.toolSpinner;
 
 public class AddCompetitionScheduleFragment extends DialogFragment implements View.OnClickListener {
     private EditOption option;
     private String title;
-    private SportDataBase sportDataBase;
+    private FirebaseFirestore db;
     private EditText editDate;
     private Spinner nameSpinner;
     private Spinner importanceSpinner;
-    private Day updateDay = new Day();
-    private long seasonPlanId;
-    private SeasonPlan seasonPlan;
+    private Pair<DocumentSnapshot, Date> updateItem;
     private Date maxDate;
     private Date minDate;
+    private DocumentReference diary;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,31 +59,45 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
         v.findViewById(R.id.okAddCompetition).setOnClickListener(this);
         ((TextView)v.findViewById(R.id.add_competition_title)).setText(title);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
-
         editDate = v.findViewById(R.id.editCompetitionDate);
         nameSpinner = v.findViewById(R.id.competitionNameSpinner);
         importanceSpinner = v.findViewById(R.id.competitionImportanceSpinner);
 
-        seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
-        maxDate = DateUtil.addDays(seasonPlan.getStart(), 365);
-        minDate = seasonPlan.getStart();
+        db = MainActivity.getInstance().getDb();
+        diary = db.collection(DIARIES).document(MainActivity.getSeasonPlanId());
 
-        editDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        month += 1;
-                        String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
-                        editDate.setText(currentDate);
-                    }
+        diary.get().addOnSuccessListener(documentSnapshot -> {
+            minDate = documentSnapshot.getDate(START);
+            maxDate = DateUtil.addDays(minDate, 365);
+
+            if (option == EditOption.UPDATE) {
+                editDate.setText(sdf.format(updateItem.second));
+                String competitionId = updateItem.first.getString(COMPETITION_ID);
+                db.collection(COMPETITIONS).document(competitionId).get(Source.CACHE).addOnSuccessListener(documentSnapshot1 -> {
+                    String competition = documentSnapshot1.getString(NAME);
+                    Object importanceIdObj = updateItem.first.get(IMPORTANCE_ID);
+                    String importanceId = importanceIdObj == null ? "" : importanceIdObj.toString();
+                    db.collection(IMPORTANCES).document(importanceId).get(Source.CACHE).addOnSuccessListener(documentSnapshot2 -> {
+                        String importance = documentSnapshot2.exists() ? documentSnapshot2.getString(NAME) : null;
+                        toolSpinner(COMPETITIONS, nameSpinner, new Edit(competitionId, competition));
+                        toolSpinner(IMPORTANCES, importanceSpinner, importance == null ? null : new Edit(importanceId, importance));
+                    });
+                });
+            } else {
+                toolSpinner(COMPETITIONS, nameSpinner, null);
+                toolSpinner(IMPORTANCES, importanceSpinner, null);
+            }
+
+            editDate.setOnClickListener(v1 -> {
+                DatePickerDialog.OnDateSetListener listener = (view, year, month, dayOfMonth) -> {
+                    month += 1;
+                    String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
+                    editDate.setText(currentDate);
                 };
                 DatePickerDialog datePickerDialog;
                 if (option == EditOption.UPDATE) {
                     Calendar cal = Calendar.getInstance();
-                    cal.setTime(updateDay.getDate());
+                    cal.setTime(updateItem.second);
                     int year = cal.get(Calendar.YEAR);
                     int month = cal.get(Calendar.MONTH);
                     int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -85,19 +110,8 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
                 datePickerDialog.getDatePicker().setMaxDate(maxDate.getTime());
                 datePickerDialog.getDatePicker().setMinDate(minDate.getTime());
                 datePickerDialog.show();
-            }
+            });
         });
-
-        Long competitionToImportanceId = updateDay.getCompetitionToImportanceId();
-        CompetitionToImportance competitionToImportance = sportDataBase.competitionToImportanceDao().getById(competitionToImportanceId);
-        Long competitionId = competitionToImportance == null ? null : competitionToImportance.getCompetitionId();
-        Long importanceId = competitionToImportance == null ? null : competitionToImportance.getImportanceId();
-        toolSpinner(sportDataBase.competitionDao(), nameSpinner, sportDataBase.competitionDao().getNameById(competitionId));
-        toolSpinner(sportDataBase.importanceDao(), importanceSpinner, sportDataBase.importanceDao().getNameById(importanceId));
-
-        if (option == EditOption.UPDATE) {
-            editDate.setText(sdf.format(updateDay.getDate()));
-        }
 
         return v;
     }
@@ -109,20 +123,12 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
                 dismiss();
                 break;
             case R.id.okAddCompetition:
-                switch (option) {
-                    case INSERT:
-                        add();
-                        break;
-                    case UPDATE:
-                        update();
-                        break;
-                }
+                handleChange();
         }
     }
 
-    public void add() {
-        Long competitionId = nameSpinner.getSelectedItem() == null ? null
-                : sportDataBase.competitionDao().getIdByName(nameSpinner.getSelectedItem().toString());
+    public void handleChange() {
+        String competitionId = nameSpinner.getSelectedItem() == null ? null : ((Edit) nameSpinner.getSelectedItem()).getId();
         if (competitionId == null) {
             Toast.makeText(MainActivity.getInstance(), R.string.competition_error, Toast.LENGTH_SHORT).show();
             return;
@@ -138,46 +144,18 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
             Toast.makeText(MainActivity.getInstance(), R.string.date_in_season, Toast.LENGTH_SHORT).show();
             return;
         }
-        Long importanceId = importanceSpinner.getSelectedItem() == null ? null
-                : sportDataBase.importanceDao().getIdByName(importanceSpinner.getSelectedItem().toString());
-        Day existDay = sportDataBase.dayDao().getDayByDateAndSeasonIdWhereCompetitionToImportanceNotNull(date, seasonPlanId);
-        if (existDay != null) {
-            this.setUpdateDay(existDay);
-            update();
-            return;
+        String importanceId = importanceSpinner.getSelectedItem() == null ? null : ((Edit) importanceSpinner.getSelectedItem()).getId();
+        int day = DateUtil.differenceInDays(minDate, date);
+        Map<String, Object> data = new HashMap<>();
+        data.put(COMPETITION_ID, competitionId);
+        if (importanceId != null) {
+            data.put(IMPORTANCE_ID, importanceId);
         }
-        CompetitionToImportance competitionToImportance = new CompetitionToImportance(competitionId, importanceId);
-        Long id = sportDataBase.competitionToImportanceDao().insert(competitionToImportance);
-        sportDataBase.dayDao().updateCompetitionToImportanceByDateAndSeasonId(id, date, seasonPlanId);
-        dismiss();
-    }
-
-    public void update() {
-        Long competitionId = nameSpinner.getSelectedItem() == null ? null
-                : sportDataBase.competitionDao().getIdByName(nameSpinner.getSelectedItem().toString());
-        if (competitionId == null) {
-            Toast.makeText(MainActivity.getInstance(), R.string.competition_error, Toast.LENGTH_SHORT).show();
-            return;
+        if (option == EditOption.UPDATE) {
+            updateItem.first.getReference().update(data);
+        } else {
+            diary.collection(DAYS).document(String.valueOf(day)).collection(DAY_COMPETITIONS).add(data);
         }
-        Date date;
-        try {
-            date = sdf.parse(editDate.getText().toString());
-        } catch (ParseException e) {
-            Toast.makeText(MainActivity.getInstance(), R.string.date_format_err, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (date.after(maxDate) || date.before(minDate)) {
-            Toast.makeText(MainActivity.getInstance(), R.string.date_in_season, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Long importanceId = importanceSpinner.getSelectedItem() == null ? null
-                : sportDataBase.importanceDao().getIdByName(importanceSpinner.getSelectedItem().toString());
-        Long competitionToImportanceId = sportDataBase.dayDao()
-                .getCompetitionToImportanceIdByDateAndSeasonId(updateDay.getDate(), updateDay.getSeasonPlanId());
-        sportDataBase.competitionToImportanceDao().deleteById(competitionToImportanceId);
-        CompetitionToImportance competitionToImportance = new CompetitionToImportance(competitionId, importanceId);
-        Long id = sportDataBase.competitionToImportanceDao().insert(competitionToImportance);
-        sportDataBase.dayDao().updateCompetitionToImportanceByDateAndSeasonId(id, date, updateDay.getSeasonPlanId());
         dismiss();
     }
 
@@ -191,12 +169,7 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
         return this;
     }
 
-    public AddCompetitionScheduleFragment setSeasonPlanId(long seasonPlanId) {
-        this.seasonPlanId = seasonPlanId;
-        return this;
-    }
-
-    public void setUpdateDay(Day updateDay) {
-        this.updateDay = updateDay;
+    public void setUpdateItem(Pair<DocumentSnapshot, Date> updateItem) {
+        this.updateItem = updateItem;
     }
 }

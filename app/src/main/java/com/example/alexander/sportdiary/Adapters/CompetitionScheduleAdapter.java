@@ -4,29 +4,35 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Enums.EditOption;
-import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Fragments.AddCompetitionScheduleFragment;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
 import com.example.alexander.sportdiary.ViewHolders.CompetitionScheduleViewHolder;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.COMPETITIONS;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.IMPORTANCES;
+import static com.example.alexander.sportdiary.CollectionContracts.DayCompetition.COMPETITION_ID;
+import static com.example.alexander.sportdiary.CollectionContracts.DayCompetition.IMPORTANCE_ID;
+import static com.example.alexander.sportdiary.CollectionContracts.Edit.NAME;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class CompetitionScheduleAdapter extends RecyclerView.Adapter<CompetitionScheduleViewHolder> {
     private static int countItems;
-    private List<Day> days = new ArrayList<>();
-    private SportDataBase sportDataBase = MainActivity.getInstance().getDatabase();
+    private List<Pair<DocumentSnapshot, Date>> dayCompetitions = new ArrayList<>();
+    private FirebaseFirestore db = MainActivity.getInstance().getDb();
 
     @NonNull
     @Override
@@ -38,7 +44,7 @@ public class CompetitionScheduleAdapter extends RecyclerView.Adapter<Competition
 
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         CompetitionScheduleViewHolder viewHolder = new CompetitionScheduleViewHolder(view);
-        if(countItems < days.size()) {
+        if(countItems < dayCompetitions.size()) {
             setData(viewHolder, countItems);
         }
         countItems++;
@@ -57,28 +63,21 @@ public class CompetitionScheduleAdapter extends RecyclerView.Adapter<Competition
                 //inflating menu from xml resource
                 popup.inflate(R.menu.edit_options);
                 //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.update:
-                                AddCompetitionScheduleFragment scheduleFragment = new AddCompetitionScheduleFragment();
-                                scheduleFragment
-                                        .setOption(EditOption.UPDATE)
-                                        .setTitle(MainActivity.getInstance().getString(R.string.updateCompetition))
-                                        .setSeasonPlanId(days.get(i).getSeasonPlanId())
-                                        .setUpdateDay(days.get(i));
-                                scheduleFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateSchedule");
-                                break;
-                            case R.id.delete:
-                                Day updateDay = days.get(i);
-                                Long competitionToImportanceId = sportDataBase.dayDao()
-                                        .getCompetitionToImportanceIdByDateAndSeasonId(updateDay.getDate(), updateDay.getSeasonPlanId());
-                                sportDataBase.competitionToImportanceDao().deleteById(competitionToImportanceId);
-                                break;
-                        }
-                        return false;
+                popup.setOnMenuItemClickListener(item -> {
+                    switch (item.getItemId()) {
+                        case R.id.update:
+                            AddCompetitionScheduleFragment scheduleFragment = new AddCompetitionScheduleFragment();
+                            scheduleFragment
+                                    .setOption(EditOption.UPDATE)
+                                    .setTitle(MainActivity.getInstance().getString(R.string.updateCompetition))
+                                    .setUpdateItem(dayCompetitions.get(i));
+                            scheduleFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateSchedule");
+                            break;
+                        case R.id.delete:
+                            dayCompetitions.get(i).first.getReference().delete();
+                            break;
                     }
+                    return false;
                 });
                 //displaying the popup
                 popup.setGravity(Gravity.END);
@@ -87,24 +86,36 @@ public class CompetitionScheduleAdapter extends RecyclerView.Adapter<Competition
         });
     }
 
-    private void setData(CompetitionScheduleViewHolder viewHolder, int i) {
-        Day day = days.get(i);
-        Long competitionId = sportDataBase.competitionToImportanceDao()
-                .getCompetitionIdById(day.getCompetitionToImportanceId());
-        String competition = sportDataBase.competitionDao().getNameById(competitionId);
-        Long importanceId = sportDataBase.competitionToImportanceDao()
-                .getImportanceIdById(day.getCompetitionToImportanceId());
-        String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameById(importanceId);
-        String dateText = sdf.format(day.getDate());
-        viewHolder.setData(dateText + ": " + competition + " (" + importance + ")");
+    private void setData(final CompetitionScheduleViewHolder viewHolder, final int i) {
+        String competitionId = dayCompetitions.get(i).first.getString(COMPETITION_ID);
+        db.collection(COMPETITIONS).document(competitionId).get().addOnSuccessListener(documentSnapshot -> {
+            String competition = documentSnapshot.getString(NAME);
+            Object importanceIdObj = dayCompetitions.get(i).first.get(IMPORTANCE_ID);
+            String importanceId = importanceIdObj == null ? "" : importanceIdObj.toString();
+            db.collection(IMPORTANCES).document(importanceId).get().addOnSuccessListener(documentSnapshot1 -> {
+                String importance = documentSnapshot1.exists() ? documentSnapshot1.getString(NAME) : "";
+                String dateText = sdf.format(dayCompetitions.get(i).second);
+                viewHolder.setData(dateText + ": " + competition + " (" + importance + ")");
+            });
+        });
+
     }
 
     @Override
     public int getItemCount() {
-        return days.size();
+        return dayCompetitions.size();
     }
 
-    public void setData(List<Day> days) {
-        this.days = days;
+    public void addData(Pair<DocumentSnapshot, Date> day) {
+        dayCompetitions.add(day);
+    }
+
+    public void removeData(Pair<DocumentSnapshot, Date> day) {
+        dayCompetitions.remove(day);
+    }
+
+    public void updateData(Pair<DocumentSnapshot, Date> day) {
+        dayCompetitions.remove(day);
+        dayCompetitions.add(day);
     }
 }

@@ -1,16 +1,13 @@
 package com.example.alexander.sportdiary.Fragments;
 
 import android.app.DatePickerDialog;
-import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -18,16 +15,9 @@ import android.widget.Toast;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
-import com.google.firebase.functions.HttpsCallableResult;
+import com.google.firebase.firestore.Source;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -35,9 +25,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.alexander.sportdiary.CollectionContracts.Collections.*;
-import static com.example.alexander.sportdiary.CollectionContracts.Diary.*;
-import static com.example.alexander.sportdiary.CollectionContracts.Day.*;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.DAYS;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.DIARIES;
+import static com.example.alexander.sportdiary.CollectionContracts.Day.DATE;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.HR_MAX;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.HR_REST;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.LAST_PERFORMANCE;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.MALE;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.NAME;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.START;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.USER_ID;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class UpdateDiaryFragment extends DialogFragment implements View.OnClickListener {
@@ -64,31 +61,20 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         v.findViewById(R.id.removeDiary).setOnClickListener(this);
         editNameText = v.findViewById(R.id.update_diary_name);
         editStartText = v.findViewById(R.id.update_diary_start);
-        editStartText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Calendar cal = Calendar.getInstance();
-                diary.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        cal.setTime(documentSnapshot.getTimestamp(START).toDate());
-                    }
-                });
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH);
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance(),
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                month +=1;
-                                String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
-                                editStartText.setText(currentDate);
-                            }
-                        }, year, month, day
-                );
-                datePickerDialog.show();
-            }
+        editStartText.setOnClickListener(v1 -> {
+            final Calendar cal = Calendar.getInstance();
+            diary.get().addOnSuccessListener(documentSnapshot -> cal.setTime(documentSnapshot.getTimestamp(START).toDate()));
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH);
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance(),
+                    (view, year1, month1, dayOfMonth) -> {
+                        month1 +=1;
+                        String currentDate = dayOfMonth + "." + (month1 < 10 ? "0" + month1 : month1) + "." + year1;
+                        editStartText.setText(currentDate);
+                    }, year, month, day
+            );
+            datePickerDialog.show();
         });
         maleSpinner = v.findViewById(R.id.update_maleSpinner);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.getInstance(), android.R.layout.simple_spinner_item);
@@ -103,19 +89,16 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         db =  MainActivity.getInstance().getDb();
         diary = db.collection(DIARIES).document(id);
 
-        diary.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Log.d("success", "diary update fragment");
-                if (documentSnapshot == null) return;
-                editNameText.setText(documentSnapshot.get(NAME).toString());
-                start = sdf.format(documentSnapshot.getTimestamp(START).toDate());
-                editStartText.setText(start);
-                maleSpinner.setSelection(documentSnapshot.get(MALE).toString().equals(MainActivity.getInstance().getString(R.string.male)) ? 0 : 1);
-                editHrMax.setText(documentSnapshot.get(HR_MAX).toString());
-                editHrRest.setText(documentSnapshot.get(HR_REST).toString());
-                editPerformance.setText(documentSnapshot.get(LAST_PERFORMANCE).toString());
-            }
+        diary.get(Source.CACHE).addOnSuccessListener(documentSnapshot -> {
+            Log.d("success", "diary update fragment");
+            if (documentSnapshot == null) return;
+            editNameText.setText(documentSnapshot.get(NAME).toString());
+            start = sdf.format(documentSnapshot.getTimestamp(START).toDate());
+            editStartText.setText(start);
+            maleSpinner.setSelection(documentSnapshot.get(MALE).toString().equals(MainActivity.getInstance().getString(R.string.male)) ? 0 : 1);
+            editHrMax.setText(documentSnapshot.get(HR_MAX).toString());
+            editHrRest.setText(documentSnapshot.get(HR_REST).toString());
+            editPerformance.setText(documentSnapshot.get(LAST_PERFORMANCE).toString());
         });
 
         return v;
@@ -149,22 +132,16 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
             final Date date = sdf.parse(dateText);
             diaryMap.put(START, date);
 
-            diary.update(diaryMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    if (start.equals(dateText)) return;
-                    db.runBatch(new WriteBatch.Function() {
-                        @Override
-                        public void apply(@NonNull WriteBatch writeBatch) {
-                            for (int i = 0; i < 366; i++) {
-                                writeBatch.update(db.collection(DIARIES)
-                                        .document(id)
-                                        .collection(DAYS)
-                                        .document(String.valueOf(i)), DATE, DateUtil.addDays(date, i));
-                            }
-                        }
-                    });
-                }
+            diary.update(diaryMap).addOnSuccessListener(aVoid -> {
+                if (start.equals(dateText)) return;
+                db.runBatch(writeBatch -> {
+                    for (int i = 0; i < 366; i++) {
+                        writeBatch.update(db.collection(DIARIES)
+                                .document(id)
+                                .collection(DAYS)
+                                .document(String.valueOf(i)), DATE, DateUtil.addDays(date, i));
+                    }
+                });
             });
 
             if (MainActivity.getSeasonPlanId() != null && MainActivity.getSeasonPlanId().equals(id)) {
@@ -179,13 +156,9 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
             }
 
             dismiss();
-        } catch (SQLiteConstraintException e) {
-            e.printStackTrace();
-            Toast.makeText(MainActivity.getInstance(), R.string.unique_err, Toast.LENGTH_SHORT).show();
         } catch (ParseException e) {
             e.printStackTrace();
             Toast.makeText(MainActivity.getInstance(), R.string.date_format_err, Toast.LENGTH_SHORT).show();
-
         }
     }
 
@@ -194,12 +167,9 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         Map<String, Object> data = new HashMap<>();
         data.put("path", "/" + DIARIES + "/" + diary.getId());
         MainActivity.getInstance().getRecursiveDeleteFunction().call(data)
-                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("delete", "Diary deleted");
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("delete", "Diary deleted");
                     }
                 });
         this.diary.delete();

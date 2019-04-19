@@ -1,10 +1,7 @@
 package com.example.alexander.sportdiary.Fragments;
 
 import android.app.Dialog;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,28 +11,24 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.alexander.sportdiary.Adapters.EditAdapter;
-import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
-import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
+import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.List;
+import static com.example.alexander.sportdiary.CollectionContracts.Edit.USER_ID;
 
 public class EditFragment<T extends Edit> extends DialogFragment implements View.OnClickListener {
-
-    private RecyclerView recyclerView;
-    private EditAdapter<T> adapter;
-    private Class<T> cls;
+    private EditAdapter adapter;
     private String title;
     private String addDialogTitle;
     private String updateDialogTitle;
-    private EditDao<T> dao;
+    private String collection;
 
-    public void setClass(Class<T> cls, String title, EditDao<T> dao, String addDialogTitle, String updateDialogTitle) {
-        this.cls = cls;
+    public void setClass(String collection, String title, String addDialogTitle, String updateDialogTitle) {
+        this.collection = collection;
         this.title = title;
-        this.dao = dao;
         this.addDialogTitle = addDialogTitle;
         this.updateDialogTitle = updateDialogTitle;
     }
@@ -47,22 +40,22 @@ public class EditFragment<T extends Edit> extends DialogFragment implements View
         v.findViewById(R.id.add_button).setOnClickListener(this);
         ((TextView) v.findViewById(R.id.edit_title)).setText(title);
 
-        recyclerView = v.findViewById(R.id.edit_items);
+        RecyclerView recyclerView = v.findViewById(R.id.edit_items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new EditAdapter<>(getContext(), dao);
-        adapter.setClass(cls, updateDialogTitle);
+        adapter = new EditAdapter(getContext());
+        adapter.setClass(collection, updateDialogTitle);
         recyclerView.setAdapter(adapter);
 
-        LiveData<List<T>> editLiveData = dao.getAll();
+        FirebaseFirestore db = MainActivity.getInstance().getDb();
 
-        editLiveData.observe(this, new Observer<List<T>>() {
-            @Override
-            public void onChanged(@Nullable List<T> elems) {
-                adapter.setData(elems);
-                adapter.notifyDataSetChanged();
-            }
-        });
+        db.collection(collection).whereEqualTo(USER_ID, MainActivity.getUserId())
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (queryDocumentSnapshots == null) return;
+                    adapter.setData(queryDocumentSnapshots.getDocuments());
+                    adapter.notifyDataSetChanged();
+                });
+
         return v;
     }
 
@@ -85,8 +78,8 @@ public class EditFragment<T extends Edit> extends DialogFragment implements View
                 dismiss();
                 break;
             case R.id.add_button:
-                AddNewEditFragment<T> dialogFragment = new AddNewEditFragment<>();
-                dialogFragment.setClass(cls, addDialogTitle, dao, EditOption.INSERT);
+                AddNewEditFragment dialogFragment = new AddNewEditFragment();
+                dialogFragment.setClass(collection, addDialogTitle, EditOption.INSERT);
                 dialogFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "addNewDialog");
                 break;
         }

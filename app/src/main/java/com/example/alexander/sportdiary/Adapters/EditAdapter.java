@@ -1,44 +1,44 @@
 package com.example.alexander.sportdiary.Adapters;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
 import com.example.alexander.sportdiary.Enums.EditOption;
-import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
 import com.example.alexander.sportdiary.Fragments.AddNewEditFragment;
 import com.example.alexander.sportdiary.MainActivity;
-import com.example.alexander.sportdiary.ViewHolders.EditViewHolder;
 import com.example.alexander.sportdiary.R;
+import com.example.alexander.sportdiary.ViewHolders.EditViewHolder;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHolder> {
+import static com.example.alexander.sportdiary.CollectionContracts.Edit.NAME;
+
+public class EditAdapter extends RecyclerView.Adapter<EditViewHolder> {
     private static int countItems;
     private Context mCtx;
-    private List<T> data = new ArrayList<>();
-    private EditDao<T> dao;
+    private List<DocumentSnapshot> data = new ArrayList<>();
     private String dialogTitle;
-    private Class<T> cls;
+    private String collection;
+    private FirebaseFirestore db;
 
-    public void setClass(Class<T> cls, String title) {
-        this.cls = cls;
+    public void setClass(String collection, String title) {
+        this.collection = collection;
         this.dialogTitle = title;
     }
 
-    public EditAdapter(Context mCtx, EditDao<T> dao) {
+    public EditAdapter(Context mCtx) {
         this.mCtx = mCtx;
+        db = MainActivity.getInstance().getDb();
         countItems = 0;
-        this.dao = dao;
     }
 
     @NonNull
@@ -52,7 +52,7 @@ public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHo
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         EditViewHolder viewHolder = new EditViewHolder(view);
         if(countItems < data.size()) {
-            viewHolder.setData(data.get(countItems).getName());
+            viewHolder.setData(data.get(countItems).get(NAME).toString());
         }
         countItems++;
 
@@ -61,7 +61,7 @@ public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHo
 
     @Override
     public void onBindViewHolder(@NonNull final EditViewHolder editViewHolder, final int i) {
-        editViewHolder.setData(data.get(i).getName());
+        editViewHolder.setData(data.get(i).get(NAME).toString());
         editViewHolder.itemView.findViewById(R.id.edit_opts).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,27 +70,19 @@ public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHo
                 //inflating menu from xml resource
                 popup.inflate(R.menu.edit_options);
                 //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.update:
-                                AddNewEditFragment<T> dialogFragment = new AddNewEditFragment<>();
-                                dialogFragment.setClass(cls, dialogTitle, dao, EditOption.UPDATE);
-                                dialogFragment.setUpdateItem(data.get(i));
-                                dialogFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateDialog");
-                                break;
-                            case R.id.delete:
-                                AsyncTask.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dao.delete(data.get(i));
-                                    }
-                                });
-                                break;
-                        }
-                        return false;
+                popup.setOnMenuItemClickListener(item -> {
+                    switch (item.getItemId()) {
+                        case R.id.update:
+                            AddNewEditFragment dialogFragment = new AddNewEditFragment();
+                            dialogFragment.setClass(collection, dialogTitle, EditOption.UPDATE);
+                            dialogFragment.setUpdateItem(data.get(i));
+                            dialogFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateDialog");
+                            break;
+                        case R.id.delete:
+                            db.collection(collection).document(data.get(i).getId()).delete();
+                            break;
                     }
+                    return false;
                 });
                 //displaying the popup
                 popup.setGravity(Gravity.END);
@@ -104,11 +96,7 @@ public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHo
         return data.size();
     }
 
-    public void setData(List<T> data) {
+    public void setData(List<DocumentSnapshot> data) {
         this.data = data;
-    }
-
-    public List<T> getData() {
-        return data;
     }
 }

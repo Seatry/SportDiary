@@ -3,7 +3,6 @@ package com.example.alexander.sportdiary;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,20 +13,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
 import com.example.alexander.sportdiary.Auth.GoogleSignInActivity;
-import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
+import com.example.alexander.sportdiary.CollectionContracts.Collections;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
 import com.example.alexander.sportdiary.Entities.EditEntities.Camp;
 import com.example.alexander.sportdiary.Entities.EditEntities.Competition;
 import com.example.alexander.sportdiary.Entities.EditEntities.Equipment;
-import com.example.alexander.sportdiary.Entities.EditEntities.Exercise;
 import com.example.alexander.sportdiary.Entities.EditEntities.Importance;
 import com.example.alexander.sportdiary.Entities.EditEntities.RestPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Stage;
@@ -37,7 +33,6 @@ import com.example.alexander.sportdiary.Entities.EditEntities.Test;
 import com.example.alexander.sportdiary.Entities.EditEntities.Time;
 import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
-import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
 import com.example.alexander.sportdiary.Fragments.CompetitionScheduleFragment;
 import com.example.alexander.sportdiary.Fragments.DayFragment;
@@ -46,15 +41,10 @@ import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
 import com.example.alexander.sportdiary.Fragments.Statistics;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 
@@ -63,9 +53,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.alexander.sportdiary.CollectionContracts.Collections.*;
-import static com.example.alexander.sportdiary.CollectionContracts.Diary.*;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.*;
+import static com.example.alexander.sportdiary.CollectionContracts.Collections.DIARIES;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.NAME;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.START;
+import static com.example.alexander.sportdiary.CollectionContracts.Diary.USER_ID;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.ADD_DIARY;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.AIMS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.BLOCKS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.BORG_RATINGS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.CALENDAR;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.CAMPS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.COMPETITIONS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.COMPETITION_SCHEDULE;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.EDIT_GROUP;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.EQUIPMENTS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.EXERCISES;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.IMPORTANCE;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.OVERALL_PLAN;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.REST_PLACE;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.STAGES;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.STATISTICS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.STYLES;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.TEMPOS;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.TEST;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.TIMES;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.TRAINING_PLACES;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.TYPES;
+import static com.example.alexander.sportdiary.Enums.MenuItemIds.ZONES;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 import static com.google.android.gms.common.ConnectionResult.SUCCESS;
 
@@ -136,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .build();
         db.setFirestoreSettings(settings);
         FirebaseFunctions firebaseFunctions = FirebaseFunctions.getInstance();
-//        firebaseFunctions.getHttpsCallable("mintAdminToken").call(userId);
         recursiveDeleteFunction = firebaseFunctions.getHttpsCallable("recursiveDelete");
 
         database = Room.databaseBuilder(this, SportDataBase.class, "SportDataBase")
@@ -145,37 +159,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .build();
 
         db.collection(DIARIES).whereEqualTo(USER_ID, userId)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                        if (queryDocumentSnapshots != null) {
-                            MenuModel menuModel = MenuModel.getMenuModelById(headerList, DIARY_GROUP.toString());
-                            MenuModel childModel;
-                            for(DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
-                                DocumentSnapshot document = documentChange.getDocument();
-                                Map<String, Object> diary = document.getData();
-                                String diaryName = diary.get(NAME) + " " + sdf.format(document.getTimestamp(START).toDate());
-                                switch (documentChange.getType()) {
-                                    case ADDED:
-                                        List<MenuModel> childs = childList.get(menuModel);
-                                        childModel = new MenuModel(diaryName, false, false, document.getId());
-                                        childs.add(0, childModel);
-                                        childList.put(menuModel, childs);
-                                        break;
-                                    case MODIFIED:
-                                        childModel = MenuModel.getMenuModelById(childList.get(menuModel), document.getId());
-                                        childModel.setMenuName(diaryName);
-                                        break;
-                                    case REMOVED:
-                                        childModel = MenuModel.getMenuModelById(childList.get(menuModel), document.getId());
-                                        childList.get(menuModel).remove(childModel);
-                                        break;
-                                }
-                                expandableListAdapter.notifyDataSetChanged();
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (queryDocumentSnapshots != null) {
+                        MenuModel menuModel = MenuModel.getMenuModelById(headerList, DIARY_GROUP.toString());
+                        MenuModel childModel;
+                        for(DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
+                            DocumentSnapshot document = documentChange.getDocument();
+                            Map<String, Object> diary = document.getData();
+                            String diaryName = diary.get(NAME) + " " + sdf.format(document.getTimestamp(START).toDate());
+                            switch (documentChange.getType()) {
+                                case ADDED:
+                                    List<MenuModel> childs = childList.get(menuModel);
+                                    childModel = new MenuModel(diaryName, false, false, document.getId());
+                                    childs.add(0, childModel);
+                                    childList.put(menuModel, childs);
+                                    break;
+                                case MODIFIED:
+                                    childModel = MenuModel.getMenuModelById(childList.get(menuModel), document.getId());
+                                    childModel.setMenuName(diaryName);
+                                    break;
+                                case REMOVED:
+                                    childModel = MenuModel.getMenuModelById(childList.get(menuModel), document.getId());
+                                    childList.get(menuModel).remove(childModel);
+                                    break;
                             }
-                        } else {
-                            Log.d("getDiaries", "Error getting documents");
+                            expandableListAdapter.notifyDataSetChanged();
                         }
+                    } else {
+                        Log.d("getDiaries", "Error getting documents");
                     }
                 });
     }
@@ -275,58 +286,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         expandableListAdapter = new ExpandableListAdapter(this, headerList, childList);
         expandableListView.setAdapter(expandableListAdapter);
 
-        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+        expandableListView.setOnGroupClickListener((parent, v, groupPosition, id) -> {
 
-                if (headerList.get(groupPosition).isGroup()) {
-                    if (!headerList.get(groupPosition).isHasChildren()) {
-                        handleClick(headerList.get(groupPosition));
-                        onBackPressed();
-                    }
-                }
-
-                return false;
-            }
-        });
-
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                if (childList.get(headerList.get(groupPosition)) != null) {
-                    MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
-                    handleClick(model);
+            if (headerList.get(groupPosition).isGroup()) {
+                if (!headerList.get(groupPosition).isHasChildren()) {
+                    handleClick(headerList.get(groupPosition));
                     onBackPressed();
                 }
-
-                return false;
             }
+
+            return false;
         });
 
-        expandableListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    int childPosition = ExpandableListView.getPackedPositionChild(id);
+        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
 
-                    // You now have everything that you would as if this was an OnChildClickListener()
-                    // Add your logic here.
-
-                    if (childList.get(headerList.get(groupPosition)) != null) {
-                        String groupId = headerList.get(groupPosition).getId();
-                        if (groupId.equals(DIARY_GROUP.toString())) {
-                            handleLongClick(childList.get(headerList.get(groupPosition)).get(childPosition).getId());
-                        }
-                        onBackPressed();
-                        // Return true as we are handling the event.
-                        return true;
-                    }
-                }
-
-                return false;
+            if (childList.get(headerList.get(groupPosition)) != null) {
+                MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
+                handleClick(model);
+                onBackPressed();
             }
+
+            return false;
+        });
+
+        expandableListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                int childPosition = ExpandableListView.getPackedPositionChild(id);
+
+                // You now have everything that you would as if this was an OnChildClickListener()
+                // Add your logic here.
+
+                if (childList.get(headerList.get(groupPosition)) != null) {
+                    String groupId = headerList.get(groupPosition).getId();
+                    if (groupId.equals(DIARY_GROUP.toString())) {
+                        handleLongClick(childList.get(headerList.get(groupPosition)).get(childPosition).getId());
+                    }
+                    onBackPressed();
+                    // Return true as we are handling the event.
+                    return true;
+                }
+            }
+
+            return false;
         });
     }
 
@@ -369,12 +371,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Google sign out
         GoogleSignInActivity.getmGoogleSignInClient().signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        getInstance().finish();
-                    }
-                });
+                task -> getInstance().finish());
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -389,89 +386,72 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         String id = model.getId();
         if (id.equals(EXERCISES.toString())) {
-            EditFragment<Exercise> dialogFragment = new EditFragment<>();
-            dialogFragment.setClass(Exercise.class, getString(R.string.Exercises),
-                    database.exerciseDao(), getString(R.string.addExercise), getString(R.string.updateExercise));
+            EditFragment dialogFragment = new EditFragment();
+            dialogFragment.setClass(Collections.EXERCISES, getString(R.string.Exercises), getString(R.string.addExercise), getString(R.string.updateExercise));
             dialogFragment.show(getSupportFragmentManager(), "ExerciseDialog");
         } else if (id.equals(ZONES.toString())) {
-            EditFragment<Zone> dialogFragment = new EditFragment<>();
-            dialogFragment.setClass(Zone.class, getString(R.string.Zones),
-                    database.zoneDao(), getString(R.string.addZone), getString(R.string.updateZone));
+            EditFragment dialogFragment = new EditFragment();
+            dialogFragment.setClass(Collections.ZONES, getString(R.string.Zones), getString(R.string.addZone), getString(R.string.updateZone));
             dialogFragment.show(getSupportFragmentManager(), "ZoneDialog");
         } else if (id.equals(AIMS.toString())) {
-            EditFragment<Aim> dialogFragment = new EditFragment<>();
-            dialogFragment.setClass(Aim.class, getString(R.string.aims),
-                    database.aimDao(), getString(R.string.addAim), getString(R.string.updateAim));
+            EditFragment dialogFragment = new EditFragment();
+            dialogFragment.setClass(Collections.AIMS, getString(R.string.aims), getString(R.string.addAim), getString(R.string.updateAim));
             dialogFragment.show(getSupportFragmentManager(), "AimDialog");
         } else if (id.equals(EQUIPMENTS.toString())) {
             EditFragment<Equipment> dialogFragment = new EditFragment<>();
-            dialogFragment.setClass(Equipment.class, getString(R.string.equipment),
-                    database.equipmentDao(), getString(R.string.addEquipment), getString(R.string.updateEquipment));
+            dialogFragment.setClass(Collections.EQUIPMENTS, getString(R.string.equipment), getString(R.string.addEquipment), getString(R.string.updateEquipment));
             dialogFragment.show(getSupportFragmentManager(), "EquipmentDialog");
         } else if (id.equals(TIMES.toString())) {
             EditFragment<Time> dialogFragment = new EditFragment<>();
-            dialogFragment.setClass(Time.class, getString(R.string.times),
-                    database.timeDao(), getString(R.string.addTime), getString(R.string.updateTime));
+            dialogFragment.setClass(Collections.TIMES, getString(R.string.times), getString(R.string.addTime), getString(R.string.updateTime));
             dialogFragment.show(getSupportFragmentManager(), "TimeDialog");
         } else if (id.equals(BORG_RATINGS.toString())) {
             EditFragment<Borg> dialogFragment = new EditFragment<>();
-            dialogFragment.setClass(Borg.class, getString(R.string.borg_ratings),
-                    database.borgDao(), getString(R.string.addBorgRating), getString(R.string.updateBorgRating));
+            dialogFragment.setClass(Collections.BORGS, getString(R.string.borg_ratings), getString(R.string.addBorgRating), getString(R.string.updateBorgRating));
             dialogFragment.show(getSupportFragmentManager(), "BorgRatingDialog");
         } else if (id.equals(TRAINING_PLACES.toString())) {
             EditFragment<TrainingPlace> dialogFragment = new EditFragment<>();
-            dialogFragment.setClass(TrainingPlace.class, getString(R.string.training_places),
-                    database.trainingPlaceDao(), getString(R.string.addTrainingPlace), getString(R.string.updateTrainingPlace));
+            dialogFragment.setClass(Collections.TRAINING_PLACES, getString(R.string.training_places), getString(R.string.addTrainingPlace), getString(R.string.updateTrainingPlace));
             dialogFragment.show(getSupportFragmentManager(), "TrainingPlaceDialog");
         } else if (id.equals(STYLES.toString())) {
             EditFragment<Style> styleEditFragment = new EditFragment<>();
-            styleEditFragment.setClass(Style.class, getString(R.string.styles),
-                    database.styleDao(), getString(R.string.addStyle), getString(R.string.updateStyle));
+            styleEditFragment.setClass(Collections.STYLES, getString(R.string.styles), getString(R.string.addStyle), getString(R.string.updateStyle));
             styleEditFragment.show(getSupportFragmentManager(), "StyleDialog");
         } else if (id.equals(TEMPOS.toString())) {
             EditFragment<Tempo> tempoEditFragment = new EditFragment<>();
-            tempoEditFragment.setClass(Tempo.class, getString(R.string.tempos),
-                    database.tempoDao(), getString(R.string.addTempo), getString(R.string.updateTempo));
+            tempoEditFragment.setClass(Collections.TEMPOS, getString(R.string.tempos), getString(R.string.addTempo), getString(R.string.updateTempo));
             tempoEditFragment.show(getSupportFragmentManager(), "tempoDialog");
         } else if (id.equals(COMPETITIONS.toString())) {
             EditFragment<Competition> competitionEditFragment = new EditFragment<>();
-            competitionEditFragment.setClass(Competition.class, getString(R.string.competitions),
-                    database.competitionDao(), getString(R.string.addCompetition), getString(R.string.updateCompetition));
+            competitionEditFragment.setClass(Collections.COMPETITIONS, getString(R.string.competitions), getString(R.string.addCompetition), getString(R.string.updateCompetition));
             competitionEditFragment.show(getSupportFragmentManager(), "competitionDialog");
         } else if (id.equals(IMPORTANCE.toString())) {
             EditFragment<Importance> importanceEditFragment = new EditFragment<>();
-            importanceEditFragment.setClass(Importance.class, getString(R.string.importance),
-                    database.importanceDao(), getString(R.string.addImportance), getString(R.string.updateImportance));
+            importanceEditFragment.setClass(Collections.IMPORTANCES, getString(R.string.importance), getString(R.string.addImportance), getString(R.string.updateImportance));
             importanceEditFragment.show(getSupportFragmentManager(), "importanceDialog");
         } else if (id.equals(BLOCKS.toString())) {
             EditFragment<Block> blockEditFragment = new EditFragment<>();
-            blockEditFragment.setClass(Block.class, getString(R.string.blocks),
-                    database.blockDao(), getString(R.string.addBlock), getString(R.string.updateBlock));
+            blockEditFragment.setClass(Collections.BLOCKS, getString(R.string.blocks), getString(R.string.addBlock), getString(R.string.updateBlock));
             blockEditFragment.show(getSupportFragmentManager(), "blockDialog");
         } else if (id.equals(STAGES.toString())) {
             EditFragment<Stage> stageEditFragment = new EditFragment<>();
-            stageEditFragment.setClass(Stage.class, getString(R.string.stages),
-                    database.stageDao(), getString(R.string.addStage), getString(R.string.updateStage));
+            stageEditFragment.setClass(Collections.STAGES, getString(R.string.stages), getString(R.string.addStage), getString(R.string.updateStage));
             stageEditFragment.show(getSupportFragmentManager(), "stageDialog");
         } else if (id.equals(TYPES.toString())) {
             EditFragment<Type> typeEditFragment = new EditFragment<>();
-            typeEditFragment.setClass(Type.class, getString(R.string.types),
-                    database.typeDao(), getString(R.string.addType), getString(R.string.updateType));
+            typeEditFragment.setClass(Collections.TYPES, getString(R.string.types), getString(R.string.addType), getString(R.string.updateType));
             typeEditFragment.show(getSupportFragmentManager(), "typeDialog");
         } else if (id.equals(CAMPS.toString())) {
             EditFragment<Camp> campEditFragment = new EditFragment<>();
-            campEditFragment.setClass(Camp.class, getString(R.string.camps),
-                    database.campDao(), getString(R.string.addCamp), getString(R.string.updateCamp));
+            campEditFragment.setClass(Collections.CAMPS, getString(R.string.camps), getString(R.string.addCamp), getString(R.string.updateCamp));
             campEditFragment.show(getSupportFragmentManager(), "campDialog");
         } else if (id.equals(REST_PLACE.toString())) {
             EditFragment<RestPlace> restPlaceEditFragment = new EditFragment<>();
-            restPlaceEditFragment.setClass(RestPlace.class, getString(R.string.rest_places),
-                    database.restPlaceDao(), getString(R.string.addRestPlace), getString(R.string.updateRestPlace));
+            restPlaceEditFragment.setClass(Collections.REST_PLACES, getString(R.string.rest_places), getString(R.string.addRestPlace), getString(R.string.updateRestPlace));
             restPlaceEditFragment.show(getSupportFragmentManager(), "restPlaceDialog");
         } else if (id.equals(TEST.toString())) {
             EditFragment<Test> testEditFragment = new EditFragment<>();
-            testEditFragment.setClass(Test.class, getString(R.string.test),
-                    database.testDao(), getString(R.string.addTest), getString(R.string.updateTest));
+            testEditFragment.setClass(Collections.TESTS, getString(R.string.test), getString(R.string.addTest), getString(R.string.updateTest));
             testEditFragment.show(getSupportFragmentManager(), "testDialog");
         } else if (id.equals(OVERALL_PLAN.toString())) {
             if (seasonPlanId == null) {
@@ -502,16 +482,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             diaryFragment.show(getSupportFragmentManager(), "diaryDialog");
         } else {
             // Handle diary select
-            dayFragment = new DayFragment();
+//            dayFragment = new DayFragment();
 //            dayFragment.setSeasonPlanId(id);
             seasonPlanId = id;
-            toolbar.getMenu().removeItem(CALENDAR.ordinal());
-            toolbar.getMenu().add(0, CALENDAR.ordinal(), 50, "").setIcon(R.drawable.ic_menu_gallery).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            this.setTitle("(" + model.getMenuName().charAt(0) + ")");
-            this.getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_frame, dayFragment)
-                    .commit();
+//            toolbar.getMenu().removeItem(CALENDAR.ordinal());
+//            toolbar.getMenu().add(0, CALENDAR.ordinal(), 50, "").setIcon(R.drawable.ic_menu_gallery).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//            this.setTitle("(" + model.getMenuName().charAt(0) + ")");
+//            this.getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.fragment_frame, dayFragment)
+//                    .commit();
         }
     }
 
