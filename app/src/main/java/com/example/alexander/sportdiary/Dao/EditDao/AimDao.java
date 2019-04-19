@@ -10,16 +10,15 @@ import java.util.List;
 
 @Dao
 public interface AimDao extends EditDao<Aim>{
-    @Query("SELECT * FROM Aim")
-    LiveData<List<Aim>> getAll();
+    @Query("SELECT * FROM Aim WHERE userId = :userId")
+    LiveData<List<Aim>> getAllByUserId(String userId);
 
-
-    @Query("SELECT name FROM Aim")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Aim WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Aim where name = :name")
     long getIdByName(String name);
 
-    @Query("SELECT name FROM Aim where id = :id")
-    String getNameById(long id);
+    @Query("SELECT name FROM Aim where id = :id and userId = :userId")
+    String getNameByIdAndUserId(long id, String userId);
 }

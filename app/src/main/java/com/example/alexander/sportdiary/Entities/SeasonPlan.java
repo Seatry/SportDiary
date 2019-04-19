@@ -9,12 +9,13 @@ import com.example.alexander.sportdiary.Converters.DateConverter;
 
 import java.util.Date;
 
-@Entity(indices = {@Index(value = {"name", "start"}, unique = true)})
+@Entity(indices = {@Index(value = {"name", "start", "userId"}, unique = true)})
 @TypeConverters(DateConverter.class)
 public class SeasonPlan {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
+    private String userId;
     private String name;
     private Date start;
     private String male = "M";
@@ -84,5 +85,13 @@ public class SeasonPlan {
 
     public void setLastPerformance(int lastPerformance) {
         this.lastPerformance = lastPerformance;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

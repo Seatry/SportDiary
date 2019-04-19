@@ -63,11 +63,11 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
         borgSpinner = v.findViewById(R.id.borgExerciseSpinner);
         noteEdit = v.findViewById(R.id.noteEdit);
 
-        toolSpinner(sportDataBase.exerciseDao(), exerciseSpinner, sportDataBase.exerciseDao().getNameById(updateTrainingExercise.getExerciseId()));
-        toolSpinner(sportDataBase.styleDao(), styleSpinner, sportDataBase.styleDao().getNameById(updateTrainingExercise.getStyleId()));
-        toolSpinner(sportDataBase.tempoDao(), tempoSpinner, sportDataBase.tempoDao().getNameById(updateTrainingExercise.getTempoId()));
-        toolSpinner(sportDataBase.zoneDao(), zoneSpinner, sportDataBase.zoneDao().getNameById(updateTrainingExercise.getZoneId()));
-        toolSpinner(sportDataBase.borgDao(), borgSpinner, sportDataBase.borgDao().getNameById(updateTrainingExercise.getBorgId()));
+        toolSpinner(sportDataBase.exerciseDao(), exerciseSpinner, sportDataBase.exerciseDao().getNameByIdAndUserId(updateTrainingExercise.getExerciseId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.styleDao(), styleSpinner, sportDataBase.styleDao().getNameByIdAndUserId(updateTrainingExercise.getStyleId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.tempoDao(), tempoSpinner, sportDataBase.tempoDao().getNameByIdAndUserId(updateTrainingExercise.getTempoId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.zoneDao(), zoneSpinner, sportDataBase.zoneDao().getNameByIdAndUserId(updateTrainingExercise.getZoneId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.borgDao(), borgSpinner, sportDataBase.borgDao().getNameByIdAndUserId(updateTrainingExercise.getBorgId(), MainActivity.getUserId()));
 
         if (option == EditOption.UPDATE) {
             fillEdits();
@@ -95,20 +95,10 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
             case R.id.okAddTrainingExercise:
                 switch (option) {
                     case INSERT:
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                add();
-                            }
-                        });
+                        AsyncTask.execute(this::add);
                         break;
                     case UPDATE:
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
+                        AsyncTask.execute(this::update);
                         break;
                 }
                 dismiss();

@@ -2,9 +2,7 @@ package com.example.alexander.sportdiary.Fragments;
 
 import android.app.Dialog;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,12 +35,9 @@ public class CompetitionScheduleFragment extends DialogFragment implements View.
 
         LiveData<List<Day>> liveData = MainActivity.getInstance().getDatabase()
                 .dayDao().getAllDaysBySeasonPlanIdWhereCompetitionToImportanceIsNotNull(seasonPlanId);
-        liveData.observe(this, new Observer<List<Day>>() {
-            @Override
-            public void onChanged(@Nullable List<Day> days) {
-                adapter.setData(days);
-                adapter.notifyDataSetChanged();
-            }
+        liveData.observe(this, days -> {
+            adapter.setData(days);
+            adapter.notifyDataSetChanged();
         });
 
         return v;

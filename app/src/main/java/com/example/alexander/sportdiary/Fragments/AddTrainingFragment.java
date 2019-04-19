@@ -51,9 +51,9 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
         aimSpinner = v.findViewById(R.id.aimSpinner);
         equipmentSpinner = v.findViewById(R.id.equipmentSpinner);
 
-        toolSpinner(sportDataBase.timeDao(), timeSpinner, sportDataBase.timeDao().getNameById(updateTraining.getTimeId()));
-        toolSpinner(sportDataBase.trainingPlaceDao(), trainingPlaceSpinner, sportDataBase.trainingPlaceDao().getNameById(updateTraining.getPlaceId()));
-        toolSpinner(sportDataBase.borgDao(), borgRatingSpinner, sportDataBase.borgDao().getNameById(updateTraining.getBorgId()));
+        toolSpinner(sportDataBase.timeDao(), timeSpinner, sportDataBase.timeDao().getNameByIdAndUserId(updateTraining.getTimeId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.trainingPlaceDao(), trainingPlaceSpinner, sportDataBase.trainingPlaceDao().getNameByIdAndUserId(updateTraining.getPlaceId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.borgDao(), borgRatingSpinner, sportDataBase.borgDao().getNameByIdAndUserId(updateTraining.getBorgId(), MainActivity.getUserId()));
         toolMultiSpinner(sportDataBase.aimDao(), aimSpinner, this, getSelectedAims());
         toolMultiSpinner(sportDataBase.equipmentDao(), equipmentSpinner, this, getSelectedEquipments());
 
@@ -68,7 +68,7 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
             }
             List<String> aims = new ArrayList<>();
             for (long id : aimIds) {
-                aims.add(sportDataBase.aimDao().getNameById(id));
+                aims.add(sportDataBase.aimDao().getNameByIdAndUserId(id, MainActivity.getUserId()));
             }
             return aims;
         }
@@ -83,7 +83,7 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
             }
             List<String> equipments = new ArrayList<>();
             for (long id : equipmentIds) {
-                equipments.add(sportDataBase.equipmentDao().getNameById(id));
+                equipments.add(sportDataBase.equipmentDao().getNameByIdAndUserId(id, MainActivity.getUserId()));
             }
             return equipments;
         }
@@ -99,20 +99,10 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
             case R.id.okAddTraining:
                 switch (option) {
                     case INSERT:
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                add();
-                            }
-                        });
+                        AsyncTask.execute(this::add);
                         break;
                     case UPDATE:
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
+                        AsyncTask.execute(this::update);
                         break;
                 }
                 dismiss();

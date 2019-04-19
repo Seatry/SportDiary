@@ -10,14 +10,14 @@ import java.util.List;
 
 @Dao
 public interface CompetitionDao extends EditDao<Competition>{
-    @Query("SELECT * FROM Competition")
-    LiveData<List<Competition>> getAll();
+    @Query("SELECT * FROM Competition WHERE userId = :userId")
+    LiveData<List<Competition>> getAllByUserId(String userId);
 
-    @Query("SELECT name FROM Competition where id = :id")
-    String getNameById(Long id);
+    @Query("SELECT name FROM Competition where id = :id and userId = :userId")
+    String getNameByIdAndUserId(Long id, String userId);
 
-    @Query("SELECT name FROM Competition")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Competition WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Competition where name = :name")
     long getIdByName(String name);

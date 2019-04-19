@@ -6,7 +6,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -49,41 +48,35 @@ public class CompetitionScheduleAdapter extends RecyclerView.Adapter<Competition
     @Override
     public void onBindViewHolder(@NonNull final CompetitionScheduleViewHolder competitionScheduleViewHolder, final int i) {
         setData(competitionScheduleViewHolder, i);
-        competitionScheduleViewHolder.itemView.findViewById(R.id.competition_opts).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(MainActivity.getInstance(), competitionScheduleViewHolder.itemView);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.edit_options);
-                //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.update:
-                                AddCompetitionScheduleFragment scheduleFragment = new AddCompetitionScheduleFragment();
-                                scheduleFragment
-                                        .setOption(EditOption.UPDATE)
-                                        .setTitle(MainActivity.getInstance().getString(R.string.updateCompetition))
-                                        .setSeasonPlanId(days.get(i).getSeasonPlanId())
-                                        .setUpdateDay(days.get(i));
-                                scheduleFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateSchedule");
-                                break;
-                            case R.id.delete:
-                                Day updateDay = days.get(i);
-                                Long competitionToImportanceId = sportDataBase.dayDao()
-                                        .getCompetitionToImportanceIdByDateAndSeasonId(updateDay.getDate(), updateDay.getSeasonPlanId());
-                                sportDataBase.competitionToImportanceDao().deleteById(competitionToImportanceId);
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                //displaying the popup
-                popup.setGravity(Gravity.END);
-                popup.show();
-            }
+        competitionScheduleViewHolder.itemView.findViewById(R.id.competition_opts).setOnClickListener(view -> {
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(MainActivity.getInstance(), competitionScheduleViewHolder.itemView);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.edit_options);
+            //adding click listener
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.update:
+                        AddCompetitionScheduleFragment scheduleFragment = new AddCompetitionScheduleFragment();
+                        scheduleFragment
+                                .setOption(EditOption.UPDATE)
+                                .setTitle(MainActivity.getInstance().getString(R.string.updateCompetition))
+                                .setSeasonPlanId(days.get(i).getSeasonPlanId())
+                                .setUpdateDay(days.get(i));
+                        scheduleFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateSchedule");
+                        break;
+                    case R.id.delete:
+                        Day updateDay = days.get(i);
+                        Long competitionToImportanceId = sportDataBase.dayDao()
+                                .getCompetitionToImportanceIdByDateAndSeasonId(updateDay.getDate(), updateDay.getSeasonPlanId());
+                        sportDataBase.competitionToImportanceDao().deleteById(competitionToImportanceId);
+                        break;
+                }
+                return false;
+            });
+            //displaying the popup
+            popup.setGravity(Gravity.END);
+            popup.show();
         });
     }
 
@@ -91,10 +84,10 @@ public class CompetitionScheduleAdapter extends RecyclerView.Adapter<Competition
         Day day = days.get(i);
         Long competitionId = sportDataBase.competitionToImportanceDao()
                 .getCompetitionIdById(day.getCompetitionToImportanceId());
-        String competition = sportDataBase.competitionDao().getNameById(competitionId);
+        String competition = sportDataBase.competitionDao().getNameByIdAndUserId(competitionId, MainActivity.getUserId());
         Long importanceId = sportDataBase.competitionToImportanceDao()
                 .getImportanceIdById(day.getCompetitionToImportanceId());
-        String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameById(importanceId);
+        String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameByIdAndUserId(importanceId, MainActivity.getUserId());
         String dateText = sdf.format(day.getDate());
         viewHolder.setData(dateText + ": " + competition + " (" + importance + ")");
     }

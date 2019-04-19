@@ -10,14 +10,14 @@ import java.util.List;
 
 @Dao
 public interface ImportanceDao extends EditDao<Importance> {
-    @Query("SELECT * FROM Importance")
-    LiveData<List<Importance>> getAll();
+    @Query("SELECT * FROM Importance WHERE userId = :userId")
+    LiveData<List<Importance>> getAllByUserId(String userId);
 
-    @Query("SELECT name FROM Importance where id = :id")
-    String getNameById(Long id);
+    @Query("SELECT name FROM Importance where id = :id and userId = :userId")
+    String getNameByIdAndUserId(Long id, String userId);
 
-    @Query("SELECT name FROM Importance")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Importance WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Importance where name = :name")
     long getIdByName(String name);

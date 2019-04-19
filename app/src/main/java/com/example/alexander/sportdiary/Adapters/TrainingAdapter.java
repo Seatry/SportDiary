@@ -8,7 +8,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -51,56 +50,45 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final TrainingViewHolder trainingViewHolder, final int i) {
         setViewHolderData(trainings.get(i), trainingViewHolder);
-        trainingViewHolder.itemView.findViewById(R.id.training_opts).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(MainActivity.getInstance(), trainingViewHolder.itemView);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.training_opts);
-                //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.trainingUpdate:
-                                AddTrainingFragment addTrainingFragment = new AddTrainingFragment();
-                                addTrainingFragment
-                                        .setTitle(MainActivity.getInstance().getString(R.string.updateTraining))
-                                        .setUpdateItem(trainings.get(i))
-                                        .setOption(EditOption.UPDATE);
-                                addTrainingFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateTraining");
-                                break;
-                            case R.id.trainingDelete:
-                                AsyncTask.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        sportDataBase.trainingDao().delete(trainings.get(i));
-                                    }
-                                });
-                                break;
-                            case R.id.trainingExercises:
-                                Intent intent = new Intent(MainActivity.getInstance(), TrainingExerciseActivity.class);
-                                intent.putExtra("trainingId", (int)trainings.get(i).getId());
-                                MainActivity.getInstance().startActivity(intent);
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                //displaying the popup
-                popup.setGravity(Gravity.END);
-                popup.show();
-            }
+        trainingViewHolder.itemView.findViewById(R.id.training_opts).setOnClickListener(view -> {
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(MainActivity.getInstance(), trainingViewHolder.itemView);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.training_opts);
+            //adding click listener
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.trainingUpdate:
+                        AddTrainingFragment addTrainingFragment = new AddTrainingFragment();
+                        addTrainingFragment
+                                .setTitle(MainActivity.getInstance().getString(R.string.updateTraining))
+                                .setUpdateItem(trainings.get(i))
+                                .setOption(EditOption.UPDATE);
+                        addTrainingFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateTraining");
+                        break;
+                    case R.id.trainingDelete:
+                        AsyncTask.execute(() -> sportDataBase.trainingDao().delete(trainings.get(i)));
+                        break;
+                    case R.id.trainingExercises:
+                        Intent intent = new Intent(MainActivity.getInstance(), TrainingExerciseActivity.class);
+                        intent.putExtra("trainingId", (int) trainings.get(i).getId());
+                        MainActivity.getInstance().startActivity(intent);
+                        break;
+                }
+                return false;
+            });
+            //displaying the popup
+            popup.setGravity(Gravity.END);
+            popup.show();
         });
     }
 
     private void setViewHolderData(Training training, TrainingViewHolder viewHolder) {
-        String time = training.getTimeId() == null ? "" : sportDataBase.timeDao().getNameById(training.getTimeId());
-        String place = training.getPlaceId() == null ? "" : sportDataBase.trainingPlaceDao().getNameById(training.getPlaceId());
+        String time = training.getTimeId() == null ? "" : sportDataBase.timeDao().getNameByIdAndUserId(training.getTimeId(), MainActivity.getUserId());
+        String place = training.getPlaceId() == null ? "" : sportDataBase.trainingPlaceDao().getNameByIdAndUserId(training.getPlaceId(), MainActivity.getUserId());
         StringBuilder aims = new StringBuilder();
         for(long aimId : sportDataBase.trainingsToAimsDao().getAimIdsByTrainingId(training.getId())) {
-            aims.append(sportDataBase.aimDao().getNameById(aimId)).append(", ");
+            aims.append(sportDataBase.aimDao().getNameByIdAndUserId(aimId, MainActivity.getUserId())).append(", ");
         }
         if(aims.length() > 1) {
             aims.deleteCharAt(aims.length() - 1);
@@ -108,13 +96,13 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingViewHolder> {
         }
         StringBuilder equipments = new StringBuilder();
         for(long eqId : sportDataBase.trainingsToEquipmentsDao().getEquipmentIdsByTrainingId(training.getId())) {
-            equipments.append(sportDataBase.equipmentDao().getNameById(eqId)).append(", ");
+            equipments.append(sportDataBase.equipmentDao().getNameByIdAndUserId(eqId, MainActivity.getUserId())).append(", ");
         }
         if(equipments.length() > 1) {
             equipments.deleteCharAt(equipments.length()-1);
             equipments.deleteCharAt(equipments.length()-1);
         }
-        String borgs = training.getBorgId() == null ? "" : sportDataBase.borgDao().getNameById(training.getBorgId());
+        String borgs = training.getBorgId() == null ? "" : sportDataBase.borgDao().getNameByIdAndUserId(training.getBorgId(), MainActivity.getUserId());
         viewHolder.setData(time, place, aims.toString(), equipments.toString(), borgs, String.valueOf(training.getCapacity()));
     }
 

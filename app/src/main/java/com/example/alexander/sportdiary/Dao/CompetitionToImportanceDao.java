@@ -6,7 +6,6 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
-import android.support.annotation.Nullable;
 
 import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 

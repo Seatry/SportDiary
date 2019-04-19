@@ -10,10 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Adapters.DreamAdapter;
-import com.example.alexander.sportdiary.Adapters.HeartRateAdapter;
 import com.example.alexander.sportdiary.Entities.DreamAnswer;
 import com.example.alexander.sportdiary.Entities.DreamQuestion;
-import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.SportDataBase;
@@ -24,7 +22,6 @@ import java.util.List;
 public class DreamFragment extends DialogFragment implements View.OnClickListener {
     private long dayId;
     private SportDataBase sportDataBase;
-    private RecyclerView recyclerView;
     private DreamAdapter adapter;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,7 +32,7 @@ public class DreamFragment extends DialogFragment implements View.OnClickListene
 
         sportDataBase = MainActivity.getInstance().getDatabase();
 
-        recyclerView = v.findViewById(R.id.dream_items);
+        RecyclerView recyclerView = v.findViewById(R.id.dream_items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new DreamAdapter();
@@ -56,12 +53,7 @@ public class DreamFragment extends DialogFragment implements View.OnClickListene
                 dismiss();
                 break;
             case R.id.okDream:
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        update();
-                    }
-                });
+                AsyncTask.execute(this::update);
                 dismiss();
                 break;
         }

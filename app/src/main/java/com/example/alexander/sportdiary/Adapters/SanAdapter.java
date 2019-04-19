@@ -8,14 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import com.example.alexander.sportdiary.Entities.DreamAnswer;
-import com.example.alexander.sportdiary.Entities.DreamQuestion;
 import com.example.alexander.sportdiary.Entities.SanAnswer;
 import com.example.alexander.sportdiary.Entities.SanQuestion;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.SportDataBase;
-import com.example.alexander.sportdiary.ViewHolders.DreamViewHolder;
 import com.example.alexander.sportdiary.ViewHolders.SanViewHolder;
 
 import java.util.ArrayList;

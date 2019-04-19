@@ -22,15 +22,15 @@ public interface EditDao<T extends Edit> {
 
     /* Here Table Time just an example of Edit Table */
 
-    @Query("SELECT * FROM Time")
-    LiveData<List<T>> getAll();
+    @Query("SELECT * FROM Time WHERE userId = :userId")
+    LiveData<List<T>> getAllByUserId(String userId);
 
-    @Query("SELECT name FROM Time")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Time WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Time where name = :name")
     long getIdByName(String name);
 
-    @Query("SELECT name FROM Time where id = :id")
-    String getNameById(long id);
+    @Query("SELECT name FROM Time where id = :id and userId = :userId")
+    String getNameByIdAndUserId(long id, String userId);
 }

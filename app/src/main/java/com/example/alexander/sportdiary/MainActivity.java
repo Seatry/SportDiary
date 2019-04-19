@@ -169,11 +169,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         database = Room.databaseBuilder(this, SportDataBase.class, "SportDataBase")
                 .fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
-                .addCallback(dbCallback)
+                //.addCallback(dbCallback)
                 .build();
 
         AsyncTask.execute(() -> {
-            List<SeasonPlan> diaries = database.seasonPlanDao().getAll();
+            List<SeasonPlan> diaries = database.seasonPlanDao().getAllByUserId(userId);
             MenuModel menuModel = MenuModel.getMenuModelById(headerList, DIARY_GROUP.getValue());
             List<MenuModel> childs = childList.get(menuModel);
             for(SeasonPlan seasonPlan : diaries) {

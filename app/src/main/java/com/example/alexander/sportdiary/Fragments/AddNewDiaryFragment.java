@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -47,20 +46,14 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
         v.findViewById(R.id.okAddDiary).setOnClickListener(this);
         editNameText = v.findViewById(R.id.add_diary_name);
         editStartText = v.findViewById(R.id.add_diary_start);
-        editStartText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance());
-                datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        month +=1;
-                        String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
-                        editStartText.setText(currentDate);
-                    }
-                });
-                datePickerDialog.show();
-            }
+        editStartText.setOnClickListener(v1 -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance());
+            datePickerDialog.setOnDateSetListener((view, year, month, dayOfMonth) -> {
+                month += 1;
+                String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
+                editStartText.setText(currentDate);
+            });
+            datePickerDialog.show();
         });
         maleSpinner = v.findViewById(R.id.maleSpinner);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.getInstance(), android.R.layout.simple_spinner_item);
@@ -109,6 +102,7 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             String dateText = editStartText.getText().toString();
             final Date date = sdf.parse(dateText);
             seasonPlan.setStart(date);
+            seasonPlan.setUserId(MainActivity.getUserId());
             final long id = dao.insert(seasonPlan);
             MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
             List<MenuModel> childs = MainActivity.getChildList().get(menuModel);
@@ -117,15 +111,11 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             childs.add(childModel);
             MainActivity.putToChildList(menuModel, childs);
             MainActivity.getExpandableListAdapter().notifyDataSetChanged();
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    for(int i = 0; i < 366; i++) {
-                        dayDao.insert(new Day(DateUtil.addDays(date, i), id));
-                    }
+            AsyncTask.execute(() -> {
+                for(int i = 0; i < 366; i++) {
+                    dayDao.insert(new Day(DateUtil.addDays(date, i), id));
                 }
             });
-
             dismiss();
         } catch (SQLiteConstraintException e) {
             e.printStackTrace();

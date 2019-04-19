@@ -1,10 +1,8 @@
 package com.example.alexander.sportdiary.Fragments;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -29,17 +27,11 @@ public class WeekInfoActivity extends AppCompatActivity implements View.OnClickL
     private SportDataBase sportDataBase;
     private static WeekInfoActivity instance;
     private long seasonPlanId;
-    private int week;
-    private SeasonPlan seasonPlan;
     private Date start;
     private TextView blockText;
     private TextView stageText;
     private TextView typeText;
     private TextView campsText;
-    private TextView aimsText;
-    private TextView equipmentsText;
-    private TextView competitionsText;
-    private TextView capacityText;
 
     public static WeekInfoActivity getInstance() {
         return instance;
@@ -60,40 +52,37 @@ public class WeekInfoActivity extends AppCompatActivity implements View.OnClickL
         seasonPlanId = intent.getLongExtra("seasonPlanId", 0);
         String title = intent.getStringExtra("title");
         actionBar.setTitle(title);
-        week = intent.getIntExtra("week", 0);
+        int week = intent.getIntExtra("week", 0);
 
         blockText = findViewById(R.id.weekBlock);
         stageText = findViewById(R.id.weekStage);
         typeText = findViewById(R.id.weekType);
         campsText = findViewById(R.id.weekCamps);
-        aimsText = findViewById(R.id.weekAims);
-        equipmentsText = findViewById(R.id.weekEquipments);
-        competitionsText = findViewById(R.id.weekCompetitions);
-        capacityText = findViewById(R.id.weekCapacity);
+        TextView aimsText = findViewById(R.id.weekAims);
+        TextView equipmentsText = findViewById(R.id.weekEquipments);
+        TextView competitionsText = findViewById(R.id.weekCompetitions);
+        TextView capacityText = findViewById(R.id.weekCapacity);
         Button updateButton = findViewById(R.id.updateWeekInfo);
         updateButton.setOnClickListener(this);
 
-        seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
-        start = DateUtil.addDays(seasonPlan.getStart(), (week-1) * 7);
+        SeasonPlan seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
+        start = DateUtil.addDays(seasonPlan.getStart(), (week -1) * 7);
         LiveData<Day> dayLiveData = sportDataBase.dayDao().getLiveDayByDateAndSeasonPlanId(start, seasonPlanId);
-        dayLiveData.observe(this, new Observer<Day>() {
-            @Override
-            public void onChanged(@Nullable Day day) {
-                if (day == null) return;
-                String block = day.getBlockId() == null ? "" :
-                        sportDataBase.blockDao().getNameById(day.getBlockId());
-                String stage = day.getStageId() == null ? "" :
-                        sportDataBase.stageDao().getNameById(day.getStageId());
-                String type = day.getTypeId() == null ? "" :
-                        sportDataBase.typeDao().getNameById(day.getTypeId());
-                String camps = day.getCampId() == null ? "" :
-                        sportDataBase.campDao().getNameById(day.getCampId());
+        dayLiveData.observe(this, day -> {
+            if (day == null) return;
+            String block = day.getBlockId() == null ? "" :
+                    sportDataBase.blockDao().getNameByIdAndUserId(day.getBlockId(), MainActivity.getUserId());
+            String stage = day.getStageId() == null ? "" :
+                    sportDataBase.stageDao().getNameByIdAndUserId(day.getStageId(), MainActivity.getUserId());
+            String type = day.getTypeId() == null ? "" :
+                    sportDataBase.typeDao().getNameByIdAndUserId(day.getTypeId(), MainActivity.getUserId());
+            String camps = day.getCampId() == null ? "" :
+                    sportDataBase.campDao().getNameByIdAndUserId(day.getCampId(), MainActivity.getUserId());
 
-                blockText.setText(String.format("%s: %s", getString(R.string.block), block));
-                stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
-                typeText.setText(String.format("%s: %s", getString(R.string.type), type));
-                campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
-            }
+            blockText.setText(String.format("%s: %s", getString(R.string.block), block));
+            stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
+            typeText.setText(String.format("%s: %s", getString(R.string.type), type));
+            campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
         });
 
 
@@ -107,9 +96,9 @@ public class WeekInfoActivity extends AppCompatActivity implements View.OnClickL
             if (day.getCompetitionToImportanceId() != null) {
                 CompetitionToImportance competitionToImportance = sportDataBase.competitionToImportanceDao()
                         .getById(day.getCompetitionToImportanceId());
-                String competition = sportDataBase.competitionDao().getNameById(competitionToImportance.getCompetitionId());
+                String competition = sportDataBase.competitionDao().getNameByIdAndUserId(competitionToImportance.getCompetitionId(), MainActivity.getUserId());
                 String importance = competitionToImportance.getImportanceId() == null ? "" :
-                        sportDataBase.importanceDao().getNameById(competitionToImportance.getImportanceId());
+                        sportDataBase.importanceDao().getNameByIdAndUserId(competitionToImportance.getImportanceId(), MainActivity.getUserId());
                 competitions.append(competition).append(" (").append(importance).append(")").append(i == 6 ? "" : ", ");
             }
             List<Training> trainings = sportDataBase.trainingDao().getAllByDayId(day.getId());
@@ -117,10 +106,10 @@ public class WeekInfoActivity extends AppCompatActivity implements View.OnClickL
                 List<Long> aimIds = sportDataBase.trainingsToAimsDao().getAimIdsByTrainingId(training.getId());
                 List<Long> equipmentIds = sportDataBase.trainingsToEquipmentsDao().getEquipmentIdsByTrainingId(training.getId());
                 for(Long aimId : aimIds) {
-                    aims.add(sportDataBase.aimDao().getNameById(aimId));
+                    aims.add(sportDataBase.aimDao().getNameByIdAndUserId(aimId, MainActivity.getUserId()));
                 }
                 for(Long equipmentId : equipmentIds) {
-                    equipments.add(sportDataBase.equipmentDao().getNameById(equipmentId));
+                    equipments.add(sportDataBase.equipmentDao().getNameByIdAndUserId(equipmentId, MainActivity.getUserId()));
                 }
             }
             capacity += day.getCapacity();

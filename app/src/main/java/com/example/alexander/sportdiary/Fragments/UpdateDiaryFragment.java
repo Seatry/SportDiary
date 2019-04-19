@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -54,26 +53,20 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
         v.findViewById(R.id.removeDiary).setOnClickListener(this);
         editNameText = v.findViewById(R.id.update_diary_name);
         editStartText = v.findViewById(R.id.update_diary_start);
-        editStartText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(seasonPlan.getStart());
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH);
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance(),
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                month +=1;
-                                String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
-                                editStartText.setText(currentDate);
-                            }
-                        }, year, month, day
-                );
-                datePickerDialog.show();
-            }
+        editStartText.setOnClickListener(v1 -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(seasonPlan.getStart());
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH);
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.getInstance(),
+                    (view, year1, month1, dayOfMonth) -> {
+                        month1 += 1;
+                        String currentDate = dayOfMonth + "." + (month1 < 10 ? "0" + month1 : month1) + "." + year1;
+                        editStartText.setText(currentDate);
+                    }, year, month, day
+            );
+            datePickerDialog.show();
         });
         maleSpinner = v.findViewById(R.id.update_maleSpinner);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.getInstance(), android.R.layout.simple_spinner_item);
@@ -134,13 +127,10 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
             seasonPlan.setStart(date);
             dao.update(seasonPlan);
 
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    dayDao.deleteBySeasonPlanId(id);
-                    for(int i = 0; i < 365; i++) {
-                        dayDao.insert(new Day(DateUtil.addDays(date, i), id));
-                    }
+            AsyncTask.execute(() -> {
+                dayDao.deleteBySeasonPlanId(id);
+                for(int i = 0; i < 365; i++) {
+                    dayDao.insert(new Day(DateUtil.addDays(date, i), id));
                 }
             });
 

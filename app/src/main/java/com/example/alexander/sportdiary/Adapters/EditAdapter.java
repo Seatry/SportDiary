@@ -7,7 +7,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -62,40 +61,29 @@ public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHo
     @Override
     public void onBindViewHolder(@NonNull final EditViewHolder editViewHolder, final int i) {
         editViewHolder.setData(data.get(i).getName());
-        editViewHolder.itemView.findViewById(R.id.edit_opts).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(mCtx, editViewHolder.itemView);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.edit_options);
-                //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.update:
-                                AddNewEditFragment<T> dialogFragment = new AddNewEditFragment<>();
-                                dialogFragment.setClass(cls, dialogTitle, dao, EditOption.UPDATE);
-                                dialogFragment.setUpdateItem(data.get(i));
-                                dialogFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateDialog");
-                                break;
-                            case R.id.delete:
-                                AsyncTask.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dao.delete(data.get(i));
-                                    }
-                                });
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                //displaying the popup
-                popup.setGravity(Gravity.END);
-                popup.show();
-            }
+        editViewHolder.itemView.findViewById(R.id.edit_opts).setOnClickListener(view -> {
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(mCtx, editViewHolder.itemView);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.edit_options);
+            //adding click listener
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.update:
+                        AddNewEditFragment<T> dialogFragment = new AddNewEditFragment<>();
+                        dialogFragment.setClass(cls, dialogTitle, dao, EditOption.UPDATE);
+                        dialogFragment.setUpdateItem(data.get(i));
+                        dialogFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateDialog");
+                        break;
+                    case R.id.delete:
+                        AsyncTask.execute(() -> dao.delete(data.get(i)));
+                        break;
+                }
+                return false;
+            });
+            //displaying the popup
+            popup.setGravity(Gravity.END);
+            popup.show();
         });
     }
 

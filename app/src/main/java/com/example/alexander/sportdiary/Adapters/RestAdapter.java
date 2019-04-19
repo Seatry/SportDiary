@@ -7,7 +7,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -39,8 +38,8 @@ public class RestAdapter extends RecyclerView.Adapter<RestViewHolder> {
         RestViewHolder viewHolder = new RestViewHolder(view);
         if(countItems < rests.size()) {
             Rest rest = rests.get(countItems);
-            String time = rest.getTimeId() == null ? "" : sportDataBase.timeDao().getNameById(rest.getTimeId());
-            String place = rest.getPlaceId() == null ? "" : sportDataBase.restPlaceDao().getNameById(rest.getPlaceId());
+            String time = rest.getTimeId() == null ? "" : sportDataBase.timeDao().getNameByIdAndUserId(rest.getTimeId(), MainActivity.getUserId());
+            String place = rest.getPlaceId() == null ? "" : sportDataBase.restPlaceDao().getNameByIdAndUserId(rest.getPlaceId(), MainActivity.getUserId());
             viewHolder.setData(place, time);
         }
         countItems++;
@@ -51,45 +50,34 @@ public class RestAdapter extends RecyclerView.Adapter<RestViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final RestViewHolder restViewHolder, final int i) {
         Rest rest = rests.get(i);
-        String time = rest.getTimeId() == null ? "" : sportDataBase.timeDao().getNameById(rest.getTimeId());
-        String place = rest.getPlaceId() == null ? "" : sportDataBase.restPlaceDao().getNameById(rest.getPlaceId());
+        String time = rest.getTimeId() == null ? "" : sportDataBase.timeDao().getNameByIdAndUserId(rest.getTimeId(), MainActivity.getUserId());
+        String place = rest.getPlaceId() == null ? "" : sportDataBase.restPlaceDao().getNameByIdAndUserId(rest.getPlaceId(), MainActivity.getUserId());
         restViewHolder.setData(place, time);
-        restViewHolder.itemView.findViewById(R.id.rest_opts).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(MainActivity.getInstance(), restViewHolder.itemView);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.edit_options);
-                //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.update:
-                                AddRestFragment addRestFragment = new AddRestFragment();
-                                addRestFragment
-                                        .setTitle(MainActivity.getInstance().getString(R.string.updateRest))
-                                        .setUpdateItem(rests.get(i))
-                                        .setOption(EditOption.UPDATE);
-                                addRestFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateRests");
-                                break;
-                            case R.id.delete:
-                                AsyncTask.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        sportDataBase.restDao().delete(rests.get(i));
-                                    }
-                                });
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                //displaying the popup
-                popup.setGravity(Gravity.END);
-                popup.show();
-            }
+        restViewHolder.itemView.findViewById(R.id.rest_opts).setOnClickListener(view -> {
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(MainActivity.getInstance(), restViewHolder.itemView);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.edit_options);
+            //adding click listener
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.update:
+                        AddRestFragment addRestFragment = new AddRestFragment();
+                        addRestFragment
+                                .setTitle(MainActivity.getInstance().getString(R.string.updateRest))
+                                .setUpdateItem(rests.get(i))
+                                .setOption(EditOption.UPDATE);
+                        addRestFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateRests");
+                        break;
+                    case R.id.delete:
+                        AsyncTask.execute(() -> sportDataBase.restDao().delete(rests.get(i)));
+                        break;
+                }
+                return false;
+            });
+            //displaying the popup
+            popup.setGravity(Gravity.END);
+            popup.show();
         });
     }
 

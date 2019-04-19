@@ -6,7 +6,6 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -37,7 +36,6 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
     private Spinner importanceSpinner;
     private Day updateDay = new Day();
     private long seasonPlanId;
-    private SeasonPlan seasonPlan;
     private Date maxDate;
     private Date minDate;
 
@@ -54,46 +52,40 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
         nameSpinner = v.findViewById(R.id.competitionNameSpinner);
         importanceSpinner = v.findViewById(R.id.competitionImportanceSpinner);
 
-        seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
+        SeasonPlan seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
         maxDate = DateUtil.addDays(seasonPlan.getStart(), 365);
         minDate = seasonPlan.getStart();
 
-        editDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        month += 1;
-                        String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
-                        editDate.setText(currentDate);
-                    }
-                };
-                DatePickerDialog datePickerDialog;
-                if (option == EditOption.UPDATE) {
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(updateDay.getDate());
-                    int year = cal.get(Calendar.YEAR);
-                    int month = cal.get(Calendar.MONTH);
-                    int day = cal.get(Calendar.DAY_OF_MONTH);
-                    datePickerDialog = new DatePickerDialog(MainActivity.getInstance(),
-                            listener, year, month, day);
-                } else {
-                    datePickerDialog = new DatePickerDialog(MainActivity.getInstance());
-                    datePickerDialog.setOnDateSetListener(listener);
-                }
-                datePickerDialog.getDatePicker().setMaxDate(maxDate.getTime());
-                datePickerDialog.getDatePicker().setMinDate(minDate.getTime());
-                datePickerDialog.show();
+        editDate.setOnClickListener(v1 -> {
+            DatePickerDialog.OnDateSetListener listener = (view, year, month, dayOfMonth) -> {
+                month += 1;
+                String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
+                editDate.setText(currentDate);
+            };
+            DatePickerDialog datePickerDialog;
+            if (option == EditOption.UPDATE) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(updateDay.getDate());
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+                datePickerDialog = new DatePickerDialog(MainActivity.getInstance(),
+                        listener, year, month, day);
+            } else {
+                datePickerDialog = new DatePickerDialog(MainActivity.getInstance());
+                datePickerDialog.setOnDateSetListener(listener);
             }
+            datePickerDialog.getDatePicker().setMaxDate(maxDate.getTime());
+            datePickerDialog.getDatePicker().setMinDate(minDate.getTime());
+            datePickerDialog.show();
         });
 
         Long competitionToImportanceId = updateDay.getCompetitionToImportanceId();
         CompetitionToImportance competitionToImportance = sportDataBase.competitionToImportanceDao().getById(competitionToImportanceId);
         Long competitionId = competitionToImportance == null ? null : competitionToImportance.getCompetitionId();
         Long importanceId = competitionToImportance == null ? null : competitionToImportance.getImportanceId();
-        toolSpinner(sportDataBase.competitionDao(), nameSpinner, sportDataBase.competitionDao().getNameById(competitionId));
-        toolSpinner(sportDataBase.importanceDao(), importanceSpinner, sportDataBase.importanceDao().getNameById(importanceId));
+        toolSpinner(sportDataBase.competitionDao(), nameSpinner, sportDataBase.competitionDao().getNameByIdAndUserId(competitionId, MainActivity.getUserId()));
+        toolSpinner(sportDataBase.importanceDao(), importanceSpinner, sportDataBase.importanceDao().getNameByIdAndUserId(importanceId, MainActivity.getUserId()));
 
         if (option == EditOption.UPDATE) {
             editDate.setText(sdf.format(updateDay.getDate()));

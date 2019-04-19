@@ -20,7 +20,6 @@ import java.util.List;
 
 public class HeartRateFragment extends DialogFragment implements View.OnClickListener {
     private long exerciseId;
-    private RecyclerView recyclerView;
     private HeartRateAdapter adapter;
     private SportDataBase sportDataBase;
 
@@ -32,7 +31,7 @@ public class HeartRateFragment extends DialogFragment implements View.OnClickLis
 
         sportDataBase = MainActivity.getInstance().getDatabase();
 
-        recyclerView = v.findViewById(R.id.hrItems);
+        RecyclerView recyclerView = v.findViewById(R.id.hrItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new HeartRateAdapter();
@@ -64,12 +63,7 @@ public class HeartRateFragment extends DialogFragment implements View.OnClickLis
                 dismiss();
                 break;
             case R.id.okHr:
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        update();
-                    }
-                });
+                AsyncTask.execute(this::update);
                 dismiss();
         }
     }

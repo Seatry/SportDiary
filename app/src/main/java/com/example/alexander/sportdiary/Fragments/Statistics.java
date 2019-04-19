@@ -3,7 +3,6 @@ package com.example.alexander.sportdiary.Fragments;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
@@ -30,13 +28,9 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.OnDataPointTapListener;
-import com.jjoe64.graphview.series.Series;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -177,70 +171,52 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
     }
 
     public void setSeriesListeners() {
-        banisterSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "Banister model: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
+        banisterSeries.setOnDataPointTapListener((series, dataPoint) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis((long) dataPoint.getX());
+            String x = sdf.format(cal.getTime());
+            String y = String.valueOf(dataPoint.getY());
+            Toast.makeText(Statistics.getInstance(), "Banister model: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
         });
 
-        trimpSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "TRIMP graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
+        trimpSeries.setOnDataPointTapListener((series, dataPoint) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis((long) dataPoint.getX());
+            String x = sdf.format(cal.getTime());
+            String y = String.valueOf(dataPoint.getY());
+            Toast.makeText(Statistics.getInstance(), "TRIMP graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
         });
 
-        dreamSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "Dream graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
+        dreamSeries.setOnDataPointTapListener((series, dataPoint) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis((long) dataPoint.getX());
+            String x = sdf.format(cal.getTime());
+            String y = String.valueOf(dataPoint.getY());
+            Toast.makeText(Statistics.getInstance(), "Dream graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
         });
 
-        healthSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "Health graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
+        healthSeries.setOnDataPointTapListener((series, dataPoint) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis((long) dataPoint.getX());
+            String x = sdf.format(cal.getTime());
+            String y = String.valueOf(dataPoint.getY());
+            Toast.makeText(Statistics.getInstance(), "Health graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
         });
 
-        activitySeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "Activity graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
+        activitySeries.setOnDataPointTapListener((series, dataPoint) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis((long) dataPoint.getX());
+            String x = sdf.format(cal.getTime());
+            String y = String.valueOf(dataPoint.getY());
+            Toast.makeText(Statistics.getInstance(), "Activity graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
         });
 
-        moodSeries.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis((long) dataPoint.getX());
-                String x = sdf.format(cal.getTime());
-                String y = String.valueOf(dataPoint.getY());
-                Toast.makeText(Statistics.getInstance(), "Mood graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
-            }
+        moodSeries.setOnDataPointTapListener((series, dataPoint) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis((long) dataPoint.getX());
+            String x = sdf.format(cal.getTime());
+            String y = String.valueOf(dataPoint.getY());
+            Toast.makeText(Statistics.getInstance(), "Mood graph: On Data Point clicked: ("+ x + "," + y + ")", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -282,23 +258,17 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
     }
 
     private void setDatePickerDialog(final EditText editText) {
-        editText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        month += 1;
-                        String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
-                        editText.setText(currentDate);
-                    }
-                };
-                DatePickerDialog datePickerDialog = new DatePickerDialog(Statistics.getInstance());
-                datePickerDialog.setOnDateSetListener(listener);
-                datePickerDialog.getDatePicker().setMaxDate(maxDate.getTime());
-                datePickerDialog.getDatePicker().setMinDate(minDate.getTime());
-                datePickerDialog.show();
-            }
+        editText.setOnClickListener(v -> {
+            DatePickerDialog.OnDateSetListener listener = (view, year, month, dayOfMonth) -> {
+                month += 1;
+                String currentDate = dayOfMonth + "." + (month < 10 ? "0" + month : month) + "." + year;
+                editText.setText(currentDate);
+            };
+            DatePickerDialog datePickerDialog = new DatePickerDialog(Statistics.getInstance());
+            datePickerDialog.setOnDateSetListener(listener);
+            datePickerDialog.getDatePicker().setMaxDate(maxDate.getTime());
+            datePickerDialog.getDatePicker().setMinDate(minDate.getTime());
+            datePickerDialog.show();
         });
     }
 

@@ -21,8 +21,8 @@ public interface SeasonPlanDao {
     @Delete
     void delete(SeasonPlan seasonPlan);
 
-    @Query("SELECT * FROM SeasonPlan")
-    List<SeasonPlan> getAll();
+    @Query("SELECT * FROM SeasonPlan WHERE userId = :userId")
+    List<SeasonPlan> getAllByUserId(String userId);
 
     @Query("SELECT * FROM SeasonPlan WHERE id = :id")
     SeasonPlan getSeasonPlanById(long id);

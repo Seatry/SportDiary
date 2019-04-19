@@ -2,9 +2,7 @@ package com.example.alexander.sportdiary.Fragments;
 
 import android.app.Dialog;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +22,6 @@ import java.util.List;
 
 public class EditFragment<T extends Edit> extends DialogFragment implements View.OnClickListener {
 
-    private RecyclerView recyclerView;
     private EditAdapter<T> adapter;
     private Class<T> cls;
     private String title;
@@ -47,21 +44,18 @@ public class EditFragment<T extends Edit> extends DialogFragment implements View
         v.findViewById(R.id.add_button).setOnClickListener(this);
         ((TextView) v.findViewById(R.id.edit_title)).setText(title);
 
-        recyclerView = v.findViewById(R.id.edit_items);
+        RecyclerView recyclerView = v.findViewById(R.id.edit_items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new EditAdapter<>(getContext(), dao);
         adapter.setClass(cls, updateDialogTitle);
         recyclerView.setAdapter(adapter);
 
-        LiveData<List<T>> editLiveData = dao.getAll();
+        LiveData<List<T>> editLiveData = dao.getAllByUserId(MainActivity.getUserId());
 
-        editLiveData.observe(this, new Observer<List<T>>() {
-            @Override
-            public void onChanged(@Nullable List<T> elems) {
-                adapter.setData(elems);
-                adapter.notifyDataSetChanged();
-            }
+        editLiveData.observe(this, elems -> {
+            adapter.setData(elems);
+            adapter.notifyDataSetChanged();
         });
         return v;
     }

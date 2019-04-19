@@ -35,7 +35,7 @@ public class AddTestFragment extends DialogFragment implements View.OnClickListe
         sportDataBase= MainActivity.getInstance().getDatabase();
         testSpinner = v.findViewById(R.id.testSpinner);
 
-        toolSpinner(sportDataBase.testDao(), testSpinner, sportDataBase.testDao().getNameById(updateItem.getTestId()));
+        toolSpinner(sportDataBase.testDao(), testSpinner, sportDataBase.testDao().getNameByIdAndUserId(updateItem.getTestId(), MainActivity.getUserId()));
         return v;
     }
 

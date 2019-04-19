@@ -8,6 +8,7 @@ public class Edit {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
+    private String userId;
     private String name;
 
     public Edit(String name) {
@@ -31,5 +32,13 @@ public class Edit {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

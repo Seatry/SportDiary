@@ -68,6 +68,7 @@ public class AddNewEditFragment<T extends Edit> extends DialogFragment implement
         try {
             T elem = cls.newInstance();
             elem.setName(editText.getText().toString());
+            elem.setUserId(MainActivity.getUserId());
             dao.insert(elem);
             dismiss();
         } catch (IllegalAccessException | java.lang.InstantiationException e) {

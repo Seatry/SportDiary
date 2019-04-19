@@ -10,14 +10,14 @@ import java.util.List;
 
 @Dao
 public interface BlockDao extends EditDao<Block> {
-    @Query("SELECT * FROM Block")
-    LiveData<List<Block>> getAll();
+    @Query("SELECT * FROM Block WHERE userId = :userId")
+    LiveData<List<Block>> getAllByUserId(String userId);
 
-    @Query("SELECT name FROM Block where id = :id")
-    String getNameById(Long id);
+    @Query("SELECT name FROM Block where id = :id and userId = :userId")
+    String getNameByIdAndUserId(Long id, String userId);
 
-    @Query("SELECT name FROM Block")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Block WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Block where name = :name")
     long getIdByName(String name);

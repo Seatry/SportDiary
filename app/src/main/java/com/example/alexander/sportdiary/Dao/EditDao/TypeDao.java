@@ -10,14 +10,14 @@ import java.util.List;
 
 @Dao
 public interface TypeDao extends EditDao<Type> {
-    @Query("SELECT * FROM Type")
-    LiveData<List<Type>> getAll();
+    @Query("SELECT * FROM Type WHERE userId = :userId")
+    LiveData<List<Type>> getAllByUserId(String userId);
 
-    @Query("SELECT name FROM Type where id = :id")
-    String getNameById(Long id);
+    @Query("SELECT name FROM Type where id = :id and userId = :userId")
+    String getNameByIdAndUserId(Long id, String userId);
 
-    @Query("SELECT name FROM Type")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Type WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Type where name = :name")
     long getIdByName(String name);

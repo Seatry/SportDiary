@@ -37,8 +37,8 @@ public class AddRestFragment extends DialogFragment implements View.OnClickListe
         timeSpinner = v.findViewById(R.id.restTimeSpinner);
         placeSpinner = v.findViewById(R.id.restPlaceSpinner);
 
-        toolSpinner(sportDataBase.timeDao(), timeSpinner, sportDataBase.timeDao().getNameById(updateItem.getTimeId()));
-        toolSpinner(sportDataBase.restPlaceDao(), placeSpinner, sportDataBase.restPlaceDao().getNameById(updateItem.getPlaceId()));
+        toolSpinner(sportDataBase.timeDao(), timeSpinner, sportDataBase.timeDao().getNameByIdAndUserId(updateItem.getTimeId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.restPlaceDao(), placeSpinner, sportDataBase.restPlaceDao().getNameByIdAndUserId(updateItem.getPlaceId(), MainActivity.getUserId()));
 
         return v;
     }
@@ -52,20 +52,10 @@ public class AddRestFragment extends DialogFragment implements View.OnClickListe
             case R.id.okAddRest:
                 switch (option) {
                     case INSERT:
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                add();
-                            }
-                        });
+                        AsyncTask.execute(this::add);
                         break;
                     case UPDATE:
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
+                        AsyncTask.execute(this::update);
                         break;
                 }
                 dismiss();

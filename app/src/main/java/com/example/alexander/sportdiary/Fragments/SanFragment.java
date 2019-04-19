@@ -9,12 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.alexander.sportdiary.Adapters.DreamAdapter;
 import com.example.alexander.sportdiary.Adapters.SanAdapter;
-import com.example.alexander.sportdiary.Entities.DreamQuestion;
 import com.example.alexander.sportdiary.Entities.SanAnswer;
 import com.example.alexander.sportdiary.Entities.SanQuestion;
-import com.example.alexander.sportdiary.Enums.SanType;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.SportDataBase;
@@ -25,7 +22,6 @@ import java.util.List;
 public class SanFragment extends DialogFragment implements View.OnClickListener {
     private long dayId;
     private SportDataBase sportDataBase;
-    private RecyclerView recyclerView;
     private SanAdapter adapter;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,7 +32,7 @@ public class SanFragment extends DialogFragment implements View.OnClickListener 
 
         sportDataBase = MainActivity.getInstance().getDatabase();
 
-        recyclerView = v.findViewById(R.id.san_items);
+        RecyclerView recyclerView = v.findViewById(R.id.san_items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new SanAdapter();
@@ -57,12 +53,7 @@ public class SanFragment extends DialogFragment implements View.OnClickListener 
                 dismiss();
                 break;
             case R.id.okSan:
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        update();
-                    }
-                });
+                AsyncTask.execute(this::update);
                 dismiss();
                 break;
         }

@@ -17,16 +17,13 @@ public class ToolerOfSpinners {
     public static <T extends Edit> void toolSpinner(final EditDao<T> dao, final Spinner spinner, @Nullable final String itemToSelect) {
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.getInstance(), android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<String> names = dao.getAllNames();
-                adapter.addAll(names);
-                adapter.notifyDataSetChanged();
-                if (names.size() > 0 && itemToSelect != null) {
-                    System.out.println(names.indexOf(itemToSelect));
-                    spinner.setSelection(names.indexOf(itemToSelect));
-                }
+        AsyncTask.execute(() -> {
+            List<String> names = dao.getAllNamesByUserId(MainActivity.getUserId());
+            adapter.addAll(names);
+            adapter.notifyDataSetChanged();
+            if (names.size() > 0 && itemToSelect != null) {
+                System.out.println(names.indexOf(itemToSelect));
+                spinner.setSelection(names.indexOf(itemToSelect));
             }
         });
         spinner.setAdapter(adapter);
@@ -68,15 +65,12 @@ public class ToolerOfSpinners {
     public static <T extends Edit> void toolMultiSpinner(
             final EditDao<T> dao, final MultiSelectionSpinner spinner,
             MultiSelectionSpinner.OnMultipleItemsSelectedListener listener, @Nullable final List<String> itemsToSelect) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<String> names = dao.getAllNames();
-                if(names.size() > 0) {
-                    spinner.setItems(names);
-                    if (itemsToSelect != null) {
-                        spinner.setSelection(itemsToSelect);
-                    }
+        AsyncTask.execute(() -> {
+            List<String> names = dao.getAllNamesByUserId(MainActivity.getUserId());
+            if(names.size() > 0) {
+                spinner.setItems(names);
+                if (itemsToSelect != null) {
+                    spinner.setSelection(itemsToSelect);
                 }
             }
         });

@@ -7,7 +7,6 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.example.alexander.sportdiary.Entities.SanAnswer;
-import com.example.alexander.sportdiary.Entities.SanQuestion;
 
 import java.util.List;
 

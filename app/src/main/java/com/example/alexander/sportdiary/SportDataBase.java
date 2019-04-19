@@ -66,10 +66,6 @@ import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 @Database(entities =
         {Exercise.class, Zone.class, SeasonPlan.class, Day.class, Equipment.class, Aim.class,
                 Time.class, Borg.class, TrainingsToEquipments.class, TrainingExercise.class,
@@ -78,7 +74,7 @@ import java.util.Random;
                 Stage.class, Type.class, CompetitionToImportance.class, HeartRate.class,
                 RestPlace.class, Test.class, DayToTest.class, Rest.class, DreamQuestion.class,
                 SanQuestion.class, DreamAnswer.class, SanAnswer.class
-        }, version = 30)
+        }, version = 31)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
     public abstract ZoneDao zoneDao();

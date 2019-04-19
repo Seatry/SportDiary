@@ -7,7 +7,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -51,56 +50,45 @@ public class TrainingExerciseAdapter extends RecyclerView.Adapter<TrainingExerci
     @Override
     public void onBindViewHolder(@NonNull final TrainingExerciseViewHolder trainingExerciseViewHolder, final int i) {
         setViewHolderData(trainingExercises.get(i), trainingExerciseViewHolder);
-        trainingExerciseViewHolder.itemView.findViewById(R.id.training_exercise_opts).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //creating a popup menu
-                PopupMenu popup = new PopupMenu(MainActivity.getInstance(), trainingExerciseViewHolder.itemView);
-                //inflating menu from xml resource
-                popup.inflate(R.menu.exercise_opts);
-                //adding click listener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.exerciseUpdate:
-                                AddTrainingExerciseFragment addTrainingExerciseFragment = new AddTrainingExerciseFragment();
-                                addTrainingExerciseFragment
-                                        .setTrainingId(trainingExercises.get(i).getTrainingId())
-                                        .setOption(EditOption.UPDATE)
-                                        .setTitle(MainActivity.getInstance().getString(R.string.updateExerciseToTraining))
-                                        .setUpdateTrainingExercise(trainingExercises.get(i));
-                                addTrainingExerciseFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "updateTrainingExercise");
-                                break;
-                            case R.id.exerciseDelete:
-                                AsyncTask.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        sportDataBase.trainingExerciseDao().delete(trainingExercises.get(i));
-                                    }
-                                });
-                                break;
-                            case R.id.heartRates:
-                                HeartRateFragment heartRateFragment = new HeartRateFragment();
-                                heartRateFragment.setExerciseId(trainingExercises.get(i).getId());
-                                heartRateFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "heartRates");
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                //displaying the popup
-                popup.setGravity(Gravity.END);
-                popup.show();
-            }
+        trainingExerciseViewHolder.itemView.findViewById(R.id.training_exercise_opts).setOnClickListener(view -> {
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(MainActivity.getInstance(), trainingExerciseViewHolder.itemView);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.exercise_opts);
+            //adding click listener
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.exerciseUpdate:
+                        AddTrainingExerciseFragment addTrainingExerciseFragment = new AddTrainingExerciseFragment();
+                        addTrainingExerciseFragment
+                                .setTrainingId(trainingExercises.get(i).getTrainingId())
+                                .setOption(EditOption.UPDATE)
+                                .setTitle(MainActivity.getInstance().getString(R.string.updateExerciseToTraining))
+                                .setUpdateTrainingExercise(trainingExercises.get(i));
+                        addTrainingExerciseFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "updateTrainingExercise");
+                        break;
+                    case R.id.exerciseDelete:
+                        AsyncTask.execute(() -> sportDataBase.trainingExerciseDao().delete(trainingExercises.get(i)));
+                        break;
+                    case R.id.heartRates:
+                        HeartRateFragment heartRateFragment = new HeartRateFragment();
+                        heartRateFragment.setExerciseId(trainingExercises.get(i).getId());
+                        heartRateFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "heartRates");
+                        break;
+                }
+                return false;
+            });
+            //displaying the popup
+            popup.setGravity(Gravity.END);
+            popup.show();
         });
     }
 
     private void setViewHolderData(TrainingExercise trainingExercise, TrainingExerciseViewHolder viewHolder) {
-        String exercise = trainingExercise.getExerciseId() == null ? "" : sportDataBase.exerciseDao().getNameById(trainingExercise.getExerciseId());
-        String style = trainingExercise.getStyleId() == null ? "" : sportDataBase.styleDao().getNameById(trainingExercise.getStyleId());
-        String tempo = trainingExercise.getTempoId() == null ? "" : sportDataBase.tempoDao().getNameById(trainingExercise.getTempoId());
-        String zone = trainingExercise.getZoneId() == null ? "" : sportDataBase.zoneDao().getNameById(trainingExercise.getZoneId());
+        String exercise = trainingExercise.getExerciseId() == null ? "" : sportDataBase.exerciseDao().getNameByIdAndUserId(trainingExercise.getExerciseId(), MainActivity.getUserId());
+        String style = trainingExercise.getStyleId() == null ? "" : sportDataBase.styleDao().getNameByIdAndUserId(trainingExercise.getStyleId(), MainActivity.getUserId());
+        String tempo = trainingExercise.getTempoId() == null ? "" : sportDataBase.tempoDao().getNameByIdAndUserId(trainingExercise.getTempoId(), MainActivity.getUserId());
+        String zone = trainingExercise.getZoneId() == null ? "" : sportDataBase.zoneDao().getNameByIdAndUserId(trainingExercise.getZoneId(), MainActivity.getUserId());
         int work = trainingExercise.getWork();
         int rest = trainingExercise.getRest();
         String workToRest = String.valueOf(work) + ":" + String.valueOf(rest);
@@ -109,7 +97,7 @@ public class TrainingExerciseAdapter extends RecyclerView.Adapter<TrainingExerci
         int length = trainingExercise.getLength();
         String capacity = String.valueOf(series) + "x" + String.valueOf(repeats) + "x" + String.valueOf(length);
         String time = String.valueOf(trainingExercise.getMinutes());
-        String borg = trainingExercise.getBorgId() == null ? "" : sportDataBase.borgDao().getNameById(trainingExercise.getBorgId());
+        String borg = trainingExercise.getBorgId() == null ? "" : sportDataBase.borgDao().getNameByIdAndUserId(trainingExercise.getBorgId(), MainActivity.getUserId());
         String note = trainingExercise.getNote();
         viewHolder.setData(exercise, style, tempo, zone, workToRest, capacity, time, borg, note);
     }

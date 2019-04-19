@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.MainActivity;
-import com.example.alexander.sportdiary.SportDataBase;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public SyncAdapter(Context context, boolean autoInitialize) {

@@ -9,7 +9,6 @@ import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
 
 import com.example.alexander.sportdiary.Converters.DateConverter;
-import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.Day;
 
 import java.util.Date;

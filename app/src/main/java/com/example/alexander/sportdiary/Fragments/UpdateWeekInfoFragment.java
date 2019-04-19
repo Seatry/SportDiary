@@ -41,10 +41,10 @@ public class UpdateWeekInfoFragment extends DialogFragment implements View.OnCli
         typeSpinner = v.findViewById(R.id.weekTypeSpinner);
         campSpinner = v.findViewById(R.id.weekCampSpinner);
 
-        toolSpinner(sportDataBase.blockDao(), blockSpinner, sportDataBase.blockDao().getNameById(day.getBlockId()));
-        toolSpinner(sportDataBase.stageDao(), stageSpinner, sportDataBase.stageDao().getNameById(day.getStageId()));
-        toolSpinner(sportDataBase.typeDao(), typeSpinner, sportDataBase.typeDao().getNameById(day.getTypeId()));
-        toolSpinner(sportDataBase.campDao(), campSpinner, sportDataBase.campDao().getNameById(day.getCampId()));
+        toolSpinner(sportDataBase.blockDao(), blockSpinner, sportDataBase.blockDao().getNameByIdAndUserId(day.getBlockId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.stageDao(), stageSpinner, sportDataBase.stageDao().getNameByIdAndUserId(day.getStageId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.typeDao(), typeSpinner, sportDataBase.typeDao().getNameByIdAndUserId(day.getTypeId(), MainActivity.getUserId()));
+        toolSpinner(sportDataBase.campDao(), campSpinner, sportDataBase.campDao().getNameByIdAndUserId(day.getCampId(), MainActivity.getUserId()));
 
         return v;
     }
@@ -56,12 +56,7 @@ public class UpdateWeekInfoFragment extends DialogFragment implements View.OnCli
                 dismiss();
                 break;
             case R.id.okUpdateWeekInfo:
-                AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
+                AsyncTask.execute(this::update);
                 dismiss();
                 break;
         }

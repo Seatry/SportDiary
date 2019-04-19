@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.alexander.sportdiary.Fragments.TrainingExerciseActivity;
 import com.example.alexander.sportdiary.Fragments.WeekInfoActivity;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;

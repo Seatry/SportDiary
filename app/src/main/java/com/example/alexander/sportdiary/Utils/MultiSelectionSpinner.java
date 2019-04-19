@@ -68,21 +68,15 @@ public class MultiSelectionSpinner extends android.support.v7.widget.AppCompatSp
         builder.setTitle(R.string.select);
         builder.setMultiChoiceItems(_items, mSelection, this);
         _itemsAtStart = getSelectedItemsAsString();
-        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                System.arraycopy(mSelection, 0, mSelectionAtStart, 0, mSelection.length);
-                listener.selectedIndices(getSelectedIndices());
-                listener.selectedStrings(getSelectedStrings());
-            }
+        builder.setPositiveButton("Submit", (dialog, which) -> {
+            System.arraycopy(mSelection, 0, mSelectionAtStart, 0, mSelection.length);
+            listener.selectedIndices(getSelectedIndices());
+            listener.selectedStrings(getSelectedStrings());
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                simple_adapter.clear();
-                simple_adapter.add(_itemsAtStart);
-                System.arraycopy(mSelectionAtStart, 0, mSelection, 0, mSelectionAtStart.length);
-            }
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            simple_adapter.clear();
+            simple_adapter.add(_itemsAtStart);
+            System.arraycopy(mSelectionAtStart, 0, mSelection, 0, mSelectionAtStart.length);
         });
         builder.show();
         return true;

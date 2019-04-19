@@ -1,9 +1,7 @@
 package com.example.alexander.sportdiary.Fragments;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +9,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.alexander.sportdiary.Adapters.TrainingExerciseAdapter;
 import com.example.alexander.sportdiary.Enums.EditOption;
@@ -24,7 +21,6 @@ import java.util.List;
 
 public class TrainingExerciseActivity extends AppCompatActivity {
     private int trainingId;
-    private RecyclerView recyclerView;
     private TrainingExerciseAdapter adapter;
     private SportDataBase sportDataBase;
     private static TrainingExerciseActivity instance;
@@ -47,7 +43,7 @@ public class TrainingExerciseActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         trainingId = intent.getIntExtra("trainingId", 0);
-        recyclerView = findViewById(R.id.training_exercises);
+        RecyclerView recyclerView = findViewById(R.id.training_exercises);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new TrainingExerciseAdapter();
@@ -55,32 +51,26 @@ public class TrainingExerciseActivity extends AppCompatActivity {
 
         LiveData<List<TrainingExercise>> trainingLiveData = sportDataBase.trainingExerciseDao()
                 .getAllLiveByTrainingId(trainingId);
-        trainingLiveData.observe(TrainingExerciseActivity.getInstance(), new Observer<List<TrainingExercise>>() {
-            @Override
-            public void onChanged(@Nullable List<TrainingExercise> elems) {
-                adapter.setTrainingExercises(elems);
-                adapter.notifyDataSetChanged();
-                if (elems != null) {
-                    int capacity = 0;
-                    for(TrainingExercise exercise : elems) {
-                        capacity += (exercise.getLength() * exercise.getRepeats() * exercise.getSeries());
-                    }
-                    sportDataBase.trainingDao().updateCapacityById(capacity, trainingId);
+        trainingLiveData.observe(TrainingExerciseActivity.getInstance(), elems -> {
+            adapter.setTrainingExercises(elems);
+            adapter.notifyDataSetChanged();
+            if (elems != null) {
+                int capacity = 0;
+                for(TrainingExercise exercise : elems) {
+                    capacity += (exercise.getLength() * exercise.getRepeats() * exercise.getSeries());
                 }
+                sportDataBase.trainingDao().updateCapacityById(capacity, trainingId);
             }
         });
 
         FloatingActionButton addTrainingExercise = findViewById(R.id.addTrainingExercise);
-        addTrainingExercise.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AddTrainingExerciseFragment addTrainingExerciseFragment = new AddTrainingExerciseFragment();
-                addTrainingExerciseFragment
-                        .setTrainingId(trainingId)
-                        .setOption(EditOption.INSERT)
-                        .setTitle(getString(R.string.addExerciseToTraining));
-                addTrainingExerciseFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "addTrainingExercise");
-            }
+        addTrainingExercise.setOnClickListener(view -> {
+            AddTrainingExerciseFragment addTrainingExerciseFragment = new AddTrainingExerciseFragment();
+            addTrainingExerciseFragment
+                    .setTrainingId(trainingId)
+                    .setOption(EditOption.INSERT)
+                    .setTitle(getString(R.string.addExerciseToTraining));
+            addTrainingExerciseFragment.show(TrainingExerciseActivity.getInstance().getSupportFragmentManager(), "addTrainingExercise");
         });
     }
 

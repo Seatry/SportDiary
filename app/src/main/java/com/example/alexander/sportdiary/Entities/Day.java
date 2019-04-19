@@ -11,8 +11,6 @@ import android.support.annotation.Nullable;
 import com.example.alexander.sportdiary.Converters.DateConverter;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Camp;
-import com.example.alexander.sportdiary.Entities.EditEntities.Competition;
-import com.example.alexander.sportdiary.Entities.EditEntities.Importance;
 import com.example.alexander.sportdiary.Entities.EditEntities.Stage;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
 

@@ -10,14 +10,14 @@ import java.util.List;
 
 @Dao
 public interface CampDao extends EditDao<Camp> {
-    @Query("SELECT * FROM Camp")
-    LiveData<List<Camp>> getAll();
+    @Query("SELECT * FROM Camp WHERE userId = :userId")
+    LiveData<List<Camp>> getAllByUserId(String userId);
 
-    @Query("SELECT name FROM Camp where id = :id")
-    String getNameById(Long id);
+    @Query("SELECT name FROM Camp where id = :id and userId = :userId")
+    String getNameByIdAndUserId(Long id, String userId);
 
-    @Query("SELECT name FROM Camp")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Camp WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Camp where name = :name")
     long getIdByName(String name);

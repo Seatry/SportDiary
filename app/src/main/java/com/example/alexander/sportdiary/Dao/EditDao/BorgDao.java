@@ -11,16 +11,16 @@ import java.util.List;
 
 @Dao
 public interface BorgDao extends EditDao<Borg>{
-    @Query("SELECT * FROM Borg")
-    LiveData<List<Borg>> getAll();
+    @Query("SELECT * FROM Borg WHERE userId = :userId")
+    LiveData<List<Borg>> getAllByUserId(String userId);
 
 
-    @Query("SELECT name FROM Borg")
-    List<String> getAllNames();
+    @Query("SELECT name FROM Borg WHERE userId = :userId")
+    List<String> getAllNamesByUserId(String userId);
 
     @Query("SELECT id FROM Borg where name = :name")
     long getIdByName(String name);
 
-    @Query("SELECT name FROM Borg where id = :id")
-    String getNameById(Long id);
+    @Query("SELECT name FROM Borg where id = :id and userId = :userId")
+    String getNameByIdAndUserId(Long id, String userId);
 }
