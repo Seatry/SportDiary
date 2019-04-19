@@ -1,8 +1,12 @@
 package com.example.alexander.sportdiary;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
@@ -85,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private DayFragment dayFragment;
     private static String userId;
+    private static final String AUTHORITY = "com.example.alexander.sportdiary.Sync.provider";
+    private static final String ACCOUNT_TYPE = "com.example.alexander.sportdiary.Sync";
+    private static final String ACCOUNT = "dummyaccount";
+    private static Account account;
 
     public void setDayFragment(DayFragment dayFragment) {
         this.dayFragment = dayFragment;
@@ -132,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = getIntent();
         userId = intent.getStringExtra("userId" );
 
+        account = createSyncAccount(this);
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -172,6 +183,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 childList.put(menuModel, childs);
             }
         });
+    }
+
+    public static Account createSyncAccount(Context context) {
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+            Log.i("account", "successfully added");
+        } else {
+            Log.e("account", "account exists");
+        }
+        return newAccount;
+    }
+
+    public static void syncImmediately() {
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        /*
+         * Request the sync for the default account, authority, and
+         * manual sync settings
+         */
+        ContentResolver.setIsSyncable(account, AUTHORITY, 1);
+        ContentResolver.requestSync(account, AUTHORITY, settingsBundle);
     }
 
     private void prepareMenuData() {
