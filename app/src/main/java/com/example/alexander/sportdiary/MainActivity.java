@@ -15,12 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
+import com.example.alexander.sportdiary.Auth.GoogleSignInActivity;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
@@ -46,6 +45,7 @@ import com.example.alexander.sportdiary.Fragments.EditFragment;
 import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
 import com.example.alexander.sportdiary.Fragments.Statistics;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +76,7 @@ import static com.example.alexander.sportdiary.Enums.MenuItemIds.TRAINING_PLACES
 import static com.example.alexander.sportdiary.Enums.MenuItemIds.TYPES;
 import static com.example.alexander.sportdiary.Enums.MenuItemIds.ZONES;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
+import static com.google.android.gms.common.api.CommonStatusCodes.SUCCESS;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SportDataBase database;
     private Toolbar toolbar;
     private DayFragment dayFragment;
-    private DrawerLayout drawer;
+    private static String userId;
 
     public void setDayFragment(DayFragment dayFragment) {
         this.dayFragment = dayFragment;
@@ -92,6 +93,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Nullable
     public static Long getSeasonPlanId() {
         return seasonPlanId;
+    }
+
+    public static String getUserId() {
+        return userId;
     }
 
     private static Long seasonPlanId;
@@ -124,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         instance = this;
 
+        Intent intent = getIntent();
+        userId = intent.getStringExtra("userId" );
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -131,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         prepareMenuData();
         populateExpandableList();
 
-        drawer = findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -143,12 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         RoomDatabase.Callback dbCallback = new RoomDatabase.Callback() {
             public void onCreate(SupportSQLiteDatabase db) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new InitializeDataBase().execute();
-                    }
-                });
+                runOnUiThread(() -> new InitializeDataBase().execute());
             }
         };
 
@@ -158,18 +161,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .addCallback(dbCallback)
                 .build();
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<SeasonPlan> diaries = database.seasonPlanDao().getAll();
-                MenuModel menuModel = MenuModel.getMenuModelById(headerList, DIARY_GROUP.getValue());
-                List<MenuModel> childs = childList.get(menuModel);
-                for(SeasonPlan seasonPlan : diaries) {
-                    String diaryName = seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart());
-                    MenuModel childModel = new MenuModel(diaryName, false, false, ((int) seasonPlan.getId()));
-                    childs.add(0, childModel);
-                    childList.put(menuModel, childs);
-                }
+        AsyncTask.execute(() -> {
+            List<SeasonPlan> diaries = database.seasonPlanDao().getAll();
+            MenuModel menuModel = MenuModel.getMenuModelById(headerList, DIARY_GROUP.getValue());
+            List<MenuModel> childs = childList.get(menuModel);
+            for(SeasonPlan seasonPlan : diaries) {
+                String diaryName = seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart());
+                MenuModel childModel = new MenuModel(diaryName, false, false, ((int) seasonPlan.getId()));
+                childs.add(0, childModel);
+                childList.put(menuModel, childs);
             }
         });
     }
@@ -260,58 +260,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         expandableListAdapter = new ExpandableListAdapter(this, headerList, childList);
         expandableListView.setAdapter(expandableListAdapter);
 
-        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+        expandableListView.setOnGroupClickListener((parent, v, groupPosition, id) -> {
 
-                if (headerList.get(groupPosition).isGroup()) {
-                    if (!headerList.get(groupPosition).isHasChildren()) {
-                        handleClick(headerList.get(groupPosition));
-                        onBackPressed();
-                    }
-                }
-
-                return false;
-            }
-        });
-
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                if (childList.get(headerList.get(groupPosition)) != null) {
-                    MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
-                    handleClick(model);
+            if (headerList.get(groupPosition).isGroup()) {
+                if (!headerList.get(groupPosition).isHasChildren()) {
+                    handleClick(headerList.get(groupPosition));
                     onBackPressed();
                 }
-
-                return false;
             }
+
+            return false;
         });
 
-        expandableListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    int childPosition = ExpandableListView.getPackedPositionChild(id);
+        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
 
-                    // You now have everything that you would as if this was an OnChildClickListener()
-                    // Add your logic here.
-
-                    if (childList.get(headerList.get(groupPosition)) != null) {
-                        int groupId = headerList.get(groupPosition).getId();
-                        if (groupId == DIARY_GROUP.getValue()) {
-                            handleLongClick(childList.get(headerList.get(groupPosition)).get(childPosition).getId());
-                        }
-                        onBackPressed();
-                        // Return true as we are handling the event.
-                        return true;
-                    }
-                }
-
-                return false;
+            if (childList.get(headerList.get(groupPosition)) != null) {
+                MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
+                handleClick(model);
+                onBackPressed();
             }
+
+            return false;
+        });
+
+        expandableListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                int childPosition = ExpandableListView.getPackedPositionChild(id);
+
+                // You now have everything that you would as if this was an OnChildClickListener()
+                // Add your logic here.
+
+                if (childList.get(headerList.get(groupPosition)) != null) {
+                    int groupId = headerList.get(groupPosition).getId();
+                    if (groupId == DIARY_GROUP.getValue()) {
+                        handleLongClick(childList.get(headerList.get(groupPosition)).get(childPosition).getId());
+                    }
+                    onBackPressed();
+                    // Return true as we are handling the event.
+                    return true;
+                }
+            }
+
+            return false;
         });
     }
 
@@ -339,13 +330,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         // noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.sign_out) {
+            signOut();
         } else if (id == CALENDAR.getValue()) {
             dayFragment.changeCalendarVisibility();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+        if (code != SUCCESS) {
+            GoogleApiAvailability.getInstance().getErrorDialog(this, code, 1).show();
+        }
+    }
+
+    private void signOut() {
+        // Firebase sign out
+        GoogleSignInActivity.getmAuth().signOut();
+
+        // Google sign out
+        GoogleSignInActivity.getmGoogleSignInClient().signOut().addOnCompleteListener(this,
+                task -> getInstance().finish());
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
