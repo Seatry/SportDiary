@@ -40,7 +40,7 @@ exports.mintAdminToken = functions.https.onCall((data, context) => {
 exports.recursiveDelete = functions
   .runWith({
     timeoutSeconds: 540,
-    memory: '2GB'
+    memory: '2GB'	
   })
   .https.onCall((data, context) => {
     // Only allow authenticate users to execute this function.
