@@ -1,4 +1,4 @@
-package com.example.alexander.sportdiary;
+package com.example.alexander.sportdiary.Menu;
 
 
 import java.util.List;

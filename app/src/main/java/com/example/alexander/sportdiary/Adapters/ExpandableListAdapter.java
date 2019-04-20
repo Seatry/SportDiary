@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.example.alexander.sportdiary.MenuModel;
+import com.example.alexander.sportdiary.Menu.MenuModel;
 import com.example.alexander.sportdiary.R;
 
 import java.util.HashMap;

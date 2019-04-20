@@ -12,7 +12,8 @@
         android:id="@+id/loadBar"
         android:layout_width="100dip"
         android:layout_height="100dip"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:tooltipText="@string/loading_data"/>
     <FrameLayout
         android:id="@+id/fragment_frame"
         android:layout_width="match_parent"

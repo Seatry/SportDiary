@@ -15,7 +15,7 @@ import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Utils.MultiSelectionSpinner;
 
 import java.util.ArrayList;

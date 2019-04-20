@@ -1,4 +1,4 @@
-package com.example.alexander.sportdiary;
+package com.example.alexander.sportdiary.DataBase;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,6 +7,7 @@ import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 
 import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.DreamQuestion;
 import com.example.alexander.sportdiary.Entities.EditEntities.*;
@@ -16,6 +17,9 @@ import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Enums.SanType;
+import com.example.alexander.sportdiary.MainActivity;
+import com.example.alexander.sportdiary.Menu.MenuModel;
+import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 
 import java.text.ParseException;
@@ -23,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class InitializeDataBase extends AsyncTask {

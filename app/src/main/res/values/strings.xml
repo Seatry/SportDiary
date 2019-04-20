@@ -158,6 +158,9 @@
     <string name="sign_out">Sign out</string>
     <string name="disconnect">Disconnect</string>
     <string name="desc_firebase_lockup">Firebase logo and name</string>
+    <string name="save_to_server">save to server</string>
+    <string name="load_from_server">load from server</string>
+    <string name="loading_data">Loading data from server...</string>
 
 
 </resources>

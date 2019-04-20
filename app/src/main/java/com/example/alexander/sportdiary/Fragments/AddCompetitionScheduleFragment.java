@@ -17,7 +17,7 @@ import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 
 import java.text.ParseException;

@@ -18,7 +18,7 @@ import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.MainActivity;
-import com.example.alexander.sportdiary.MenuModel;
+import com.example.alexander.sportdiary.Menu.MenuModel;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 
@@ -26,7 +26,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class UpdateDiaryFragment extends DialogFragment implements View.OnClickListener {

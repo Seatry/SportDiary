@@ -29,7 +29,7 @@ import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 
 import java.text.ParseException;
@@ -143,7 +143,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("day1");
 
         tabSpec.setContent(R.id.trainingTab);
-        tabSpec.setIndicator(getString(R.string.Trainings));
+        tabSpec.setIndicator(MainActivity.getInstance().getString(R.string.Trainings));
         tabHost.addTab(tabSpec);
 
         FloatingActionButton addTraining = v.findViewById(R.id.addTraining);
@@ -154,7 +154,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
                 addTrainingFragment
                         .setDayId(dayId)
                         .setOption(EditOption.INSERT)
-                        .setTitle(getString(R.string.addTraining));
+                        .setTitle(MainActivity.getInstance().getString(R.string.addTraining));
                 addTrainingFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "addTraining");
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -168,7 +168,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
                 addTestFragment
                         .setDayId(dayId)
                         .setOption(EditOption.INSERT)
-                        .setTitle(getString(R.string.addTest));
+                        .setTitle(MainActivity.getInstance().getString(R.string.addTest));
                 addTestFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "addTests");
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -182,7 +182,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
                 addRestFragment
                         .setDayId(dayId)
                         .setOption(EditOption.INSERT)
-                        .setTitle(getString(R.string.addRest));
+                        .setTitle(MainActivity.getInstance().getString(R.string.addRest));
                 addRestFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "addRest");
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -190,22 +190,22 @@ public class DayFragment extends Fragment implements View.OnClickListener {
 
         tabSpec = tabHost.newTabSpec("day2");
         tabSpec.setContent(R.id.testTab);
-        tabSpec.setIndicator(getString(R.string.Tests));
+        tabSpec.setIndicator(MainActivity.getInstance().getString(R.string.Tests));
         tabHost.addTab(tabSpec);
 
         tabSpec = tabHost.newTabSpec("day3");
         tabSpec.setContent(R.id.restTab);
-        tabSpec.setIndicator(getString(R.string.Rest));
+        tabSpec.setIndicator(MainActivity.getInstance().getString(R.string.Rest));
         tabHost.addTab(tabSpec);
 
         tabSpec = tabHost.newTabSpec("day4");
         tabSpec.setContent(R.id.questionsTab);
-        tabSpec.setIndicator(getString(R.string.Questionnaire));
+        tabSpec.setIndicator(MainActivity.getInstance().getString(R.string.Questionnaire));
         tabHost.addTab(tabSpec);
 
         tabSpec = tabHost.newTabSpec("day5");
         tabSpec.setContent(R.id.dayInfoTab);
-        tabSpec.setIndicator(getString(R.string.Information));
+        tabSpec.setIndicator(MainActivity.getInstance().getString(R.string.Information));
         tabHost.addTab(tabSpec);
 
         tabHost.setCurrentTab(0);
@@ -295,25 +295,25 @@ public class DayFragment extends Fragment implements View.OnClickListener {
             blockId = dayDao.getLiveBlockIdBySIdAndDate(seasonPlanId, date);
             blockId.observe(instance, id -> {
                 String block = id == null ? "" : sportDataBase.blockDao().getNameByIdAndUserId(id, MainActivity.getUserId());
-                blockText.setText(String.format("%s: %s", getString(R.string.block), block));
+                blockText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.block), block));
             });
             if (stageId != null) stageId.removeObservers(instance);
             stageId = dayDao.getLiveStageIdBySIdAndDate(seasonPlanId, date);
             stageId.observe(instance, id -> {
                 String stage = id == null ? "" : sportDataBase.stageDao().getNameByIdAndUserId(id, MainActivity.getUserId());
-                stageText.setText(String.format("%s: %s", getString(R.string.stage), stage));
+                stageText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.stage), stage));
             });
             if (typeId != null) typeId.removeObservers(instance);
             typeId = dayDao.getLiveTypeIdBySIdAndDate(seasonPlanId, date);
             typeId.observe(instance, id -> {
                 String type = id == null ? "" : sportDataBase.typeDao().getNameByIdAndUserId(id, MainActivity.getUserId());
-                typeText.setText(String.format("%s: %s", getString(R.string.type), type));
+                typeText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.type), type));
             });
             if (campId != null) campId.removeObservers(instance);
             campId = dayDao.getLiveCampIdBySIdAndDate(seasonPlanId, date);
             campId.observe(instance, id -> {
                 String camps = id == null ? "" : sportDataBase.campDao().getNameByIdAndUserId(id, MainActivity.getUserId());
-                campsText.setText(String.format("%s: %s", getString(R.string.camps), camps));
+                campsText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.camps), camps));
             });
             if (CiId != null) CiId.removeObservers(instance);
             CiId = dayDao.getLiveCIIdBySIdAndDate(seasonPlanId, date);
@@ -328,10 +328,10 @@ public class DayFragment extends Fragment implements View.OnClickListener {
                     String importance = importanceId == null ? "" : sportDataBase.importanceDao().getNameByIdAndUserId(importanceId, MainActivity.getUserId());
                     competitionToImportance = competition + " (" + importance + ")";
                 }
-                competitionText.setText(String.format("%s: %s", getString(R.string.competition), competitionToImportance));
+                competitionText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.competition), competitionToImportance));
             });
             String capacity = String.valueOf(day.getCapacity());
-            capacityText.setText(String.format("%s: %s", getString(R.string.capacity), capacity));
+            capacityText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.capacity), capacity));
         } catch (ParseException e) {
             e.printStackTrace();
         }

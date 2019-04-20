@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.example.alexander.sportdiary.DataBase.SyncDataBase;
+import com.example.alexander.sportdiary.Enums.SignType;
 import com.example.alexander.sportdiary.MainActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -20,6 +23,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import com.example.alexander.sportdiary.R;
+
+import static com.example.alexander.sportdiary.Enums.SignType.NEW_SIGN;
+import static com.example.alexander.sportdiary.Enums.SignType.OLD_SIGN;
 
 
 public class GoogleSignInActivity extends BaseActivity implements
@@ -64,7 +70,7 @@ public class GoogleSignInActivity extends BaseActivity implements
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+        updateUI(currentUser, OLD_SIGN);
     }
     // [END on_start_check_user]
 
@@ -83,8 +89,9 @@ public class GoogleSignInActivity extends BaseActivity implements
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
+                Toast.makeText(this, "Google sign in failed", Toast.LENGTH_SHORT).show();
                 // [START_EXCLUDE]
-                updateUI(null);
+                hideProgressDialog();
                 // [END_EXCLUDE]
             }
         }
@@ -105,12 +112,11 @@ public class GoogleSignInActivity extends BaseActivity implements
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
                         FirebaseUser user = mAuth.getCurrentUser();
-                        updateUI(user);
+                        updateUI(user, NEW_SIGN);
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Snackbar.make(findViewById(R.id.google_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                        updateUI(null);
+                        Toast.makeText(this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
                     }
 
                     // [START_EXCLUDE]
@@ -128,11 +134,12 @@ public class GoogleSignInActivity extends BaseActivity implements
     // [END signin]
 
 
-    private void updateUI(FirebaseUser user) {
+    private void updateUI(FirebaseUser user, SignType signType) {
         hideProgressDialog();
         if (user != null) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("userId", user.getUid());
+            intent.putExtra("signType", signType.toString());
             this.startActivity(intent);
         }
     }

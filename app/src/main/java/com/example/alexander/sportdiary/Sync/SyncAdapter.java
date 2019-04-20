@@ -1,15 +1,14 @@
 package com.example.alexander.sportdiary.Sync;
 
 import android.accounts.Account;
+import android.arch.persistence.room.Room;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.example.alexander.sportdiary.Entities.Training;
-import com.example.alexander.sportdiary.MainActivity;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public SyncAdapter(Context context, boolean autoInitialize) {
@@ -22,7 +21,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.e("SYNC", "FUCKING SYNC");
-        MainActivity.getInstance().getDatabase().trainingDao().insert(new Training(1));
+        SportDataBase database = Room.databaseBuilder(getContext(), SportDataBase.class, "SportDataBase")
+                .allowMainThreadQueries()
+                .build();
     }
 }

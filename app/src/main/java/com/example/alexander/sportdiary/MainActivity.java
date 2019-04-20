@@ -2,9 +2,7 @@ package com.example.alexander.sportdiary;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +23,8 @@ import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
 import com.example.alexander.sportdiary.Auth.GoogleSignInActivity;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SyncDataBase;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
@@ -43,6 +43,7 @@ import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
 import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
+import com.example.alexander.sportdiary.Enums.SignType;
 import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
 import com.example.alexander.sportdiary.Fragments.CompetitionScheduleFragment;
 import com.example.alexander.sportdiary.Fragments.DayFragment;
@@ -50,36 +51,39 @@ import com.example.alexander.sportdiary.Fragments.EditFragment;
 import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
 import com.example.alexander.sportdiary.Fragments.Statistics;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
+import com.example.alexander.sportdiary.Menu.MenuModel;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.ADD_DIARY;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.AIMS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.BLOCKS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.BORG_RATINGS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.CALENDAR;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.CAMPS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.COMPETITIONS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.COMPETITION_SCHEDULE;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.DIARY_GROUP;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.EDIT_GROUP;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.EQUIPMENTS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.EXERCISES;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.IMPORTANCE;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.OVERALL_PLAN;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.REST_PLACE;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.STAGES;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.STATISTICS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.STYLES;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.TEMPOS;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.TEST;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.TIMES;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.TRAINING_PLACES;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.TYPES;
-import static com.example.alexander.sportdiary.Enums.MenuItemIds.ZONES;
+import static com.example.alexander.sportdiary.Enums.SignType.NEW_SIGN;
+import static com.example.alexander.sportdiary.Enums.SignType.OLD_SIGN;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.ADD_DIARY;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.AIMS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.BLOCKS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.BORG_RATINGS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.CALENDAR;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.CAMPS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.COMPETITIONS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.COMPETITION_SCHEDULE;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.DIARY_GROUP;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.EDIT_GROUP;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.EQUIPMENTS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.EXERCISES;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.IMPORTANCE;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.OVERALL_PLAN;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.REST_PLACE;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.STAGES;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.STATISTICS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.STYLES;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.TEMPOS;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.TEST;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.TIMES;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.TRAINING_PLACES;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.TYPES;
+import static com.example.alexander.sportdiary.Menu.MenuItemIds.ZONES;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 import static com.google.android.gms.common.api.CommonStatusCodes.SUCCESS;
 
@@ -90,6 +94,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private DayFragment dayFragment;
     private static String userId;
+    private static String signType;
+    private static Long seasonPlanId;
+    private static ExpandableListAdapter expandableListAdapter;
+    private ExpandableListView expandableListView;
+    private static List<MenuModel> headerList = new ArrayList<>();
+    private static HashMap<MenuModel, List<MenuModel>> childList = new HashMap<>();
     private static final String AUTHORITY = "com.example.alexander.sportdiary.Sync.provider";
     private static final String ACCOUNT_TYPE = "com.example.alexander.sportdiary.Sync";
     private static final String ACCOUNT = "dummyaccount";
@@ -108,11 +118,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return userId;
     }
 
-    private static Long seasonPlanId;
-
-    private static ExpandableListAdapter expandableListAdapter;
-    private ExpandableListView expandableListView;
-
     public static List<MenuModel> getHeaderList() {
         return headerList;
     }
@@ -120,9 +125,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static HashMap<MenuModel, List<MenuModel>> getChildList() {
         return childList;
     }
-
-    private static List<MenuModel> headerList = new ArrayList<>();
-    private static HashMap<MenuModel, List<MenuModel>> childList = new HashMap<>();
 
     public static MainActivity getInstance() {
         return instance;
@@ -140,8 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Intent intent = getIntent();
         userId = intent.getStringExtra("userId" );
-
-        account = createSyncAccount(this);
+        signType = intent.getStringExtra("signType");
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -160,18 +161,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
 
-        RoomDatabase.Callback dbCallback = new RoomDatabase.Callback() {
-            public void onCreate(SupportSQLiteDatabase db) {
-                runOnUiThread(() -> new InitializeDataBase().execute());
-            }
-        };
-
         database = Room.databaseBuilder(this, SportDataBase.class, "SportDataBase")
                 .fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
-                //.addCallback(dbCallback)
                 .build();
 
+        initializeDataBase();
+        account = createSyncAccount(this);
+
+        if (signType.equals(OLD_SIGN.toString())) {
+            fillDiariesMenu();
+        }
+
+    }
+
+    private void initializeDataBase() {
+        if (signType.equals(NEW_SIGN.toString())) {
+            signType = OLD_SIGN.toString();
+            new SyncDataBase().execute();
+        }
+    }
+
+    public void fillDiariesMenu() {
         AsyncTask.execute(() -> {
             List<SeasonPlan> diaries = database.seasonPlanDao().getAllByUserId(userId);
             MenuModel menuModel = MenuModel.getMenuModelById(headerList, DIARY_GROUP.getValue());
@@ -185,17 +196,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public static Account createSyncAccount(Context context) {
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
-        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            Log.i("account", "successfully added");
-        } else {
-            Log.e("account", "account exists");
-        }
-        return newAccount;
-    }
-
     public static void syncImmediately() {
         Bundle settingsBundle = new Bundle();
         settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
@@ -206,6 +206,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          */
         ContentResolver.setIsSyncable(account, AUTHORITY, 1);
         ContentResolver.requestSync(account, AUTHORITY, settingsBundle);
+    }
+
+    public static Account createSyncAccount(Context context) {
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+            Log.i("account", "successfully added");
+        } else {
+            Log.e("account", "account exists");
+        }
+        return newAccount;
     }
 
     private void prepareMenuData() {

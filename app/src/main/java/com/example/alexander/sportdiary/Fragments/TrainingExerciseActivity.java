@@ -15,7 +15,7 @@ import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 
 import java.util.List;
 

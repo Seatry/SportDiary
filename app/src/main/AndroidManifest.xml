@@ -53,7 +53,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <provider android:authorities="com.example.alexander.sportdiary.Sync.provider"
+        <provider
+            android:authorities="com.example.alexander.sportdiary.Sync.provider"
             android:name="com.example.alexander.sportdiary.Sync.StubProvider"
             android:exported="false"
             android:syncable="true">
@@ -62,13 +63,16 @@
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
-                <meta-data android:name="android.accounts.AccountAuthenticator"
-                    android:resource="@xml/authenticator"/>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator"/>
         </service>
-        <service android:name=".Sync.SyncService" android:exported="true">
+        <service android:name=".Sync.SyncService"
+            android:exported="true"
+            android:process=":sync">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-        </intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
             <meta-data android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter"/>
         </service>

@@ -22,7 +22,7 @@ import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;

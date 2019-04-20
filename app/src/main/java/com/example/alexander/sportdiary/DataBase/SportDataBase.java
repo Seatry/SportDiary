@@ -1,4 +1,4 @@
-package com.example.alexander.sportdiary;
+package com.example.alexander.sportdiary.DataBase;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;

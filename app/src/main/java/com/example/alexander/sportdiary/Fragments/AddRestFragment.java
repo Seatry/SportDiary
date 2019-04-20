@@ -13,7 +13,7 @@ import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Rest;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 
 import static com.example.alexander.sportdiary.Utils.ToolerOfSpinners.toolSpinner;
 

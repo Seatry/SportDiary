@@ -15,7 +15,7 @@ import com.example.alexander.sportdiary.Entities.DayToTest;
 import com.example.alexander.sportdiary.Fragments.AddTestFragment;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.ViewHolders.TestViewHolder;
 
 import java.util.ArrayList;

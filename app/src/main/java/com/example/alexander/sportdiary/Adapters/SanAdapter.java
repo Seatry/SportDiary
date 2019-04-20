@@ -12,7 +12,7 @@ import com.example.alexander.sportdiary.Entities.SanAnswer;
 import com.example.alexander.sportdiary.Entities.SanQuestion;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
-import com.example.alexander.sportdiary.SportDataBase;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.ViewHolders.SanViewHolder;
 
 import java.util.ArrayList;
