@@ -52,6 +52,7 @@ import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
 import com.example.alexander.sportdiary.Fragments.Statistics;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
 import com.example.alexander.sportdiary.Menu.MenuModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.ArrayList;
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String ACCOUNT_TYPE = "com.example.alexander.sportdiary.Sync";
     private static final String ACCOUNT = "dummyaccount";
     private static Account account;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public void setDayFragment(DayFragment dayFragment) {
         this.dayFragment = dayFragment;
