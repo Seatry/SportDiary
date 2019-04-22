@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
+import com.example.alexander.sportdiary.Dto.DayDto;
+import com.example.alexander.sportdiary.Dto.SeasonPlanDto;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
 import com.example.alexander.sportdiary.Enums.Table;
@@ -25,6 +27,7 @@ import com.example.alexander.sportdiary.Utils.DateUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -108,17 +111,8 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             final long id = dao.insert(seasonPlan);
             seasonPlan.setId(id);
 
-            AsyncTask.execute(() -> {
-                try {
-                    MainActivity.syncSave(
-                            MainActivity.getObjectMapper().writeValueAsString(
-                                    MainActivity.getConverter().convertEntityToDto(seasonPlan)
-                            ), Table.SEASON_PLAN
-                    );
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-            });
+            SeasonPlanDto seasonPlanDto = MainActivity.getConverter().convertEntityToDto(seasonPlan);
+            List<DayDto> dayDtos = new ArrayList<>();
 
             MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
             List<MenuModel> childs = MainActivity.getChildList().get(menuModel);
@@ -132,17 +126,16 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
                     Day day = new Day(DateUtil.addDays(date, i), id);
                     long dayId = dayDao.insert(day);
                     day.setId(dayId);
-                    try {
-                        MainActivity.syncSave(
-                                MainActivity.getObjectMapper().writeValueAsString(
-                                        MainActivity.getConverter().convertEntityToDto(day)
-                                ), Table.DAY
-                        );
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                    dayDtos.add(MainActivity.getConverter().convertEntityToDto(day));
+                }
+                seasonPlanDto.setDays(dayDtos);
+                try {
+                    MainActivity.syncSave(MainActivity.getObjectMapper().writeValueAsString(seasonPlanDto), Table.SEASON_PLAN);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
                 }
             });
+
             dismiss();
         } catch (SQLiteConstraintException e) {
             e.printStackTrace();
