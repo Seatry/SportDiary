@@ -9,14 +9,17 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Training;
 import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Utils.MultiSelectionSpinner;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,19 +124,34 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
         updateTraining.setPlaceId(trainingPlaceId);
         updateTraining.setBorgId(borgRatingId);
         sportDataBase.trainingDao().update(updateTraining);
+        save(updateTraining);
 
         List<String> aimNames = aimSpinner.getSelectedStrings();
         List<String> equipmentNames = equipmentSpinner.getSelectedStrings();
-        sportDataBase.trainingsToAimsDao().deleteByTrainingId(updateTraining.getId());
-        sportDataBase.trainingsToEquipmentsDao().deleteByTrainingId(updateTraining.getId());
+        sportDataBase.trainingsToAimsDao().getByTrainingId(updateTraining.getId())
+                .forEach(x -> {
+                    sportDataBase.trainingsToAimsDao().delete(x);
+                    MainActivity.syncDelete(x.getId(), Table.TRAININGS_TO_AIMS);
+                });
+        sportDataBase.trainingsToEquipmentsDao().getByTrainingId(updateTraining.getId())
+                .forEach(x -> {
+                    sportDataBase.trainingsToEquipmentsDao().delete(x);
+                    MainActivity.syncDelete(x.getId(), Table.TRAININGS_TO_EQUIPMENTS);
+                });
         for(String aimName : aimNames) {
             long aimId = sportDataBase.aimDao().getIdByName(aimName);
-            sportDataBase.trainingsToAimsDao().insert(new TrainingsToAims(updateTraining.getId(), aimId));
+            TrainingsToAims toAims = new TrainingsToAims(updateTraining.getId(), aimId);
+            long id = sportDataBase.trainingsToAimsDao().insert(toAims);
+            toAims.setId(id);
+            saveAims(toAims);
         }
         for(String equipmentName : equipmentNames) {
             long equipmentId = sportDataBase.equipmentDao().getIdByName(equipmentName);
-            sportDataBase.trainingsToEquipmentsDao().insert(new TrainingsToEquipments(updateTraining.getId(), equipmentId));
-        }
+            TrainingsToEquipments toEquipments = new TrainingsToEquipments(updateTraining.getId(), equipmentId);
+            long id = sportDataBase.trainingsToEquipmentsDao().insert(toEquipments);
+            toEquipments.setId(id);
+            saveEquipments(toEquipments);
+            }
     }
 
     public void add() {
@@ -145,17 +163,70 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
                 : sportDataBase.borgDao().getIdByName(borgRatingSpinner.getSelectedItem().toString());
         Training training = new Training(dayId, timeId, trainingPlaceId, borgRatingId);
         long trainingId = sportDataBase.trainingDao().insert(training);
+        training.setId(trainingId);
+        save(training);
 
         List<String> aimNames = aimSpinner.getSelectedStrings();
         List<String> equipmentNames = equipmentSpinner.getSelectedStrings();
         for(String aimName : aimNames) {
             long aimId = sportDataBase.aimDao().getIdByName(aimName);
-            sportDataBase.trainingsToAimsDao().insert(new TrainingsToAims(trainingId, aimId));
+            TrainingsToAims toAims = new TrainingsToAims(trainingId, aimId);
+            long id = sportDataBase.trainingsToAimsDao().insert(toAims);
+            toAims.setId(id);
+            saveAims(toAims);
         }
         for(String equipmentName : equipmentNames) {
             long equipmentId = sportDataBase.equipmentDao().getIdByName(equipmentName);
-            sportDataBase.trainingsToEquipmentsDao().insert(new TrainingsToEquipments(trainingId, equipmentId));
+            TrainingsToEquipments toEquipments = new TrainingsToEquipments(trainingId, equipmentId);
+            long id = sportDataBase.trainingsToEquipmentsDao().insert(toEquipments);
+            toEquipments.setId(id);
+            saveEquipments(toEquipments);
         }
+    }
+
+    private void saveAims(TrainingsToAims toAims) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(toAims)
+                                ), Table.TRAININGS_TO_AIMS
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+    }
+
+    private void saveEquipments(TrainingsToEquipments toEquipments) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(toEquipments)
+                                ), Table.TRAININGS_TO_EQUIPMENTS
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+    }
+
+    private void save(Training training) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(training)
+                                ), Table.TRAINING
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     public AddTrainingFragment setDayId(long dayId) {

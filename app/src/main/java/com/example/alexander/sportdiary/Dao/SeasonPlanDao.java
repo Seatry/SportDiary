@@ -26,4 +26,7 @@ public interface SeasonPlanDao {
 
     @Query("SELECT * FROM SeasonPlan WHERE id = :id")
     SeasonPlan getSeasonPlanById(long id);
+
+    @Query("DELETE FROM SeasonPlan WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

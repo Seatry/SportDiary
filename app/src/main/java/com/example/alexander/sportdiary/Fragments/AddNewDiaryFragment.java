@@ -17,10 +17,12 @@ import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.Menu.MenuModel;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -104,6 +106,20 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             seasonPlan.setStart(date);
             seasonPlan.setUserId(MainActivity.getUserId());
             final long id = dao.insert(seasonPlan);
+            seasonPlan.setId(id);
+
+            AsyncTask.execute(() -> {
+                try {
+                    MainActivity.syncSave(
+                            MainActivity.getObjectMapper().writeValueAsString(
+                                    MainActivity.getConverter().convertEntityToDto(seasonPlan)
+                            ), Table.SEASON_PLAN
+                    );
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+
             MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
             List<MenuModel> childs = MainActivity.getChildList().get(menuModel);
             String diaryName = seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart());
@@ -113,7 +129,18 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             MainActivity.getExpandableListAdapter().notifyDataSetChanged();
             AsyncTask.execute(() -> {
                 for(int i = 0; i < 366; i++) {
-                    dayDao.insert(new Day(DateUtil.addDays(date, i), id));
+                    Day day = new Day(DateUtil.addDays(date, i), id);
+                    long dayId = dayDao.insert(day);
+                    day.setId(dayId);
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(day)
+                                ), Table.DAY
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             dismiss();

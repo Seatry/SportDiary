@@ -31,4 +31,7 @@ public interface TrainingsToEquipmentsDao {
 
     @Query("DELETE FROM TrainingsToEquipments where training_id = :id")
     void deleteByTrainingId(long id);
+
+    @Query("SELECT * FROM TrainingsToEquipments where training_id = :id")
+    List<TrainingsToEquipments> getByTrainingId(long id);
 }

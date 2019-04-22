@@ -21,4 +21,7 @@ public interface TestDao extends EditDao<Test> {
 
     @Query("SELECT name FROM Test where id = :id and userId = :userId")
     String getNameByIdAndUserId(Long id, String userId);
+
+    @Query("DELETE FROM Test WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

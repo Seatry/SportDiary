@@ -21,4 +21,7 @@ public interface RestPlaceDao extends EditDao<RestPlace> {
 
     @Query("SELECT name FROM RestPlace where id = :id and userId = :userId")
     String getNameByIdAndUserId(Long id, String userId);
+
+    @Query("DELETE FROM RestPlace WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

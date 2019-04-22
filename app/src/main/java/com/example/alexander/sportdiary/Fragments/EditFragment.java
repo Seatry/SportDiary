@@ -27,14 +27,16 @@ public class EditFragment<T extends Edit> extends DialogFragment implements View
     private String title;
     private String addDialogTitle;
     private String updateDialogTitle;
+    private String table;
     private EditDao<T> dao;
 
-    public void setClass(Class<T> cls, String title, EditDao<T> dao, String addDialogTitle, String updateDialogTitle) {
+    public void setClass(Class<T> cls, String title, EditDao<T> dao, String addDialogTitle, String updateDialogTitle, String table) {
         this.cls = cls;
         this.title = title;
         this.dao = dao;
         this.addDialogTitle = addDialogTitle;
         this.updateDialogTitle = updateDialogTitle;
+        this.table = table;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,7 +50,7 @@ public class EditFragment<T extends Edit> extends DialogFragment implements View
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new EditAdapter<>(getContext(), dao);
-        adapter.setClass(cls, updateDialogTitle);
+        adapter.setClass(cls, updateDialogTitle, table);
         recyclerView.setAdapter(adapter);
 
         LiveData<List<T>> editLiveData = dao.getAllByUserId(MainActivity.getUserId());
@@ -80,7 +82,7 @@ public class EditFragment<T extends Edit> extends DialogFragment implements View
                 break;
             case R.id.add_button:
                 AddNewEditFragment<T> dialogFragment = new AddNewEditFragment<>();
-                dialogFragment.setClass(cls, addDialogTitle, dao, EditOption.INSERT);
+                dialogFragment.setClass(cls, addDialogTitle, dao, EditOption.INSERT, table);
                 dialogFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "addNewDialog");
                 break;
         }

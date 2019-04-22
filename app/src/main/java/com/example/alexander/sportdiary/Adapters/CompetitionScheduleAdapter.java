@@ -1,6 +1,7 @@
 package com.example.alexander.sportdiary.Adapters;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Day;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.Fragments.AddCompetitionScheduleFragment;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
@@ -70,6 +72,11 @@ public class CompetitionScheduleAdapter extends RecyclerView.Adapter<Competition
                         Long competitionToImportanceId = sportDataBase.dayDao()
                                 .getCompetitionToImportanceIdByDateAndSeasonId(updateDay.getDate(), updateDay.getSeasonPlanId());
                         sportDataBase.competitionToImportanceDao().deleteById(competitionToImportanceId);
+
+                        AsyncTask.execute(() -> {
+                            MainActivity.syncDelete(competitionToImportanceId, Table.COMPETITION_TO_IMPORTANCE);
+                        });
+
                         break;
                 }
                 return false;

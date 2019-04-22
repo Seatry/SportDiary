@@ -21,4 +21,7 @@ public interface StageDao extends EditDao<Stage> {
 
     @Query("SELECT id FROM Stage where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Stage WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

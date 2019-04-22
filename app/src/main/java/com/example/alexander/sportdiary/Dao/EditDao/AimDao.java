@@ -21,4 +21,7 @@ public interface AimDao extends EditDao<Aim>{
 
     @Query("SELECT name FROM Aim where id = :id and userId = :userId")
     String getNameByIdAndUserId(long id, String userId);
+
+    @Query("DELETE FROM Aim WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

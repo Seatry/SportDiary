@@ -21,4 +21,7 @@ public interface StyleDao extends EditDao<Style> {
 
     @Query("SELECT id FROM Style where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Style WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

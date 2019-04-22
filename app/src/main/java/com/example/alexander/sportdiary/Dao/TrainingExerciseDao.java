@@ -34,4 +34,7 @@ public interface TrainingExerciseDao {
 
     @Query("UPDATE TrainingExercise SET hrAvg = :hr WHERE id = :exerciseId")
     void updateHrById(double hr, long exerciseId);
+
+    @Query("SELECT * FROM TrainingExercise WHERE id = :id")
+    TrainingExercise getById(Long id);
 }

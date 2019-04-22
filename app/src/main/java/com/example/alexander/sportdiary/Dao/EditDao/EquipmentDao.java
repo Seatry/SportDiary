@@ -24,4 +24,7 @@ public interface EquipmentDao extends EditDao<Equipment>{
 
     @Query("SELECT name FROM Equipment where id = :id and userId = :userId")
     String getNameByIdAndUserId(long id, String userId);
+
+    @Query("DELETE FROM Equipment WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

@@ -28,10 +28,12 @@ public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHo
     private EditDao<T> dao;
     private String dialogTitle;
     private Class<T> cls;
+    private String table;
 
-    public void setClass(Class<T> cls, String title) {
+    public void setClass(Class<T> cls, String title, String table) {
         this.cls = cls;
         this.dialogTitle = title;
+        this.table = table;
     }
 
     public EditAdapter(Context mCtx, EditDao<T> dao) {
@@ -71,12 +73,15 @@ public class EditAdapter<T extends Edit> extends RecyclerView.Adapter<EditViewHo
                 switch (item.getItemId()) {
                     case R.id.update:
                         AddNewEditFragment<T> dialogFragment = new AddNewEditFragment<>();
-                        dialogFragment.setClass(cls, dialogTitle, dao, EditOption.UPDATE);
+                        dialogFragment.setClass(cls, dialogTitle, dao, EditOption.UPDATE, table);
                         dialogFragment.setUpdateItem(data.get(i));
                         dialogFragment.show(MainActivity.getInstance().getSupportFragmentManager(), "updateDialog");
                         break;
                     case R.id.delete:
-                        AsyncTask.execute(() -> dao.delete(data.get(i)));
+                        AsyncTask.execute(() -> {
+                            dao.delete(data.get(i));
+                            MainActivity.syncDelete(data.get(i).getId(), table);
+                        });
                         break;
                 }
                 return false;

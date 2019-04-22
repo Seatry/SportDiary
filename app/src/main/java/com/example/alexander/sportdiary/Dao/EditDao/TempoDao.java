@@ -21,4 +21,7 @@ public interface TempoDao extends EditDao<Tempo> {
 
     @Query("SELECT id FROM Tempo where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Tempo WHERE userId = :userId")
+    void delteByUserId(String userId);
 }

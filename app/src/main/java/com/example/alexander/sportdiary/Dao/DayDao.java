@@ -85,4 +85,7 @@ public interface DayDao {
 
     @Query("UPDATE Day set dream = :dream WHERE id = :dayId")
     void updateDreamById(double dream, long dayId);
+
+    @Query("SELECT * FROM Day WHERE id = :id")
+    Day getById(Long id);
 }

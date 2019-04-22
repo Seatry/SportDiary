@@ -1,5 +1,6 @@
 package com.example.alexander.sportdiary.Fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -9,11 +10,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.alexander.sportdiary.Entities.Rest;
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.DayToTest;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import static com.example.alexander.sportdiary.Utils.ToolerOfSpinners.toolSpinner;
 
@@ -67,7 +71,9 @@ public class AddTestFragment extends DialogFragment implements View.OnClickListe
             return;
         }
         DayToTest dayToTest = new DayToTest(dayId, testId);
-        sportDataBase.dayToTestDao().insert(dayToTest);
+        long id = sportDataBase.dayToTestDao().insert(dayToTest);
+        dayToTest.setId(id);
+        save(dayToTest);
     }
 
     public void update() {
@@ -79,6 +85,22 @@ public class AddTestFragment extends DialogFragment implements View.OnClickListe
         }
         updateItem.setTestId(testId);
         sportDataBase.dayToTestDao().update(updateItem);
+        save(updateItem);
+    }
+
+    private void save(DayToTest dayToTest) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(dayToTest)
+                                ), Table.DAY_TO_TEST
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     public String getTitle() {

@@ -21,4 +21,7 @@ public interface CompetitionDao extends EditDao<Competition>{
 
     @Query("SELECT id FROM Competition where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Competition WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

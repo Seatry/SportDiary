@@ -21,4 +21,7 @@ public interface TypeDao extends EditDao<Type> {
 
     @Query("SELECT id FROM Type where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Type WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

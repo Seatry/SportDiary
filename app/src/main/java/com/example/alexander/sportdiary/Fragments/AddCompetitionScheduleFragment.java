@@ -1,6 +1,7 @@
 package com.example.alexander.sportdiary.Fragments;
 
 import android.app.DatePickerDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -11,14 +12,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.alexander.sportdiary.Dto.CompetitionToImportanceDto;
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -140,7 +144,23 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
         }
         CompetitionToImportance competitionToImportance = new CompetitionToImportance(competitionId, importanceId);
         Long id = sportDataBase.competitionToImportanceDao().insert(competitionToImportance);
-        sportDataBase.dayDao().updateCompetitionToImportanceByDateAndSeasonId(id, date, seasonPlanId);
+        Day day = sportDataBase.dayDao().getDayByDateAndSeasonPlanId(date, seasonPlanId);
+        day.setCompetitionToImportanceId(id);
+        sportDataBase.dayDao().update(day);
+
+        AsyncTask.execute(() -> {
+            try {
+                competitionToImportance.setId(id);
+                String data = MainActivity.getObjectMapper().writeValueAsString(MainActivity.getConverter().convertEntityToDto(competitionToImportance));
+                MainActivity.syncSave(data, Table.COMPETITION_TO_IMPORTANCE);
+                data = MainActivity.getObjectMapper().writeValueAsString(MainActivity.getConverter().convertEntityToDto(day));
+                MainActivity.syncSave(data, Table.DAY);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
+
+
         dismiss();
     }
 
@@ -169,7 +189,23 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
         sportDataBase.competitionToImportanceDao().deleteById(competitionToImportanceId);
         CompetitionToImportance competitionToImportance = new CompetitionToImportance(competitionId, importanceId);
         Long id = sportDataBase.competitionToImportanceDao().insert(competitionToImportance);
-        sportDataBase.dayDao().updateCompetitionToImportanceByDateAndSeasonId(id, date, updateDay.getSeasonPlanId());
+        Day day = sportDataBase.dayDao().getDayByDateAndSeasonPlanId(date, updateDay.getSeasonPlanId());
+        day.setCompetitionToImportanceId(id);
+        sportDataBase.dayDao().update(day);
+
+        AsyncTask.execute(() -> {
+            try {
+                MainActivity.syncDelete(competitionToImportanceId, Table.COMPETITION_TO_IMPORTANCE);
+                competitionToImportance.setId(id);
+                String data = MainActivity.getObjectMapper().writeValueAsString(MainActivity.getConverter().convertEntityToDto(competitionToImportance));
+                MainActivity.syncSave(data, Table.COMPETITION_TO_IMPORTANCE);
+                data = MainActivity.getObjectMapper().writeValueAsString(MainActivity.getConverter().convertEntityToDto(day));
+                MainActivity.syncSave(data, Table.DAY);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
+
         dismiss();
     }
 

@@ -21,4 +21,7 @@ public interface CampDao extends EditDao<Camp> {
 
     @Query("SELECT id FROM Camp where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Camp WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

@@ -12,9 +12,12 @@ import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Adapters.HeartRateAdapter;
 import com.example.alexander.sportdiary.Entities.HeartRate;
+import com.example.alexander.sportdiary.Entities.TrainingExercise;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 
@@ -74,11 +77,45 @@ public class HeartRateFragment extends DialogFragment implements View.OnClickLis
         for (HeartRate heartRate : heartRates) {
             hr += heartRate.getHr();
             sportDataBase.heartRateDao().update(heartRate);
+            saveHeartRate(heartRate);
         }
         if (heartRates.size() > 0) {
             hr /= heartRates.size();
-            sportDataBase.trainingExerciseDao().updateHrById(hr, exerciseId);
+            TrainingExercise trainingExercise = sportDataBase.trainingExerciseDao().getById(exerciseId);
+            trainingExercise.setHrAvg(hr);
+            sportDataBase.trainingExerciseDao().update(trainingExercise);
+            save(trainingExercise);
         }
+    }
+
+    private void save(TrainingExercise trainingExercise) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(trainingExercise)
+                                ), Table.TRAINING_EXERCISE
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+    }
+
+    private void saveHeartRate(HeartRate heartRate) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(heartRate)
+                                ), Table.HEART_RATE
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     public void setExerciseId(long exerciseId) {

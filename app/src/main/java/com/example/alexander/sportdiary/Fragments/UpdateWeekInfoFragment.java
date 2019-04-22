@@ -9,10 +9,12 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 
 import com.example.alexander.sportdiary.Entities.Day;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.Date;
 
@@ -75,8 +77,23 @@ public class UpdateWeekInfoFragment extends DialogFragment implements View.OnCli
             day.setCampId(campSpinner.getSelectedItem() == null ? null
                     : sportDataBase.campDao().getIdByName(campSpinner.getSelectedItem().toString()));
             sportDataBase.dayDao().update(day);
+            saveDay(day);
             date = DateUtil.addDays(date, 1);
         }
+    }
+
+    private void saveDay(Day day) {
+        AsyncTask.execute(() -> {
+            try {
+                MainActivity.syncSave(
+                        MainActivity.getObjectMapper().writeValueAsString(
+                                MainActivity.getConverter().convertEntityToDto(day)
+                        ), Table.DAY
+                );
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void setStart(Date start) {

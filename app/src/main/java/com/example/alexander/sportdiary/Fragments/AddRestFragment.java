@@ -11,9 +11,11 @@ import android.widget.TextView;
 
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Rest;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import static com.example.alexander.sportdiary.Utils.ToolerOfSpinners.toolSpinner;
 
@@ -69,7 +71,9 @@ public class AddRestFragment extends DialogFragment implements View.OnClickListe
         Long restPlaceId = placeSpinner.getSelectedItem() == null ? null
                 : sportDataBase.restPlaceDao().getIdByName(placeSpinner.getSelectedItem().toString());
         Rest rest = new Rest(dayId, timeId, restPlaceId);
-        sportDataBase.restDao().insert(rest);
+        long id = sportDataBase.restDao().insert(rest);
+        rest.setId(id);
+        save(rest);
     }
 
     public void update() {
@@ -80,6 +84,22 @@ public class AddRestFragment extends DialogFragment implements View.OnClickListe
         updateItem.setTimeId(timeId);
         updateItem.setPlaceId(restPlaceId);
         sportDataBase.restDao().update(updateItem);
+        save(updateItem);
+    }
+
+    private void save(Rest rest) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(rest)
+                                ), Table.REST
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     public String getTitle() {

@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface EditDao<T extends Edit> {
     @Insert
-    void insert(T t);
+    long insert(T t);
 
     @Update
     void update(T t);

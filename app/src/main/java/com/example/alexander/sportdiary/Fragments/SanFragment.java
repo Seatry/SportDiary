@@ -10,11 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Adapters.SanAdapter;
+import com.example.alexander.sportdiary.Entities.Day;
+import com.example.alexander.sportdiary.Entities.DreamAnswer;
 import com.example.alexander.sportdiary.Entities.SanAnswer;
 import com.example.alexander.sportdiary.Entities.SanQuestion;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -67,16 +71,20 @@ public class SanFragment extends DialogFragment implements View.OnClickListener 
             if (answer.equals("-")) {
                 if (sanAnswer != null) {
                     sportDataBase.sanAnswerDao().delete(sanAnswer);
+                    MainActivity.syncDelete(sanAnswer.getId(), Table.SAN_ANSWER);
                 }
                 continue;
             }
             int answerInt = Integer.valueOf(answer);
             if (sanAnswer == null) {
-                sportDataBase.sanAnswerDao().insert(new SanAnswer(dayId, questionId, answerInt));
+                sanAnswer = new SanAnswer(dayId, questionId, answerInt);
+                long id = sportDataBase.sanAnswerDao().insert(sanAnswer);
+                sanAnswer.setId(id);
             } else {
                 sanAnswer.setAnswer(answerInt);
                 sportDataBase.sanAnswerDao().update(sanAnswer);
             }
+            save(sanAnswer);
         }
         List<SanAnswer> answers = sportDataBase.sanAnswerDao().getAllByDayId(dayId);
         double health = 0, activity = 0, mood = 0;
@@ -98,9 +106,41 @@ public class SanFragment extends DialogFragment implements View.OnClickListener 
                     break;
             }
         }
-        sportDataBase.dayDao().updateHealthById(health / h, dayId);
-        sportDataBase.dayDao().updateActivityById(activity / a, dayId);
-        sportDataBase.dayDao().updateMoodById(mood / m, dayId);
+        Day day = sportDataBase.dayDao().getById(dayId);
+        day.setActivity(activity / a);
+        day.setHealth(health / h);
+        day.setMood(mood / m);
+        sportDataBase.dayDao().update(day);
+        saveDay(day);
+    }
+
+    private void save(SanAnswer sanAnswer) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(sanAnswer)
+                                ), Table.SAN_ANSWER
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+    }
+
+    private void saveDay(Day day) {
+        AsyncTask.execute(() -> {
+            try {
+                MainActivity.syncSave(
+                        MainActivity.getObjectMapper().writeValueAsString(
+                                MainActivity.getConverter().convertEntityToDto(day)
+                        ), Table.DAY
+                );
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void setDayId(long dayId) {

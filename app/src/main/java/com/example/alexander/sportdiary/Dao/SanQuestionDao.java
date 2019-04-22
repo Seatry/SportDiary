@@ -26,4 +26,7 @@ public interface SanQuestionDao {
 
     @Query("SELECT * FROM SanQuestion WHERE id = :questionId")
     SanQuestion getById(long questionId);
+
+    @Query("DELETE FROM SanQuestion")
+    void deleteAll();
 }

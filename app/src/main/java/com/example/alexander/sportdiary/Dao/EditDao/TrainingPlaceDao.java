@@ -24,4 +24,7 @@ public interface TrainingPlaceDao extends EditDao<TrainingPlace> {
 
     @Query("SELECT name FROM TrainingPlace where id = :id and userId = :userId")
     String getNameByIdAndUserId(Long id, String userId);
+
+    @Query("DELETE FROM TrainingPlace WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

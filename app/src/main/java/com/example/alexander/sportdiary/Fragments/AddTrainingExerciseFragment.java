@@ -10,12 +10,15 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.alexander.sportdiary.Entities.Rest;
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.HeartRate;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 
@@ -127,6 +130,8 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
         TrainingExercise trainingExercise = new TrainingExercise(trainingId, exerciseId, styleId, tempoId, zoneId,
                 borgId, work, rest, length, repeats, series, note, minutes);
         long id = sportDataBase.trainingExerciseDao().insert(trainingExercise);
+        trainingExercise.setId(id);
+        save(trainingExercise);
         addHeartRates(series, repeats, id);
     }
 
@@ -134,11 +139,30 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
         for(int i = 0; i < series; i++) {
             for(int j = 0; j < repeats; j++) {
                 HeartRate heartRate = new HeartRate(id, TrainingExerciseActivity.getInstance().getString(R.string.before), i+1, j+1);
-                sportDataBase.heartRateDao().insert(heartRate);
+                long hid = sportDataBase.heartRateDao().insert(heartRate);
+                heartRate.setId(hid);
+                saveHeartRate(heartRate);
                 heartRate = new HeartRate(id, TrainingExerciseActivity.getInstance().getString(R.string.after), i+1, j+1);
-                sportDataBase.heartRateDao().insert(heartRate);
+                hid = sportDataBase.heartRateDao().insert(heartRate);
+                heartRate.setId(hid);
+                saveHeartRate(heartRate);
             }
         }
+    }
+
+    private void saveHeartRate(HeartRate heartRate) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(heartRate)
+                                ), Table.HEART_RATE
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     public void update() {
@@ -177,8 +201,14 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
         updateTrainingExercise.setMinutes(minutes);
 
         sportDataBase.trainingExerciseDao().update(updateTrainingExercise);
+        save(updateTrainingExercise);
+
         if (oldSeries != series || oldRepeats != repeats) {
-            sportDataBase.heartRateDao().deleteByExerciseIdWithGreaterSeriesOrRepeat(updateTrainingExercise.getId(), series, repeats);
+            sportDataBase.heartRateDao().getByExerciseIdWithGreaterSeriesOrRepeat(updateTrainingExercise.getId(), series, repeats)
+                    .forEach(x -> {
+                        sportDataBase.heartRateDao().delete(x);
+                        MainActivity.syncDelete(x.getId(), Table.HEART_RATE);
+                    });
             addHeartRates(series, repeats, updateTrainingExercise.getId());
             double hr = 0;
             List<Integer> hrList = sportDataBase.heartRateDao().getHrByExerciseId(updateTrainingExercise.getId());
@@ -189,8 +219,24 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
                 hr /= hrList.size();
                 updateTrainingExercise.setHrAvg(hr);
                 sportDataBase.trainingExerciseDao().update(updateTrainingExercise);
+                save(updateTrainingExercise);
             }
         }
+    }
+
+    private void save(TrainingExercise trainingExercise) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(trainingExercise)
+                                ), Table.TRAINING_EXERCISE
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     public AddTrainingExerciseFragment setUpdateTrainingExercise(TrainingExercise updateTrainingExercise) {

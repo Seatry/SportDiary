@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
 import com.example.alexander.sportdiary.Auth.GoogleSignInActivity;
+import com.example.alexander.sportdiary.Converters.EntityDtoConverter;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.DataBase.SyncDataBase;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
@@ -43,7 +44,7 @@ import com.example.alexander.sportdiary.Entities.EditEntities.TrainingPlace;
 import com.example.alexander.sportdiary.Entities.EditEntities.Type;
 import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
-import com.example.alexander.sportdiary.Enums.SignType;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.Fragments.AddNewDiaryFragment;
 import com.example.alexander.sportdiary.Fragments.CompetitionScheduleFragment;
 import com.example.alexander.sportdiary.Fragments.DayFragment;
@@ -61,6 +62,8 @@ import java.util.List;
 
 import static com.example.alexander.sportdiary.Enums.SignType.NEW_SIGN;
 import static com.example.alexander.sportdiary.Enums.SignType.OLD_SIGN;
+import static com.example.alexander.sportdiary.Enums.SyncOption.DELETE;
+import static com.example.alexander.sportdiary.Enums.SyncOption.SAVE;
 import static com.example.alexander.sportdiary.Menu.MenuItemIds.ADD_DIARY;
 import static com.example.alexander.sportdiary.Menu.MenuItemIds.AIMS;
 import static com.example.alexander.sportdiary.Menu.MenuItemIds.BLOCKS;
@@ -105,7 +108,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String ACCOUNT_TYPE = "com.example.alexander.sportdiary.Sync";
     private static final String ACCOUNT = "dummyaccount";
     private static Account account;
+
+    public static ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public static EntityDtoConverter getConverter() {
+        return converter;
+    }
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final EntityDtoConverter converter = new EntityDtoConverter();
 
     public void setDayFragment(DayFragment dayFragment) {
         this.dayFragment = dayFragment;
@@ -180,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initializeDataBase() {
         if (signType.equals(NEW_SIGN.toString())) {
             signType = OLD_SIGN.toString();
-            new SyncDataBase().execute();
+            new SyncDataBase().execute(userId);
         }
     }
 
@@ -198,14 +211,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public static void syncImmediately() {
+    public static void syncSave(String data, String table) {
         Bundle settingsBundle = new Bundle();
         settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        /*
-         * Request the sync for the default account, authority, and
-         * manual sync settings
-         */
+        settingsBundle.putString("data", data);
+        settingsBundle.putString("table", table);
+        settingsBundle.putString("option", SAVE.toString());
+        ContentResolver.setIsSyncable(account, AUTHORITY, 1);
+        ContentResolver.requestSync(account, AUTHORITY, settingsBundle);
+    }
+
+    public static void syncDelete(Long id, String table) {
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        settingsBundle.putLong("id", id);
+        settingsBundle.putString("table", table);
+        settingsBundle.putString("option", DELETE.toString());
         ContentResolver.setIsSyncable(account, AUTHORITY, 1);
         ContentResolver.requestSync(account, AUTHORITY, settingsBundle);
     }
@@ -418,87 +441,87 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == EXERCISES.getValue()) {
             EditFragment<Exercise> dialogFragment = new EditFragment<>();
             dialogFragment.setClass(Exercise.class, getString(R.string.Exercises),
-                    database.exerciseDao(), getString(R.string.addExercise), getString(R.string.updateExercise));
+                    database.exerciseDao(), getString(R.string.addExercise), getString(R.string.updateExercise), Table.EXERCISE);
             dialogFragment.show(getSupportFragmentManager(), "ExerciseDialog");
         } else if (id == ZONES.getValue()) {
             EditFragment<Zone> dialogFragment = new EditFragment<>();
             dialogFragment.setClass(Zone.class, getString(R.string.Zones),
-                    database.zoneDao(), getString(R.string.addZone), getString(R.string.updateZone));
+                    database.zoneDao(), getString(R.string.addZone), getString(R.string.updateZone), Table.ZONE);
             dialogFragment.show(getSupportFragmentManager(), "ZoneDialog");
         } else if (id == AIMS.getValue()) {
             EditFragment<Aim> dialogFragment = new EditFragment<>();
             dialogFragment.setClass(Aim.class, getString(R.string.aims),
-                    database.aimDao(), getString(R.string.addAim), getString(R.string.updateAim));
+                    database.aimDao(), getString(R.string.addAim), getString(R.string.updateAim), Table.AIM);
             dialogFragment.show(getSupportFragmentManager(), "AimDialog");
         } else if (id == EQUIPMENTS.getValue()) {
             EditFragment<Equipment> dialogFragment = new EditFragment<>();
             dialogFragment.setClass(Equipment.class, getString(R.string.equipment),
-                    database.equipmentDao(), getString(R.string.addEquipment), getString(R.string.updateEquipment));
+                    database.equipmentDao(), getString(R.string.addEquipment), getString(R.string.updateEquipment), Table.EQUIPMENT);
             dialogFragment.show(getSupportFragmentManager(), "EquipmentDialog");
         } else if (id == TIMES.getValue()) {
             EditFragment<Time> dialogFragment = new EditFragment<>();
             dialogFragment.setClass(Time.class, getString(R.string.times),
-                    database.timeDao(), getString(R.string.addTime), getString(R.string.updateTime));
+                    database.timeDao(), getString(R.string.addTime), getString(R.string.updateTime), Table.TIME);
             dialogFragment.show(getSupportFragmentManager(), "TimeDialog");
         } else if (id == BORG_RATINGS.getValue()) {
             EditFragment<Borg> dialogFragment = new EditFragment<>();
             dialogFragment.setClass(Borg.class, getString(R.string.borg_ratings),
-                    database.borgDao(), getString(R.string.addBorgRating), getString(R.string.updateBorgRating));
+                    database.borgDao(), getString(R.string.addBorgRating), getString(R.string.updateBorgRating), Table.BORG);
             dialogFragment.show(getSupportFragmentManager(), "BorgRatingDialog");
         } else if (id == TRAINING_PLACES.getValue()) {
             EditFragment<TrainingPlace> dialogFragment = new EditFragment<>();
             dialogFragment.setClass(TrainingPlace.class, getString(R.string.training_places),
-                    database.trainingPlaceDao(), getString(R.string.addTrainingPlace), getString(R.string.updateTrainingPlace));
+                    database.trainingPlaceDao(), getString(R.string.addTrainingPlace), getString(R.string.updateTrainingPlace), Table.TRAINING_PLACE);
             dialogFragment.show(getSupportFragmentManager(), "TrainingPlaceDialog");
         } else if (id == STYLES.getValue()) {
             EditFragment<Style> styleEditFragment = new EditFragment<>();
             styleEditFragment.setClass(Style.class, getString(R.string.styles),
-                    database.styleDao(), getString(R.string.addStyle), getString(R.string.updateStyle));
+                    database.styleDao(), getString(R.string.addStyle), getString(R.string.updateStyle), Table.STYLE);
             styleEditFragment.show(getSupportFragmentManager(), "StyleDialog");
         } else if (id == TEMPOS.getValue()) {
             EditFragment<Tempo> tempoEditFragment = new EditFragment<>();
             tempoEditFragment.setClass(Tempo.class, getString(R.string.tempos),
-                    database.tempoDao(), getString(R.string.addTempo), getString(R.string.updateTempo));
+                    database.tempoDao(), getString(R.string.addTempo), getString(R.string.updateTempo), Table.TEMPO);
             tempoEditFragment.show(getSupportFragmentManager(), "tempoDialog");
         } else if (id == COMPETITIONS.getValue()) {
             EditFragment<Competition> competitionEditFragment = new EditFragment<>();
             competitionEditFragment.setClass(Competition.class, getString(R.string.competitions),
-                    database.competitionDao(), getString(R.string.addCompetition), getString(R.string.updateCompetition));
+                    database.competitionDao(), getString(R.string.addCompetition), getString(R.string.updateCompetition), Table.COMPETITION);
             competitionEditFragment.show(getSupportFragmentManager(), "competitionDialog");
         } else if (id == IMPORTANCE.getValue()) {
             EditFragment<Importance> importanceEditFragment = new EditFragment<>();
             importanceEditFragment.setClass(Importance.class, getString(R.string.importance),
-                    database.importanceDao(), getString(R.string.addImportance), getString(R.string.updateImportance));
+                    database.importanceDao(), getString(R.string.addImportance), getString(R.string.updateImportance), Table.IMPORTANCE);
             importanceEditFragment.show(getSupportFragmentManager(), "importanceDialog");
         } else if (id == BLOCKS.getValue()) {
             EditFragment<Block> blockEditFragment = new EditFragment<>();
             blockEditFragment.setClass(Block.class, getString(R.string.blocks),
-                    database.blockDao(), getString(R.string.addBlock), getString(R.string.updateBlock));
+                    database.blockDao(), getString(R.string.addBlock), getString(R.string.updateBlock), Table.BLOCK);
             blockEditFragment.show(getSupportFragmentManager(), "blockDialog");
         } else if (id == STAGES.getValue()) {
             EditFragment<Stage> stageEditFragment = new EditFragment<>();
             stageEditFragment.setClass(Stage.class, getString(R.string.stages),
-                    database.stageDao(), getString(R.string.addStage), getString(R.string.updateStage));
+                    database.stageDao(), getString(R.string.addStage), getString(R.string.updateStage), Table.STAGE);
             stageEditFragment.show(getSupportFragmentManager(), "stageDialog");
         } else if (id == TYPES.getValue()) {
             EditFragment<Type> typeEditFragment = new EditFragment<>();
             typeEditFragment.setClass(Type.class, getString(R.string.types),
-                    database.typeDao(), getString(R.string.addType), getString(R.string.updateType));
+                    database.typeDao(), getString(R.string.addType), getString(R.string.updateType), Table.TYPE);
             typeEditFragment.show(getSupportFragmentManager(), "typeDialog");
         } else if (id == CAMPS.getValue()) {
             EditFragment<Camp> campEditFragment = new EditFragment<>();
             campEditFragment.setClass(Camp.class, getString(R.string.camps),
-                    database.campDao(), getString(R.string.addCamp), getString(R.string.updateCamp));
+                    database.campDao(), getString(R.string.addCamp), getString(R.string.updateCamp), Table.CAMP);
             campEditFragment.show(getSupportFragmentManager(), "campDialog");
         } else if (id == REST_PLACE.getValue()) {
             EditFragment<RestPlace> restPlaceEditFragment = new EditFragment<>();
             restPlaceEditFragment.setClass(RestPlace.class, getString(R.string.rest_places),
-                    database.restPlaceDao(), getString(R.string.addRestPlace), getString(R.string.updateRestPlace));
+                    database.restPlaceDao(), getString(R.string.addRestPlace), getString(R.string.updateRestPlace), Table.REST_PLACE);
             restPlaceEditFragment.show(getSupportFragmentManager(), "restPlaceDialog");
         } else if (id == TEST.getValue()) {
             EditFragment<Test> testEditFragment = new EditFragment<>();
             testEditFragment.setClass(Test.class, getString(R.string.test),
-                    database.testDao(), getString(R.string.addTest), getString(R.string.updateTest));
+                    database.testDao(), getString(R.string.addTest), getString(R.string.updateTest), Table.TEST);
             testEditFragment.show(getSupportFragmentManager(), "testDialog");
         } else if (id == OVERALL_PLAN.getValue()) {
             if (seasonPlanId == null) {

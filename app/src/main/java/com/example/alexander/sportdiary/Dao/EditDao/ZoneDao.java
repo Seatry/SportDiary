@@ -22,4 +22,7 @@ public interface ZoneDao extends EditDao<Zone> {
 
     @Query("SELECT id FROM Zone where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Zone WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

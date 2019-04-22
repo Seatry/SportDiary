@@ -17,14 +17,17 @@ import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.Dao.SeasonPlanDao;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.SeasonPlan;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.Menu.MenuModel;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.Utils.DateUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static com.example.alexander.sportdiary.Menu.MenuItemIds.DIARY_GROUP;
 import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
@@ -128,9 +131,37 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
             dao.update(seasonPlan);
 
             AsyncTask.execute(() -> {
+                try {
+                    MainActivity.syncSave(
+                            MainActivity.getObjectMapper().writeValueAsString(
+                                    MainActivity.getConverter().convertEntityToDto(seasonPlan)
+                            ), Table.SEASON_PLAN
+                    );
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            AsyncTask.execute(() -> {
+                dayDao.getAllBySeasonPlanId(id)
+                        .forEach(x -> {
+                            dayDao.delete(x);
+                            MainActivity.syncDelete(x.getId(), Table.DAY);
+                        });
                 dayDao.deleteBySeasonPlanId(id);
                 for(int i = 0; i < 365; i++) {
-                    dayDao.insert(new Day(DateUtil.addDays(date, i), id));
+                    Day day = new Day(DateUtil.addDays(date, i), id);
+                    long dayId = dayDao.insert(day);
+                    day.setId(dayId);
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(day)
+                                ), Table.DAY
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
 
@@ -163,6 +194,7 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
     public void remove() {
         SeasonPlan seasonPlan = dao.getSeasonPlanById(id);
         dao.delete(seasonPlan);
+        MainActivity.syncDelete(seasonPlan.getId(), Table.SEASON_PLAN);
         MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
         MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
         MainActivity.getChildList().get(menuModel).remove(diary);

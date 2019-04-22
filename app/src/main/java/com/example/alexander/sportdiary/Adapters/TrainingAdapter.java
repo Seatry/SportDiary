@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.Training;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.Fragments.AddTrainingFragment;
 import com.example.alexander.sportdiary.Fragments.TrainingExerciseActivity;
 import com.example.alexander.sportdiary.MainActivity;
@@ -68,6 +69,7 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingViewHolder> {
                         break;
                     case R.id.trainingDelete:
                         AsyncTask.execute(() -> sportDataBase.trainingDao().delete(trainings.get(i)));
+                        MainActivity.syncDelete(trainings.get(i).getId(), Table.TRAINING);
                         break;
                     case R.id.trainingExercises:
                         Intent intent = new Intent(MainActivity.getInstance(), TrainingExerciseActivity.class);

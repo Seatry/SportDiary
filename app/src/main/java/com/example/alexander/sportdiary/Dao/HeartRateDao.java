@@ -25,6 +25,9 @@ public interface HeartRateDao {
     @Query("DELETE FROM HeartRate WHERE exercise_id = :id and (series > :series or repeat > :repeats)")
     void deleteByExerciseIdWithGreaterSeriesOrRepeat(long id, int series, int repeats);
 
+    @Query("SELECT * FROM HeartRate WHERE exercise_id = :id and (series > :series or repeat > :repeats)")
+    List<HeartRate> getByExerciseIdWithGreaterSeriesOrRepeat(long id, int series, int repeats);
+
     @Query("SELECT hr FROM HeartRate WHERE exercise_id = :id")
     List<Integer> getHrByExerciseId(long id);
 

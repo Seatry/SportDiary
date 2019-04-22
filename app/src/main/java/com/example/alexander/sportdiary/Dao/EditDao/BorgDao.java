@@ -23,4 +23,7 @@ public interface BorgDao extends EditDao<Borg>{
 
     @Query("SELECT name FROM Borg where id = :id and userId = :userId")
     String getNameByIdAndUserId(Long id, String userId);
+
+    @Query("DELETE FROM Borg WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

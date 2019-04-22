@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.DayToTest;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.Fragments.AddTestFragment;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
@@ -65,6 +66,7 @@ public class TestAdapter extends RecyclerView.Adapter<TestViewHolder> {
                         break;
                     case R.id.delete:
                         AsyncTask.execute(() -> sportDataBase.dayToTestDao().delete(tests.get(i)));
+                        MainActivity.syncDelete(tests.get(i).getId(), Table.TEST);
                         break;
                 }
                 return false;

@@ -21,4 +21,7 @@ public interface BlockDao extends EditDao<Block> {
 
     @Query("SELECT id FROM Block where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Block WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

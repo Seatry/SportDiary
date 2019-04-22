@@ -23,4 +23,7 @@ public interface DreamQuestionDao {
 
     @Query("SELECT * FROM DreamQuestion")
     List<DreamQuestion> getAll();
+
+    @Query("DELETE FROM DreamQuestion")
+    void deleteAll();
 }

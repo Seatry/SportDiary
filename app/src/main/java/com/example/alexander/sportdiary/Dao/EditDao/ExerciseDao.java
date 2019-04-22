@@ -21,4 +21,7 @@ public interface ExerciseDao extends EditDao<Exercise> {
 
     @Query("SELECT id FROM Exercise where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Exercise WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

@@ -1,6 +1,7 @@
 package com.example.alexander.sportdiary.Fragments;
 
 import android.database.sqlite.SQLiteConstraintException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.example.alexander.sportdiary.Enums.EditOption;
 import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class AddNewEditFragment<T extends Edit> extends DialogFragment implements View.OnClickListener {
 
@@ -24,12 +26,14 @@ public class AddNewEditFragment<T extends Edit> extends DialogFragment implement
     private EditText editText;
     private EditOption option;
     private T updateItem;
+    private String table;
 
-    public void setClass(Class<T> cls, String title, EditDao<T> dao, EditOption option) {
+    public void setClass(Class<T> cls, String title, EditDao<T> dao, EditOption option, String table) {
         this.cls = cls;
         this.title = title;
         this.dao = dao;
         this.option = option;
+        this.table = table;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,7 +73,9 @@ public class AddNewEditFragment<T extends Edit> extends DialogFragment implement
             T elem = cls.newInstance();
             elem.setName(editText.getText().toString());
             elem.setUserId(MainActivity.getUserId());
-            dao.insert(elem);
+            Long id = dao.insert(elem);
+            elem.setId(id);
+            save(elem);
             dismiss();
         } catch (IllegalAccessException | java.lang.InstantiationException e) {
             e.printStackTrace();
@@ -84,11 +90,26 @@ public class AddNewEditFragment<T extends Edit> extends DialogFragment implement
         updateItem.setName(editText.getText().toString());
         try {
             dao.update(updateItem);
+            save(updateItem);
             dismiss();
         } catch (SQLiteConstraintException e) {
             e.printStackTrace();
             Toast.makeText(MainActivity.getInstance(), R.string.unique_err, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void save(T elem) {
+        AsyncTask.execute(() -> {
+            try {
+                MainActivity.syncSave(
+                        MainActivity.getObjectMapper().writeValueAsString(
+                                MainActivity.getConverter().convertEntityToDto(elem)
+                        ), table
+                );
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void setUpdateItem(T t) {

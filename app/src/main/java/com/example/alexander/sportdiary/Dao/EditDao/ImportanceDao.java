@@ -21,4 +21,7 @@ public interface ImportanceDao extends EditDao<Importance> {
 
     @Query("SELECT id FROM Importance where name = :name")
     long getIdByName(String name);
+
+    @Query("DELETE FROM Importance WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

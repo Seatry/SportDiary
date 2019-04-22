@@ -21,4 +21,7 @@ public interface TimeDao extends EditDao<Time>{
 
     @Query("SELECT name FROM Time where id = :id and userId = :userId")
     String getNameByIdAndUserId(Long id, String userId);
+
+    @Query("DELETE FROM Time WHERE userId = :userId")
+    void deleteByUserId(String userId);
 }

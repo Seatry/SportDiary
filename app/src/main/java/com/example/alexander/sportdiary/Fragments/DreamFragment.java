@@ -10,11 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alexander.sportdiary.Adapters.DreamAdapter;
+import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.DreamAnswer;
 import com.example.alexander.sportdiary.Entities.DreamQuestion;
+import com.example.alexander.sportdiary.Entities.Training;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -67,20 +71,56 @@ public class DreamFragment extends DialogFragment implements View.OnClickListene
             if (answer.equals("-")) {
                 if (dreamAnswer != null) {
                     sportDataBase.dreamAnswerDao().delete(dreamAnswer);
+                    MainActivity.syncDelete(dreamAnswer.getId(), Table.DREAM_ANSWER);
                 }
                 continue;
             }
             int answerInt = answer.equals(MainActivity.getInstance().getString(R.string.yes)) ? 1 : 0;
             if (dreamAnswer == null) {
-                sportDataBase.dreamAnswerDao().insert(new DreamAnswer(dayId, questionId, answerInt));
+                dreamAnswer = new DreamAnswer(dayId, questionId, answerInt);
+                long id = sportDataBase.dreamAnswerDao().insert(dreamAnswer);
+                dreamAnswer.setId(id);
             } else {
                 dreamAnswer.setAnswer(answerInt);
                 sportDataBase.dreamAnswerDao().update(dreamAnswer);
             }
+            save(dreamAnswer);
         }
         List<DreamAnswer> dreamAnswers = sportDataBase.dreamAnswerDao().getAllByDayWhereAnswerIsYes(dayId);
         double dream = dreamAnswers.size() * 6.7;
-        sportDataBase.dayDao().updateDreamById(dream, dayId);
+        Day day = sportDataBase.dayDao().getById(dayId);
+        day.setDream(dream);
+        sportDataBase.dayDao().update(day);
+        saveDay(day);
+    }
+
+    private void saveDay(Day day) {
+        AsyncTask.execute(() -> {
+            try {
+                MainActivity.syncSave(
+                        MainActivity.getObjectMapper().writeValueAsString(
+                                MainActivity.getConverter().convertEntityToDto(day)
+                        ), Table.DAY
+                );
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void save(DreamAnswer dreamAnswer) {
+        AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(dreamAnswer)
+                                ), Table.DREAM_ANSWER
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     public void setDayId(long dayId) {
