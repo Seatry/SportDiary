@@ -48,5 +48,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.6'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    implementation group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
 }
 apply plugin: 'com.google.gms.google-services'

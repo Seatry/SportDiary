@@ -181,12 +181,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .allowMainThreadQueries()
                 .build();
 
-        initializeDataBase();
-        account = createSyncAccount(this);
-
         if (signType.equals(OLD_SIGN.toString())) {
             fillDiariesMenu();
         }
+
+        initializeDataBase();
+        account = createSyncAccount(this);
+
 
     }
 
