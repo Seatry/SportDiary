@@ -12,6 +12,8 @@ import java.util.List;
 import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import cz.msebera.android.httpclient.Consts;
+import cz.msebera.android.httpclient.HttpEntity;
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.ClientProtocolException;
@@ -20,6 +22,7 @@ import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.protocol.HTTP;
 
 public class SyncWorker extends Worker {
 
@@ -53,12 +56,8 @@ public class SyncWorker extends Worker {
                 Log.d("DELETE", table + " " + id);
                 break;
         }
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            // writing error to Log
-            e.printStackTrace();
-        }
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePair, Consts.UTF_8);
+        httpPost.setEntity(entity);
         try {
             HttpResponse response = httpClient.execute(httpPost);
             Log.d("Http Response:", response.toString());
