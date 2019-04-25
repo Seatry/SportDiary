@@ -49,5 +49,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     implementation group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
+    implementation group: 'android.arch.work', name: 'work-runtime', version: '1.0.1'
+
 }
 apply plugin: 'com.google.gms.google-services'

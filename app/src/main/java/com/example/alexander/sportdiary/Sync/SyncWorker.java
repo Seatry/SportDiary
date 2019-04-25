@@ -1,11 +1,7 @@
 package com.example.alexander.sportdiary.Sync;
 
-import android.accounts.Account;
-import android.content.AbstractThreadedSyncAdapter;
-import android.content.ContentProviderClient;
 import android.content.Context;
-import android.content.SyncResult;
-import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.IOException;
@@ -13,6 +9,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.work.Data;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.ClientProtocolException;
@@ -22,17 +21,16 @@ import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-public class SyncAdapter extends AbstractThreadedSyncAdapter {
-    public SyncAdapter(Context context, boolean autoInitialize) {
-        super(context, autoInitialize);
+public class SyncWorker extends Worker {
+
+    public SyncWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
     }
 
-    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
-        super(context, autoInitialize, allowParallelSyncs);
-    }
-
+    @NonNull
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+    public Result doWork() {
+        Data extras = getInputData();
         String table = extras.getString("table");
         String option = extras.getString("option");
         HttpClient httpClient = new DefaultHttpClient();
@@ -49,7 +47,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.d("SAVE", table + " " + data);
                 break;
             case "DELETE":
-                Long id = extras.getLong("id");
+                Long id = extras.getLong("id", -1);
                 httpPost = new HttpPost(url + "/delete");
                 nameValuePair.add(new BasicNameValuePair("id", id.toString()));
                 Log.d("DELETE", table + " " + id);
@@ -69,5 +67,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return Result.success();
     }
 }

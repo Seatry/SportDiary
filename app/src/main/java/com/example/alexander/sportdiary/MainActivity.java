@@ -53,12 +53,19 @@ import com.example.alexander.sportdiary.Fragments.OverallPlanFragment;
 import com.example.alexander.sportdiary.Fragments.Statistics;
 import com.example.alexander.sportdiary.Fragments.UpdateDiaryFragment;
 import com.example.alexander.sportdiary.Menu.MenuModel;
+import com.example.alexander.sportdiary.Sync.SyncWorker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import static com.example.alexander.sportdiary.Enums.SignType.NEW_SIGN;
 import static com.example.alexander.sportdiary.Enums.SignType.OLD_SIGN;
@@ -104,10 +111,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ExpandableListView expandableListView;
     private static List<MenuModel> headerList = new ArrayList<>();
     private static HashMap<MenuModel, List<MenuModel>> childList = new HashMap<>();
-    private static final String AUTHORITY = "com.example.alexander.sportdiary.Sync.provider";
-    private static final String ACCOUNT_TYPE = "com.example.alexander.sportdiary.Sync";
-    private static final String ACCOUNT = "dummyaccount";
-    private static Account account;
 
     public static ObjectMapper getObjectMapper() {
         return objectMapper;
@@ -186,9 +189,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         initializeDataBase();
-        account = createSyncAccount(this);
-
-
     }
 
     private void initializeDataBase() {
@@ -213,36 +213,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public static void syncSave(String data, String table) {
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        settingsBundle.putString("data", data);
-        settingsBundle.putString("table", table);
-        settingsBundle.putString("option", SAVE.toString());
-        ContentResolver.setIsSyncable(account, AUTHORITY, 1);
-        ContentResolver.requestSync(account, AUTHORITY, settingsBundle);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED).build();
+        Data inputData = new Data.Builder()
+                .putString("data", data)
+                .putString("table", table)
+                .putString("option", SAVE.toString())
+                .build();
+        OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance().enqueue(syncRequest);
     }
 
     public static void syncDelete(Long id, String table) {
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        settingsBundle.putLong("id", id);
-        settingsBundle.putString("table", table);
-        settingsBundle.putString("option", DELETE.toString());
-        ContentResolver.setIsSyncable(account, AUTHORITY, 1);
-        ContentResolver.requestSync(account, AUTHORITY, settingsBundle);
-    }
-
-    public static Account createSyncAccount(Context context) {
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
-        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            Log.i("account", "successfully added");
-        } else {
-            Log.e("account", "account exists");
-        }
-        return newAccount;
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED).build();
+        Data inputData = new Data.Builder()
+                .putLong("id", id)
+                .putString("table", table)
+                .putString("option", DELETE.toString())
+                .build();
+        OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance().enqueue(syncRequest);
     }
 
     private void prepareMenuData() {
