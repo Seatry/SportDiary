@@ -33,7 +33,7 @@ public class CompetitionScheduleFragment extends DialogFragment implements View.
         final CompetitionScheduleAdapter adapter = new CompetitionScheduleAdapter();
         recyclerView.setAdapter(adapter);
 
-        LiveData<List<Day>> liveData = MainActivity.getInstance().getDatabase()
+        LiveData<List<Day>> liveData = MainActivity.getDatabase()
                 .dayDao().getAllDaysBySeasonPlanIdWhereCompetitionToImportanceIsNotNull(seasonPlanId);
         liveData.observe(this, days -> {
             adapter.setData(days);

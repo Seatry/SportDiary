@@ -32,7 +32,7 @@ public class HeartRateFragment extends DialogFragment implements View.OnClickLis
         v.findViewById(R.id.cancelHr).setOnClickListener(this);
         v.findViewById(R.id.okHr).setOnClickListener(this);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
 
         RecyclerView recyclerView = v.findViewById(R.id.hrItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());

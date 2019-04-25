@@ -22,7 +22,7 @@ import java.util.List;
 public class DreamAdapter extends RecyclerView.Adapter<DreamViewHolder> {
     private static int countItems;
     private long dayId;
-    private SportDataBase sportDataBase = MainActivity.getInstance().getDatabase();
+    private SportDataBase sportDataBase = MainActivity.getDatabase();
     private List<DreamQuestion> questions = new ArrayList<>();
     private HashMap<Long, String> answerToQuestion= new HashMap<>();
 

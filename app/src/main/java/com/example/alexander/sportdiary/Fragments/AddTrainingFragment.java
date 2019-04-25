@@ -47,7 +47,7 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
         v.findViewById(R.id.okAddTraining).setOnClickListener(this);
         ((TextView)v.findViewById(R.id.trainingTitle)).setText(title);
 
-        sportDataBase= MainActivity.getInstance().getDatabase();
+        sportDataBase= MainActivity.getDatabase();
         timeSpinner = v.findViewById(R.id.timeSpinner);
         trainingPlaceSpinner = v.findViewById(R.id.trainingPlaceSpinner);
         borgRatingSpinner = v.findViewById(R.id.borgRatingSpinner);

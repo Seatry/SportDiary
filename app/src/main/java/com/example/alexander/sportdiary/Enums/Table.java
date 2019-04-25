@@ -32,4 +32,5 @@ public class Table {
     public static final String TRAINING_EXERCISE = "trainingexercise";
     public static final String TRAININGS_TO_AIMS = "trainingstoaims";
     public static final String TRAININGS_TO_EQUIPMENTS = "trainingstoequipments";
+    public static final String VERSION = "version";
 }

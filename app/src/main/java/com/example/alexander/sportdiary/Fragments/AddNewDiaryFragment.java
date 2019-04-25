@@ -70,8 +70,8 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
         editHrRest = v.findViewById(R.id.hrRest);
         editPerformance = v.findViewById(R.id.performance);
 
-        dao = MainActivity.getInstance().getDatabase().seasonPlanDao();
-        dayDao = MainActivity.getInstance().getDatabase().dayDao();
+        dao = MainActivity.getDatabase().seasonPlanDao();
+        dayDao = MainActivity.getDatabase().dayDao();
 
         return v;
     }
@@ -109,10 +109,6 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             seasonPlan.setStart(date);
             seasonPlan.setUserId(MainActivity.getUserId());
             final long id = dao.insert(seasonPlan);
-            seasonPlan.setId(id);
-
-            SeasonPlanDto seasonPlanDto = MainActivity.getConverter().convertEntityToDto(seasonPlan);
-            List<DayDto> dayDtos = new ArrayList<>();
 
             MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
             List<MenuModel> childs = MainActivity.getChildList().get(menuModel);
@@ -124,16 +120,9 @@ public class AddNewDiaryFragment extends DialogFragment implements View.OnClickL
             AsyncTask.execute(() -> {
                 for(int i = 0; i < 366; i++) {
                     Day day = new Day(DateUtil.addDays(date, i), id);
-                    long dayId = dayDao.insert(day);
-                    day.setId(dayId);
-                    dayDtos.add(MainActivity.getConverter().convertEntityToDto(day));
+                    dayDao.insert(day);
                 }
-                seasonPlanDto.setDays(dayDtos);
-                try {
-                    MainActivity.syncSave(MainActivity.getObjectMapper().writeValueAsString(seasonPlanDto), Table.SEASON_PLAN);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                MainActivity.syncSeasonPlan(id, Table.SEASON_PLAN);
             });
 
             dismiss();

@@ -27,7 +27,7 @@ import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 public class CompetitionScheduleAdapter extends RecyclerView.Adapter<CompetitionScheduleViewHolder> {
     private static int countItems;
     private List<Day> days = new ArrayList<>();
-    private SportDataBase sportDataBase = MainActivity.getInstance().getDatabase();
+    private SportDataBase sportDataBase = MainActivity.getDatabase();
 
     @NonNull
     @Override

@@ -76,7 +76,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_day, container, false);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
 
         SeasonPlan seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
         Date minDate = seasonPlan.getStart();
@@ -85,7 +85,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
         MainActivity.getInstance().setTitle(diaryName + " " + sdf.format(minDate));
 
         currentDate = sdf.format(minDate);
-        dayDao = MainActivity.getInstance().getDatabase().dayDao();
+        dayDao = MainActivity.getDatabase().dayDao();
 
         calendarView = v.findViewById(R.id.calendar);
         calendarView.setMinDate(minDate.getTime());

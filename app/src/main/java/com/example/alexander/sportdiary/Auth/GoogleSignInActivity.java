@@ -3,12 +3,10 @@ package com.example.alexander.sportdiary.Auth;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.alexander.sportdiary.DataBase.SyncDataBase;
 import com.example.alexander.sportdiary.Enums.SignType;
 import com.example.alexander.sportdiary.MainActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;

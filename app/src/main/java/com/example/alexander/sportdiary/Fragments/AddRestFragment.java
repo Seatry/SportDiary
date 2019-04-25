@@ -35,7 +35,7 @@ public class AddRestFragment extends DialogFragment implements View.OnClickListe
         v.findViewById(R.id.okAddRest).setOnClickListener(this);
         ((TextView)v.findViewById(R.id.restTitle)).setText(title);
 
-        sportDataBase= MainActivity.getInstance().getDatabase();
+        sportDataBase= MainActivity.getDatabase();
         timeSpinner = v.findViewById(R.id.restTimeSpinner);
         placeSpinner = v.findViewById(R.id.restPlaceSpinner);
 

@@ -45,7 +45,7 @@ public class WeekInfoActivity extends AppCompatActivity implements View.OnClickL
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
         instance = this;
 
         Intent intent = getIntent();

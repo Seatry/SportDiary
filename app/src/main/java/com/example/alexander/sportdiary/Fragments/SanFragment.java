@@ -34,7 +34,7 @@ public class SanFragment extends DialogFragment implements View.OnClickListener 
         v.findViewById(R.id.cancelSan).setOnClickListener(this);
         v.findViewById(R.id.okSan).setOnClickListener(this);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
 
         RecyclerView recyclerView = v.findViewById(R.id.san_items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());

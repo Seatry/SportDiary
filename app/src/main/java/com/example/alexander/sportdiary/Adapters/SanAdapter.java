@@ -22,7 +22,7 @@ import java.util.List;
 public class SanAdapter extends RecyclerView.Adapter<SanViewHolder> {
     private static int countItems;
     private long dayId;
-    private SportDataBase sportDataBase = MainActivity.getInstance().getDatabase();
+    private SportDataBase sportDataBase = MainActivity.getDatabase();
     private List<SanQuestion> questions = new ArrayList<>();
     private HashMap<Long, String> answerToQuestion= new HashMap<>();
 

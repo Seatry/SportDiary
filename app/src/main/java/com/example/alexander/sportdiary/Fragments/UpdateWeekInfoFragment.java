@@ -35,7 +35,7 @@ public class UpdateWeekInfoFragment extends DialogFragment implements View.OnCli
         v.findViewById(R.id.cancelUpdateWeekInfo).setOnClickListener(this);
         v.findViewById(R.id.okUpdateWeekInfo).setOnClickListener(this);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
         Day day = sportDataBase.dayDao().getDayByDateAndSeasonPlanId(start, seasonPlanId);
 
         blockSpinner = v.findViewById(R.id.weekBlockSpinner);

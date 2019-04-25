@@ -1,4 +1,4 @@
-package com.example.alexander.sportdiary.DataBase;
+package com.example.alexander.sportdiary.Sync;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,6 +7,7 @@ import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 
 import com.example.alexander.sportdiary.Dao.EditDao.EditDao;
+import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Dto.DayDto;
 import com.example.alexander.sportdiary.Dto.DayToTestDto;
 import com.example.alexander.sportdiary.Dto.DreamAnswerDto;
@@ -20,7 +21,10 @@ import com.example.alexander.sportdiary.Dto.TrainingExerciseDto;
 import com.example.alexander.sportdiary.Dto.TrainingsToAimsDto;
 import com.example.alexander.sportdiary.Dto.TrainingsToEquipmentsDto;
 import com.example.alexander.sportdiary.Dto.UnloadDto;
+import com.example.alexander.sportdiary.Dto.VersionDto;
 import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
+import com.example.alexander.sportdiary.Entities.Version;
+import com.example.alexander.sportdiary.Enums.Table;
 import com.example.alexander.sportdiary.MainActivity;
 import com.example.alexander.sportdiary.R;
 
@@ -33,8 +37,6 @@ import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
-import cz.msebera.android.httpclient.params.BasicHttpParams;
-import cz.msebera.android.httpclient.params.HttpParams;
 import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class SyncDataBase extends AsyncTask<String, Void, Void> {
@@ -66,10 +68,17 @@ public class SyncDataBase extends AsyncTask<String, Void, Void> {
     }
 
     private void save(String data, String userId) {
-        System.out.println(data);
-        System.out.println(userId);
-        SportDataBase dataBase = MainActivity.getInstance().getDatabase();
+        SportDataBase dataBase = MainActivity.getDatabase();
         try {
+            UnloadDto dto = MainActivity.getObjectMapper().readValue(data, UnloadDto.class);
+            Version version = dataBase.versionDao().getByUserId(userId);
+            VersionDto versionDto = dto.getVersionDto();
+            if (version != null && versionDto != null && versionDto.getVersion().equals(version.getVersion())) {
+                Log.d("VERSION", "equal versions - not need unload");
+                return;
+            } else if (version != null) {
+                dataBase.versionDao().delete(version);
+            }
             dataBase.seasonPlanDao().deleteByUserId(userId);
             dataBase.dreamQuestionDao().deleteAll();
             dataBase.sanQuestionDao().deleteAll();
@@ -90,7 +99,6 @@ public class SyncDataBase extends AsyncTask<String, Void, Void> {
             dataBase.trainingPlaceDao().deleteByUserId(userId);
             dataBase.typeDao().deleteByUserId(userId);
             dataBase.zoneDao().deleteByUserId(userId);
-            UnloadDto dto = MainActivity.getObjectMapper().readValue(data, UnloadDto.class);
             if (dto.getDreamQuestionDtos() != null) {
                 dto.getDreamQuestionDtos()
                         .stream()
@@ -120,6 +128,19 @@ public class SyncDataBase extends AsyncTask<String, Void, Void> {
             addEdit(dto.getImportances(), MainActivity.getConverter()::convertDtoToEntityImportance, dataBase.importanceDao());
             addEdit(dto.getZones(), MainActivity.getConverter()::convertDtoToEntityZone, dataBase.zoneDao());
             addEdit(dto.getRestPlaces(), MainActivity.getConverter()::convertDtoToEntityRestPlace, dataBase.restPlaceDao());
+
+            if (dto.getVersionDto() != null) {
+                Log.d("VERSION", "get version from server");
+                dataBase.versionDao().insert(MainActivity.getConverter().convertDtoToEntity(dto.getVersionDto()));
+            } else {
+                Log.d("VERSION", "initialize version for user");
+                version = new Version(userId, 0L);
+                long vid = dataBase.versionDao().insert(version);
+                version.setId(vid);
+                versionDto = MainActivity.getConverter().convertEntityToDto(version);
+                MainActivity.syncSave(MainActivity.getObjectMapper().writeValueAsString(versionDto), Table.VERSION);
+            }
+
             if (dto.getSeasonPlanDtos() == null) return;
             for (SeasonPlanDto seasonPlanDto : dto.getSeasonPlanDtos()) {
                 dataBase.seasonPlanDao().insert(MainActivity.getConverter().convertDtoToEntity(seasonPlanDto));

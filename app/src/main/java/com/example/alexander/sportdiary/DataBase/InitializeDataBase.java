@@ -34,7 +34,7 @@ public class InitializeDataBase extends AsyncTask {
     @Override
     protected Object doInBackground(Object[] objects) {
         Log.i("do", "DO IN BACKGROUND");
-        SportDataBase dataBase = MainActivity.getInstance().getDatabase();
+        SportDataBase dataBase = MainActivity.getDatabase();
         for(int i = 1; i < 4; i++) {
             fillEdit(Exercise.class, "exercise" + i, dataBase.exerciseDao());
             fillEdit(Zone.class, "zone" + i, dataBase.zoneDao());
@@ -106,7 +106,7 @@ public class InitializeDataBase extends AsyncTask {
     }
 
     private SeasonPlan createTestDiary() {
-        SportDataBase database = MainActivity.getInstance().getDatabase();
+        SportDataBase database = MainActivity.getDatabase();
         Log.i("diary", "Create Test Banister Diary");
         Random random = new Random();
         Date date = new Date();

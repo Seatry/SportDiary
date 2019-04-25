@@ -38,7 +38,7 @@ public class TrainingExerciseActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(R.string.exercises_to_training);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
         instance = this;
 
         Intent intent = getIntent();

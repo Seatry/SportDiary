@@ -84,7 +84,7 @@ public class Statistics extends AppCompatActivity implements View.OnClickListene
         seasonPlanId = intent.getLongExtra("seasonPlanId", 0);
 
         inputLayout = findViewById(R.id.inputLayout);
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
         seasonPlan = sportDataBase.seasonPlanDao().getSeasonPlanById(seasonPlanId);
 
         preCalculate();

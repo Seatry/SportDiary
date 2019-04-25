@@ -50,7 +50,7 @@ public class AddCompetitionScheduleFragment extends DialogFragment implements Vi
         v.findViewById(R.id.okAddCompetition).setOnClickListener(this);
         ((TextView)v.findViewById(R.id.add_competition_title)).setText(title);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
 
         editDate = v.findViewById(R.id.editCompetitionDate);
         nameSpinner = v.findViewById(R.id.competitionNameSpinner);

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class TrainingAdapter extends RecyclerView.Adapter<TrainingViewHolder> {
     private static int countItems;
-    private SportDataBase sportDataBase = MainActivity.getInstance().getDatabase();
+    private SportDataBase sportDataBase = MainActivity.getDatabase();
     private List<Training> trainings = new ArrayList<>();
 
     @NonNull

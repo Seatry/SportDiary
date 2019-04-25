@@ -36,4 +36,5 @@ public class UnloadDto {
     private List<EditDto> trainingPlaces;
     private List<EditDto> types;
     private List<EditDto> zones;
+    private VersionDto versionDto;
 }

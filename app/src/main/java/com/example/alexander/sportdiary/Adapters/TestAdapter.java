@@ -24,7 +24,7 @@ import java.util.List;
 
 public class TestAdapter extends RecyclerView.Adapter<TestViewHolder> {
     private static int countItems;
-    private SportDataBase sportDataBase = MainActivity.getInstance().getDatabase();
+    private SportDataBase sportDataBase = MainActivity.getDatabase();
     private List<DayToTest> tests = new ArrayList<>();
 
     @NonNull

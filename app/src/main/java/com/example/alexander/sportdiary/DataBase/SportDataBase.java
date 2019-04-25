@@ -34,6 +34,7 @@ import com.example.alexander.sportdiary.Dao.TrainingDao;
 import com.example.alexander.sportdiary.Dao.TrainingExerciseDao;
 import com.example.alexander.sportdiary.Dao.TrainingsToAimsDao;
 import com.example.alexander.sportdiary.Dao.TrainingsToEquipmentsDao;
+import com.example.alexander.sportdiary.Dao.VersionDao;
 import com.example.alexander.sportdiary.Entities.CompetitionToImportance;
 import com.example.alexander.sportdiary.Entities.DayToTest;
 import com.example.alexander.sportdiary.Entities.DreamAnswer;
@@ -65,6 +66,7 @@ import com.example.alexander.sportdiary.Entities.EditEntities.Zone;
 import com.example.alexander.sportdiary.Entities.TrainingExercise;
 import com.example.alexander.sportdiary.Entities.TrainingsToAims;
 import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
+import com.example.alexander.sportdiary.Entities.Version;
 
 @Database(entities =
         {Exercise.class, Zone.class, SeasonPlan.class, Day.class, Equipment.class, Aim.class,
@@ -73,7 +75,7 @@ import com.example.alexander.sportdiary.Entities.TrainingsToEquipments;
                 Tempo.class, Block.class, Camp.class, Competition.class, Importance.class,
                 Stage.class, Type.class, CompetitionToImportance.class, HeartRate.class,
                 RestPlace.class, Test.class, DayToTest.class, Rest.class, DreamQuestion.class,
-                SanQuestion.class, DreamAnswer.class, SanAnswer.class
+                SanQuestion.class, DreamAnswer.class, SanAnswer.class, Version.class
         }, version = 31)
 public abstract class SportDataBase extends RoomDatabase {
     public abstract ExerciseDao exerciseDao();
@@ -107,4 +109,5 @@ public abstract class SportDataBase extends RoomDatabase {
     public abstract SanQuestionDao sanQuestionDao();
     public abstract SanAnswerDao sanAnswerDao();
     public abstract DreamAnswerDao dreamAnswerDao();
+    public abstract VersionDao versionDao();
 }

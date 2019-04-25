@@ -34,7 +34,7 @@ public class DreamFragment extends DialogFragment implements View.OnClickListene
         v.findViewById(R.id.cancelDream).setOnClickListener(this);
         v.findViewById(R.id.okDream).setOnClickListener(this);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
 
         RecyclerView recyclerView = v.findViewById(R.id.dream_items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());

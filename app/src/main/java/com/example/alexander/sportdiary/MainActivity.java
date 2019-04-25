@@ -1,10 +1,6 @@
 package com.example.alexander.sportdiary;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.arch.persistence.room.Room;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,7 +11,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
@@ -25,7 +20,7 @@ import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
 import com.example.alexander.sportdiary.Auth.GoogleSignInActivity;
 import com.example.alexander.sportdiary.Converters.EntityDtoConverter;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
-import com.example.alexander.sportdiary.DataBase.SyncDataBase;
+import com.example.alexander.sportdiary.Sync.SyncDataBase;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
 import com.example.alexander.sportdiary.Entities.EditEntities.Block;
 import com.example.alexander.sportdiary.Entities.EditEntities.Borg;
@@ -60,9 +55,11 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import androidx.work.Constraints;
 import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -101,7 +98,7 @@ import static com.google.android.gms.common.api.CommonStatusCodes.SUCCESS;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static MainActivity instance;
-    private SportDataBase database;
+    private static SportDataBase database;
     private Toolbar toolbar;
     private DayFragment dayFragment;
     private static String userId;
@@ -219,12 +216,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putString("data", data)
                 .putString("table", table)
                 .putString("option", SAVE.toString())
+                .putString("userId", userId)
                 .build();
         OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueue(syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork("syncData", ExistingWorkPolicy.APPEND, syncRequest);
+    }
+
+    public static void syncSeasonPlan(Long id, String table) {
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED).build();
+        Data inputData = new Data.Builder()
+                .putLong("id", id)
+                .putString("table", table)
+                .putString("option", SAVE.toString())
+                .putString("userId", userId)
+                .build();
+        OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance().enqueueUniqueWork("syncData", ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     public static void syncDelete(Long id, String table) {
@@ -234,12 +248,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putLong("id", id)
                 .putString("table", table)
                 .putString("option", DELETE.toString())
+                .putString("userId", userId)
                 .build();
         OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueue(syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork("syncData", ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     private void prepareMenuData() {
@@ -563,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public SportDataBase getDatabase() {
+    public static SportDataBase getDatabase() {
         return database;
     }
 

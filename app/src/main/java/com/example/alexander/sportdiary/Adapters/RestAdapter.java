@@ -24,7 +24,7 @@ import java.util.List;
 
 public class RestAdapter extends RecyclerView.Adapter<RestViewHolder> {
     private static int countItems;
-    private SportDataBase sportDataBase = MainActivity.getInstance().getDatabase();
+    private SportDataBase sportDataBase = MainActivity.getDatabase();
     private List<Rest> rests = new ArrayList<>();
 
     @NonNull

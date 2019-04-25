@@ -54,7 +54,7 @@ public class AddTrainingExerciseFragment extends DialogFragment implements View.
         v.findViewById(R.id.okAddTrainingExercise).setOnClickListener(this);
         ((TextView)v.findViewById(R.id.addTrainingExerciseTitle)).setText(title);
 
-        sportDataBase = MainActivity.getInstance().getDatabase();
+        sportDataBase = MainActivity.getDatabase();
 
         exerciseSpinner = v.findViewById(R.id.exerciseSpinner);
         styleSpinner = v.findViewById(R.id.styleSpinner);
