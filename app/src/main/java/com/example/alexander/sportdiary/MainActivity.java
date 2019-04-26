@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
@@ -55,7 +56,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -102,12 +102,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private DayFragment dayFragment;
     private static String userId;
+    private static String token;
     private static String signType;
     private static Long seasonPlanId;
     private static ExpandableListAdapter expandableListAdapter;
     private ExpandableListView expandableListView;
     private static List<MenuModel> headerList = new ArrayList<>();
     private static HashMap<MenuModel, List<MenuModel>> childList = new HashMap<>();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final EntityDtoConverter converter = new EntityDtoConverter();
 
     public static ObjectMapper getObjectMapper() {
         return objectMapper;
@@ -116,9 +119,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static EntityDtoConverter getConverter() {
         return converter;
     }
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final EntityDtoConverter converter = new EntityDtoConverter();
 
     public void setDayFragment(DayFragment dayFragment) {
         this.dayFragment = dayFragment;
@@ -158,6 +158,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = getIntent();
         userId = intent.getStringExtra("userId" );
         signType = intent.getStringExtra("signType");
+        token = intent.getStringExtra("token");
+
+        Log.d("TOKEN", token);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -191,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initializeDataBase() {
         if (signType.equals(NEW_SIGN.toString())) {
             signType = OLD_SIGN.toString();
-            new SyncDataBase().execute(userId);
+            new SyncDataBase().execute(userId, token);
         }
     }
 
@@ -217,12 +220,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putString("table", table)
                 .putString("option", SAVE.toString())
                 .putString("userId", userId)
+                .putString("token", token)
                 .build();
         OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueueUniqueWork("syncData", ExistingWorkPolicy.APPEND, syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork("sync data", ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     public static void syncSeasonPlan(Long id, String table) {
@@ -233,12 +237,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putString("table", table)
                 .putString("option", SAVE.toString())
                 .putString("userId", userId)
+                .putString("token", token)
                 .build();
         OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueueUniqueWork("syncData", ExistingWorkPolicy.APPEND, syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork("sync data", ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     public static void syncDelete(Long id, String table) {
@@ -249,12 +254,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putString("table", table)
                 .putString("option", DELETE.toString())
                 .putString("userId", userId)
+                .putString("token", token)
                 .build();
         OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(SyncWorker.class)
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueueUniqueWork("syncData", ExistingWorkPolicy.APPEND, syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork("sync data", ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     private void prepareMenuData() {
@@ -431,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void signOut() {
+    public void signOut() {
         // Firebase sign out
         GoogleSignInActivity.getmAuth().signOut();
 

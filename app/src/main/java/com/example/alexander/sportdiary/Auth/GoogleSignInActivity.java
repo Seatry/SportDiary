@@ -138,7 +138,10 @@ public class GoogleSignInActivity extends BaseActivity implements
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("userId", user.getUid());
             intent.putExtra("signType", signType.toString());
-            this.startActivity(intent);
+            user.getIdToken(true).addOnSuccessListener(getTokenResult -> {
+                intent.putExtra("token", getTokenResult.getToken());
+                startActivity(intent);
+            });
         }
     }
 

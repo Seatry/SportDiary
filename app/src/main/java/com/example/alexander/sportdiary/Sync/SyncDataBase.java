@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.HttpStatus;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
@@ -56,14 +57,21 @@ public class SyncDataBase extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... strings) {
         HttpClient httpClient = new DefaultHttpClient();
         String url = "http://192.168.1.136:8082";
-        HttpGet httpGet = new HttpGet(url + "/unload?userId="+strings[0]);
+        HttpGet httpGet = new HttpGet(url + "/auth/unload?userId="+strings[0]);
+        httpGet.setHeader("X-Firebase-Auth", strings[1]);
         try {
+            Log.d("UNLOAD", "start execute");
             HttpResponse response = httpClient.execute(httpGet);
-            String result = EntityUtils.toString(response.getEntity());
-            save(result, strings[0]);
+            System.out.println(response);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                String result = EntityUtils.toString(response.getEntity());
+                save(result, strings[0]);
+                return null;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        MainActivity.getInstance().signOut();
         return null;
     }
 

@@ -4,6 +4,7 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.alexander.sportdiary.Auth.GoogleSignInActivity;
 import com.example.alexander.sportdiary.Converters.EntityDtoConverter;
@@ -41,9 +42,11 @@ public class SyncWorker extends Worker {
     private static SportDataBase database;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final EntityDtoConverter converter = new EntityDtoConverter();
+    private Context context;
 
     public SyncWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+        this.context = context;
         database = Room.databaseBuilder(context, SportDataBase.class, "SportDataBase")
                 .fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
@@ -66,12 +69,14 @@ public class SyncWorker extends Worker {
         String table = extras.getString("table");
         String option = extras.getString("option");
         String userId = extras.getString("userId");
+        String token = extras.getString("token");
         Long version =  database.versionDao().getByUserId(userId).getVersion();
 
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.136:8082/save";
+        String url = "http://192.168.1.136:8082/auth/save";
 
-        HttpGet httpGet = new HttpGet("http://192.168.1.136:8082/version?userId="+userId);
+        HttpGet httpGet = new HttpGet("http://192.168.1.136:8082/auth/version?userId="+userId);
+        httpGet.setHeader("X-Firebase-Auth", token);
         try {
             HttpResponse response = httpClient.execute(httpGet);
             Long result = 0L;
@@ -81,6 +86,7 @@ public class SyncWorker extends Worker {
             if (!version.equals(result)) {
                 Log.d("VERSION", "old version - need unload");
                 Log.d("VERSION", version + " " + result);
+                Toast.makeText(context, "Данные устарели - необходимо синхронизировать с сервером", Toast.LENGTH_SHORT).show();
                 signOut();
                 return Result.failure();
             } else {
@@ -93,6 +99,7 @@ public class SyncWorker extends Worker {
         }
 
         HttpPost httpPost = new HttpPost();
+        httpPost.setHeader("X-Firebase-Auth", token);
         List<NameValuePair> nameValuePair = new ArrayList<>(2);
         nameValuePair.add(new BasicNameValuePair("table", table));
         nameValuePair.add(new BasicNameValuePair("userId", userId));
