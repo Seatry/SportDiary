@@ -99,7 +99,6 @@ public class SyncWorker extends Worker {
         }
 
         HttpPost httpPost = new HttpPost();
-        httpPost.setHeader("X-Firebase-Auth", token);
         List<NameValuePair> nameValuePair = new ArrayList<>(2);
         nameValuePair.add(new BasicNameValuePair("table", table));
         nameValuePair.add(new BasicNameValuePair("userId", userId));
@@ -134,6 +133,7 @@ public class SyncWorker extends Worker {
                 Log.d("DELETE", table + " " + id);
                 break;
         }
+        httpPost.setHeader("X-Firebase-Auth", token);
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePair, Consts.UTF_8);
         httpPost.setEntity(entity);
         try {
