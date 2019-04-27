@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +42,8 @@ public class HeartRateAdapter extends RecyclerView.Adapter<HeartRateViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull HeartRateViewHolder heartRateViewHolder, int i) {
-        HeartRate heartRate = heartRates.get(i);
         heartRateViewHolder.getMyCustomEditTextListener().updatePosition(i);
+        HeartRate heartRate = heartRates.get(i);
         heartRateViewHolder.setData(heartRate.getSeries(), heartRate.getRepeat(), heartRate.getTime(), heartRate.getHr());
     }
 
@@ -60,7 +61,7 @@ public class HeartRateAdapter extends RecyclerView.Adapter<HeartRateViewHolder> 
     }
 
     public class MyCustomEditTextListener implements TextWatcher {
-        private int position;
+        private int position = -1;
 
         public void updatePosition(int position) {
             this.position = position;
@@ -73,7 +74,8 @@ public class HeartRateAdapter extends RecyclerView.Adapter<HeartRateViewHolder> 
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-            if(charSequence.length() > 0) {
+            if(charSequence.length() > 0 && position != -1) {
+                Log.d("HR", "ON CHANGED " + position + " " + Integer.valueOf(charSequence.toString()));
                 heartRates.get(position).setHr(Integer.valueOf(charSequence.toString()));
             }
         }
