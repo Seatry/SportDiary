@@ -1,6 +1,8 @@
 package com.example.alexander.sportdiary.Menu;
 
 
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 public class MenuModel {
@@ -8,6 +10,8 @@ public class MenuModel {
     private String menuName;
     private boolean hasChildren, isGroup;
     private int id;
+    @Nullable
+    private Integer menuIcon, expandIcon;
 
 
     public MenuModel(String menuName, boolean isGroup, boolean hasChildren, int id) {
@@ -57,5 +61,22 @@ public class MenuModel {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setMenuIcon(Integer menuIcon) {
+        this.menuIcon = menuIcon;
+    }
+
+    public Integer getMenuIcon() {
+        return menuIcon;
+    }
+
+    @Nullable
+    public Integer getExpandIcon() {
+        return expandIcon;
+    }
+
+    public void setExpandIcon(@Nullable Integer expandIcon) {
+        this.expandIcon = expandIcon;
     }
 }

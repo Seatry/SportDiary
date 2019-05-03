@@ -4,22 +4,12 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/fragment_update_diary">
-    <LinearLayout
+    <TextView
         android:id="@+id/update_diary_title"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/update_diary"
-            android:textAppearance="?android:textAppearanceLarge"/>
-        <Button
-            android:id="@+id/removeDiary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-"/>
-    </LinearLayout>
+        android:text="@string/update_diary"
+        android:textAppearance="?android:textAppearanceLarge"/>
 
     <EditText
         android:id="@+id/update_diary_name"
@@ -81,8 +71,17 @@
         android:id="@+id/cancelUpdateDiary"
         android:text="@string/cancel"
         android:layout_below="@id/update_performance"
+        android:layout_toLeftOf="@id/removeDiary"
+        android:layout_toStartOf="@id/removeDiary" />
+
+    <Button
+        android:id="@+id/removeDiary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/update_performance"
         android:layout_toLeftOf="@id/okUpdateDiary"
-        android:layout_toStartOf="@id/okUpdateDiary" />
+        android:layout_toStartOf="@id/okUpdateDiary"
+        android:text="@string/remove" />
 
     <Button
         android:layout_width="wrap_content"

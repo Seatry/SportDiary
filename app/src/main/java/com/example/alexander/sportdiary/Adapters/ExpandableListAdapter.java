@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.alexander.sportdiary.Menu.MenuModel;
@@ -86,7 +87,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
-        String headerTitle = getGroup(groupPosition).getMenuName();
+        MenuModel model = getGroup(groupPosition);
+        String headerTitle = model.getMenuName();
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -98,6 +100,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         lblListHeader.setText(headerTitle);
         lblListHeader.setTextColor(Color.WHITE);
 
+        ((ImageView) convertView.findViewById(R.id.menu_icon)).setImageResource(model.getMenuIcon());
+        if (model.getExpandIcon() != null) {
+            ((ImageView) convertView.findViewById(R.id.expand_icon)).setImageResource(model.getExpandIcon());
+        } else {
+            ((ImageView) convertView.findViewById(R.id.expand_icon)).setImageResource(0);
+        }
         return convertView;
     }
 

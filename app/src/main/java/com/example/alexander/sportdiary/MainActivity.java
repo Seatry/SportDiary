@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 childs.add(0, childModel);
                 childList.put(menuModel, childs);
             }
+            getExpandableListAdapter().notifyDataSetChanged();
         });
     }
 
@@ -267,6 +268,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         headerList.clear();
         childList.clear();
         MenuModel menuModel = new MenuModel(getString(R.string.lists_edit), true, true, EDIT_GROUP.getValue());
+        menuModel.setMenuIcon(R.drawable.icons8_pencil_30);
+        menuModel.setExpandIcon(R.drawable.icons8_expand_arrow_filled_30);
+
         headerList.add(menuModel);
         List<MenuModel> childModelsList = new ArrayList<>();
         MenuModel childModel = new MenuModel(getString(R.string.Exercises), false, false, EXERCISES.getValue());
@@ -309,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         menuModel = new MenuModel(getString(R.string.overall_plan), true, false, OVERALL_PLAN.getValue());
+        menuModel.setMenuIcon(R.drawable.icons8_blanket_filled_30);
         headerList.add(menuModel);
 
         if (!menuModel.isHasChildren()) {
@@ -316,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         menuModel = new MenuModel(getString(R.string.competition_schedule), true, false, COMPETITION_SCHEDULE.getValue());
+        menuModel.setMenuIcon(R.drawable.icons8_trophy_30);
         headerList.add(menuModel);
 
         if (!menuModel.isHasChildren()) {
@@ -323,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         menuModel = new MenuModel(getString(R.string.statistics), true, false, STATISTICS.getValue());
+        menuModel.setMenuIcon(R.drawable.icons8_combo_chart_filled_30);
         headerList.add(menuModel);
 
         if (!menuModel.isHasChildren()) {
@@ -330,6 +337,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         menuModel = new MenuModel(getString(R.string.diaries), true, true, DIARY_GROUP.getValue());
+        menuModel.setMenuIcon(R.drawable.icons8_user_30);
+        menuModel.setExpandIcon(R.drawable.icons8_expand_arrow_filled_30);
         headerList.add(menuModel);
         childModelsList = new ArrayList<>();
         if (menuModel.isHasChildren()) {
@@ -337,6 +346,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         menuModel = new MenuModel(getString(R.string.add), true, false, ADD_DIARY.getValue());
+        menuModel.setMenuIcon(R.drawable.icons8_plus_30);
         headerList.add(menuModel);
 
         if (!menuModel.isHasChildren()) {
@@ -350,11 +360,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         expandableListView.setAdapter(expandableListAdapter);
 
         expandableListView.setOnGroupClickListener((parent, v, groupPosition, id) -> {
-
-            if (headerList.get(groupPosition).isGroup()) {
-                if (!headerList.get(groupPosition).isHasChildren()) {
-                    handleClick(headerList.get(groupPosition));
+            MenuModel model = headerList.get(groupPosition);
+            if (model.isGroup()) {
+                if (!model.isHasChildren()) {
+                    handleClick(model);
                     onBackPressed();
+                }
+                if (model.getExpandIcon() != null && model.getExpandIcon() == R.drawable.icons8_expand_arrow_filled_30) {
+                    model.setExpandIcon(R.drawable.icons8_collapse_arrow_filled_30);
+                    expandableListAdapter.notifyDataSetChanged();
+                } else if (model.getExpandIcon() != null && model.getExpandIcon() == R.drawable.icons8_collapse_arrow_filled_30) {
+                    model.setExpandIcon(R.drawable.icons8_expand_arrow_filled_30);
+                    expandableListAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -575,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             dayFragment.setSeasonPlanId(id);
             seasonPlanId = (long) id;
             toolbar.getMenu().removeItem(CALENDAR.getValue());
-            toolbar.getMenu().add(0, CALENDAR.getValue(), 50, "").setIcon(R.drawable.ic_menu_gallery).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            toolbar.getMenu().add(0, CALENDAR.getValue(), 50, "").setIcon(R.drawable.icons8_calendar_24).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             this.setTitle("(" + model.getMenuName().charAt(0) + ")");
             this.getSupportFragmentManager()
                     .beginTransaction()
