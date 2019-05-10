@@ -209,7 +209,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 childs.add(0, childModel);
                 childList.put(menuModel, childs);
             }
-            getExpandableListAdapter().notifyDataSetChanged();
         });
     }
 
@@ -368,10 +367,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 if (model.getExpandIcon() != null && model.getExpandIcon() == R.drawable.icons8_expand_arrow_filled_30) {
                     model.setExpandIcon(R.drawable.icons8_collapse_arrow_filled_30);
-                    expandableListAdapter.notifyDataSetChanged();
                 } else if (model.getExpandIcon() != null && model.getExpandIcon() == R.drawable.icons8_collapse_arrow_filled_30) {
                     model.setExpandIcon(R.drawable.icons8_expand_arrow_filled_30);
-                    expandableListAdapter.notifyDataSetChanged();
                 }
             }
 

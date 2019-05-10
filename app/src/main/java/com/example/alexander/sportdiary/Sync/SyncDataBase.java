@@ -56,7 +56,7 @@ public class SyncDataBase extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... strings) {
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.136:8082";
+        String url = "https://limitless-shelf-62410.herokuapp.com";
         HttpGet httpGet = new HttpGet(url + "/auth/unload?userId="+strings[0]);
         httpGet.setHeader("X-Firebase-Auth", strings[1]);
         try {

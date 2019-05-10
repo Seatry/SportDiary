@@ -73,9 +73,9 @@ public class SyncWorker extends Worker {
         Long version =  database.versionDao().getByUserId(userId).getVersion();
 
         HttpClient httpClient = new DefaultHttpClient();
-        String url = "http://192.168.1.136:8082/auth/save";
+        String url = "https://limitless-shelf-62410.herokuapp.com/auth/save";
 
-        HttpGet httpGet = new HttpGet("http://192.168.1.136:8082/auth/version?userId="+userId);
+        HttpGet httpGet = new HttpGet("https://limitless-shelf-62410.herokuapp.com/auth/version?userId="+userId);
         httpGet.setHeader("X-Firebase-Auth", token);
         try {
             HttpResponse response = httpClient.execute(httpGet);
