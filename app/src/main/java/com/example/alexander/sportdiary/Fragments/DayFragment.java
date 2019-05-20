@@ -250,6 +250,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
                         capacity += training.getCapacity();
                     }
                     sportDataBase.dayDao().updateCapacityById(capacity, dayId);
+                    capacityText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.capacity), capacity));
                 }
             });
         } catch (ParseException e) {
