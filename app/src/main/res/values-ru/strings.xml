@@ -162,6 +162,7 @@
     <string name="save_to_server">save to server</string>
     <string name="load_from_server">load from server</string>
     <string name="loading_data">Зарузка данных с сервера…</string>
+    <string name="makeTest">test diary</string>
 
 
 </resources>

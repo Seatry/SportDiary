@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.example.alexander.sportdiary.Adapters.ExpandableListAdapter;
 import com.example.alexander.sportdiary.Auth.GoogleSignInActivity;
 import com.example.alexander.sportdiary.Converters.EntityDtoConverter;
+import com.example.alexander.sportdiary.DataBase.InitializeTest;
 import com.example.alexander.sportdiary.DataBase.SportDataBase;
 import com.example.alexander.sportdiary.Sync.SyncDataBase;
 import com.example.alexander.sportdiary.Entities.EditEntities.Aim;
@@ -437,6 +438,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             signOut();
         } else if (id == CALENDAR.getValue()) {
             dayFragment.changeCalendarVisibility();
+        } else if (id == R.id.test) {
+            new InitializeTest().execute();
         }
 
         return super.onOptionsItemSelected(item);
