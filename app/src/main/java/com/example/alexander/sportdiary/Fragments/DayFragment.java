@@ -331,8 +331,10 @@ public class DayFragment extends Fragment implements View.OnClickListener {
                 }
                 competitionText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.competition), competitionToImportance));
             });
-            String capacity = String.valueOf(day.getCapacity());
-            capacityText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.capacity), capacity));
+            if (day != null) {
+                String capacity = String.valueOf(day.getCapacity());
+                capacityText.setText(String.format("%s: %s", MainActivity.getInstance().getString(R.string.capacity), capacity));
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
