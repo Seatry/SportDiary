@@ -32,7 +32,7 @@ public class TrainingsToEquipments {
     }
 
     public TrainingsToEquipments() {
-        
+
     }
 
     public long getTrainingId() {
