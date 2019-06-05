@@ -31,6 +31,10 @@ public class TrainingsToEquipments {
         this.equipmentId = equipmentId;
     }
 
+    public TrainingsToEquipments() {
+        
+    }
+
     public long getTrainingId() {
         return trainingId;
     }
