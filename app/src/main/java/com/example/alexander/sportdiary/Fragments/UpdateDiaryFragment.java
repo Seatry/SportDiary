@@ -130,34 +130,49 @@ public class UpdateDiaryFragment extends DialogFragment implements View.OnClickL
             }
             String dateText = editStartText.getText().toString();
             final Date date = sdf.parse(dateText);
-            seasonPlan.setStart(date);
-            dao.delete(seasonPlan);
-            MainActivity.syncDelete(seasonPlan.getId(), Table.SEASON_PLAN);
-            dao.insert(seasonPlan);
+            if (!date.equals(seasonPlan.getStart())) {
+                seasonPlan.setStart(date);
+                dao.delete(seasonPlan);
+                MainActivity.syncDelete(seasonPlan.getId(), Table.SEASON_PLAN);
+                dao.insert(seasonPlan);
 
-            AsyncTask.execute(() -> {
-                for(int i = 0; i < 365; i++) {
-                    Day day = new Day(DateUtil.addDays(date, i), id);
-                    dayDao.insert(day);
+                AsyncTask.execute(() -> {
+                    for (int i = 0; i < 365; i++) {
+                        Day day = new Day(DateUtil.addDays(date, i), id);
+                        dayDao.insert(day);
+                    }
+                    MainActivity.syncSeasonPlan(seasonPlan.getId(), Table.SEASON_PLAN);
+                });
+
+                if (MainActivity.getSeasonPlanId() != null && MainActivity.getSeasonPlanId() == id) {
+                    DayFragment dayFragment = new DayFragment();
+                    dayFragment.setSeasonPlanId(id);
+                    MainActivity.getInstance().setTitle("(" + seasonPlan.getName().charAt(0) + ")");
+                    MainActivity.getInstance().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_frame, dayFragment)
+                            .commit();
+                    MainActivity.getInstance().setDayFragment(dayFragment);
                 }
-                MainActivity.syncSeasonPlan(seasonPlan.getId(), Table.SEASON_PLAN);
-            });
 
-            if (MainActivity.getSeasonPlanId() != null && MainActivity.getSeasonPlanId() == id) {
-                DayFragment dayFragment = new DayFragment();
-                dayFragment.setSeasonPlanId(id);
-                MainActivity.getInstance().setTitle("(" + seasonPlan.getName().charAt(0) + ")");
-                MainActivity.getInstance().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_frame, dayFragment)
-                        .commit();
-                MainActivity.getInstance().setDayFragment(dayFragment);
+                MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
+                MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
+                diary.setMenuName(seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart()));
+                MainActivity.getExpandableListAdapter().notifyDataSetChanged();
+            } else {
+                dao.update(seasonPlan);
+                AsyncTask.execute(() -> {
+                    try {
+                        MainActivity.syncSave(
+                                MainActivity.getObjectMapper().writeValueAsString(
+                                        MainActivity.getConverter().convertEntityToDto(seasonPlan)
+                                ), Table.SEASON_PLAN
+                        );
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
-
-            MenuModel menuModel = MenuModel.getMenuModelById(MainActivity.getHeaderList(), DIARY_GROUP.getValue());
-            MenuModel diary = MenuModel.getMenuModelById(MainActivity.getChildList().get(menuModel), id);
-            diary.setMenuName(seasonPlan.getName() + " " + sdf.format(seasonPlan.getStart()));
-            MainActivity.getExpandableListAdapter().notifyDataSetChanged();
             dismiss();
         } catch (SQLiteConstraintException e) {
             e.printStackTrace();
