@@ -8,7 +8,8 @@ public class DateConverter {
 
     @TypeConverter
     public static Date toDate(Long dateLong){
-        return dateLong == null ? null: new Date(dateLong);
+        Date date = dateLong == null ? null: new Date(dateLong);
+        return date;
     }
 
     @TypeConverter

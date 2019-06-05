@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import com.example.alexander.sportdiary.Adapters.RestAdapter;
 import com.example.alexander.sportdiary.Adapters.TestAdapter;
 import com.example.alexander.sportdiary.Adapters.TrainingAdapter;
+import com.example.alexander.sportdiary.Converters.DateConverter;
 import com.example.alexander.sportdiary.Dao.DayDao;
 import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.DayToTest;
@@ -150,6 +152,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
         addTraining.setOnClickListener(view -> {
             try {
                 long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
+                Log.d("TRAINING", currentDate + " " + seasonPlanId + " " + dayId);
                 AddTrainingFragment addTrainingFragment = new AddTrainingFragment();
                 addTrainingFragment
                         .setDayId(dayId)
@@ -238,6 +241,7 @@ public class DayFragment extends Fragment implements View.OnClickListener {
 
     public void getTrainings() {
         try {
+            Log.d("CHECK", sdf.parse(currentDate)+"");
             final long dayId = dayDao.getDayIdByDateAndSeasonPlanId(sdf.parse(currentDate), seasonPlanId);
             if (trainingLiveData != null) trainingLiveData.removeObservers(MainActivity.getInstance());
             trainingLiveData = sportDataBase.trainingDao().getAllLiveByDayId(dayId);

@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueueUniqueWork("sync data", ExistingWorkPolicy.APPEND, syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork(userId, ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     public static void syncSeasonPlan(Long id, String table) {
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueueUniqueWork("sync data", ExistingWorkPolicy.APPEND, syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork(userId, ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     public static void syncDelete(Long id, String table) {
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build();
-        WorkManager.getInstance().enqueueUniqueWork("sync data", ExistingWorkPolicy.APPEND, syncRequest);
+        WorkManager.getInstance().enqueueUniqueWork(userId, ExistingWorkPolicy.APPEND, syncRequest);
     }
 
     private void prepareMenuData() {

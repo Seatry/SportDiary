@@ -3,6 +3,7 @@ package com.example.alexander.sportdiary.Fragments;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -161,6 +162,7 @@ public class AddTrainingFragment extends DialogFragment implements View.OnClickL
                 : sportDataBase.trainingPlaceDao().getIdByName(trainingPlaceSpinner.getSelectedItem().toString());
         Long borgRatingId = borgRatingSpinner.getSelectedItem() == null ? null
                 : sportDataBase.borgDao().getIdByName(borgRatingSpinner.getSelectedItem().toString());
+        Log.d("ADD", dayId + "");
         Training training = new Training(dayId, timeId, trainingPlaceId, borgRatingId);
         long trainingId = sportDataBase.trainingDao().insert(training);
         training.setId(trainingId);

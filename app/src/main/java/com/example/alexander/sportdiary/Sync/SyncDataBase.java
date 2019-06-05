@@ -22,6 +22,7 @@ import com.example.alexander.sportdiary.Dto.TrainingsToAimsDto;
 import com.example.alexander.sportdiary.Dto.TrainingsToEquipmentsDto;
 import com.example.alexander.sportdiary.Dto.UnloadDto;
 import com.example.alexander.sportdiary.Dto.VersionDto;
+import com.example.alexander.sportdiary.Entities.Day;
 import com.example.alexander.sportdiary.Entities.EditEntities.Edit;
 import com.example.alexander.sportdiary.Entities.Version;
 import com.example.alexander.sportdiary.Enums.Table;
@@ -30,6 +31,7 @@ import com.example.alexander.sportdiary.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
@@ -39,6 +41,8 @@ import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.util.EntityUtils;
+
+import static com.example.alexander.sportdiary.Utils.DateUtil.sdf;
 
 public class SyncDataBase extends AsyncTask<String, Void, Void> {
 
@@ -153,7 +157,11 @@ public class SyncDataBase extends AsyncTask<String, Void, Void> {
             for (SeasonPlanDto seasonPlanDto : dto.getSeasonPlanDtos()) {
                 dataBase.seasonPlanDao().insert(MainActivity.getConverter().convertDtoToEntity(seasonPlanDto));
                 for (DayDto dayDto : seasonPlanDto.getDays()) {
-                    dataBase.dayDao().insert(MainActivity.getConverter().convertDtoToEntity(dayDto));
+                    dayDto.setDate(new Date(dayDto.getDate().getTime() - 10800000)); // погрешность на три часа, связано с разными форматами хранения данных...
+                    long id = dataBase.dayDao().insert(MainActivity.getConverter().convertDtoToEntity(dayDto));
+                    if ( id == 6952) {
+                        Log.d("CHECK", "" + dayDto.getDate());
+                    }
                     if (dayDto.getTrainings() == null) dayDto.setTrainings(new ArrayList<>());
                     for (TrainingDto trainingDto : dayDto.getTrainings()) {
                         dataBase.trainingDao().insert(MainActivity.getConverter().convertDtoToEntity(trainingDto));

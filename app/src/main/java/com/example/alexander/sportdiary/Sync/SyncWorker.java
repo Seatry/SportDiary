@@ -65,6 +65,7 @@ public class SyncWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        Log.d("SYNC", "DO WORK");
         Data extras = getInputData();
         String table = extras.getString("table");
         String option = extras.getString("option");
