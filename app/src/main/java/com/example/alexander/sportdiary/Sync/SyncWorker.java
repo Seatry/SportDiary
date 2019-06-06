@@ -22,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import androidx.work.BackoffPolicy;
 import androidx.work.Data;
+import androidx.work.WorkContinuation;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import cz.msebera.android.httpclient.Consts;
@@ -65,7 +68,6 @@ public class SyncWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.d("SYNC", "DO WORK");
         Data extras = getInputData();
         String table = extras.getString("table");
         String option = extras.getString("option");

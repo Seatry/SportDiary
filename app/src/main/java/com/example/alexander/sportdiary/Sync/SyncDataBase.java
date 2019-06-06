@@ -159,9 +159,6 @@ public class SyncDataBase extends AsyncTask<String, Void, Void> {
                 for (DayDto dayDto : seasonPlanDto.getDays()) {
                     dayDto.setDate(new Date(dayDto.getDate().getTime() - 10800000)); // погрешность на три часа, связано с разными форматами хранения данных...
                     long id = dataBase.dayDao().insert(MainActivity.getConverter().convertDtoToEntity(dayDto));
-                    if ( id == 6952) {
-                        Log.d("CHECK", "" + dayDto.getDate());
-                    }
                     if (dayDto.getTrainings() == null) dayDto.setTrainings(new ArrayList<>());
                     for (TrainingDto trainingDto : dayDto.getTrainings()) {
                         dataBase.trainingDao().insert(MainActivity.getConverter().convertDtoToEntity(trainingDto));

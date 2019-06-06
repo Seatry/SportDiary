@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
@@ -214,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public static void syncSave(String data, String table) {
+        WorkManager.getInstance().pruneWork();
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED).build();
         Data inputData = new Data.Builder()
@@ -231,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public static void syncSeasonPlan(Long id, String table) {
+        WorkManager.getInstance().pruneWork();
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED).build();
         Data inputData = new Data.Builder()
@@ -248,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public static void syncDelete(Long id, String table) {
+        WorkManager.getInstance().pruneWork();
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED).build();
         Data inputData = new Data.Builder()
